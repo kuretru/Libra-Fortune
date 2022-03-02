@@ -1,61 +1,74 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.api.common.constant.code.ServiceErrorCodes;
+import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
-import com.kuretru.web.libra.entity.data.LedgerDO;
-import com.kuretru.web.libra.entity.data.SysUserDO;
 import com.kuretru.web.libra.entity.query.LedgerCategoryQuery;
-import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerCategoryDTO;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
-import com.kuretru.web.libra.entity.transfer.SysUserDTO;
 import com.kuretru.web.libra.mapper.LedgerCategoryMapper;
 import com.kuretru.web.libra.service.LedgerCategoryService;
 import com.kuretru.web.libra.service.LedgerService;
-import com.kuretru.web.libra.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
+
     private final LedgerService ledgerService;
-    private final SysUserService userService;
 
     @Autowired
-    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, LedgerService ledgerService, SysUserService userService) {
+    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, LedgerService ledgerService) {
         super(mapper, LedgerCategoryDO.class, LedgerCategoryDTO.class);
         this.ledgerService = ledgerService;
-        this.userService = userService;
     }
 
     @Override
     public synchronized LedgerCategoryDTO save(LedgerCategoryDTO record) throws ServiceException {
-        String ledgerId = record.getUserId();
-        if (ledgerService.get(UUID.fromString(ledgerId)) == null) {
-            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该账本不存在，不可操作");
-        }
-        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("name", record.getName());
-//        column 是表的列
-        queryWrapper.eq("ledger_id", record.getUserId());
-        if (get(queryWrapper) != null) {
-            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "产生了已存在的类，请重新修改名称后提交");
-        }
+        validDTO(record);
         return super.save(record);
     }
 
     @Override
-    public LedgerCategoryDTO get(QueryWrapper<LedgerCategoryDO> queryWrapper) {
-        LedgerCategoryDO record = mapper.selectOne(queryWrapper);
-        return doToDto(record);
+    public LedgerCategoryDTO update(LedgerCategoryDTO record) throws ServiceException {
+        validDTO(record);
+        return super.update(record);
     }
 
+    @Override
+    protected LedgerCategoryDTO doToDto(LedgerCategoryDO record) {
+        LedgerCategoryDTO result = super.doToDto(record);
+        if (result != null) {
+            result.setLedgerId(UUID.fromString(record.getLedgerId()));
+        }
+        return result;
+    }
+
+    @Override
+    protected LedgerCategoryDO dtoToDo(LedgerCategoryDTO record) {
+        LedgerCategoryDO result = super.dtoToDo(record);
+        if (result != null) {
+            result.setLedgerId(record.getLedgerId().toString());
+        }
+        return result;
+    }
+
+    private void validDTO(LedgerCategoryDTO record) throws ServiceException {
+        LedgerDTO ledgerDTO = ledgerService.get(record.getLedgerId());
+        if (ledgerDTO == null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
+        }
+        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger_id", record.getLedgerId().toString());
+        queryWrapper.eq("name", record.getName());
+        LedgerCategoryDO one = mapper.selectOne(queryWrapper);
+        if (one != null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.USER_REPEATED_REQUEST, "该账本下已存在该分类");
+        }
+    }
 
 }

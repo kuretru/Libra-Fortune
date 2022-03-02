@@ -1,0 +1,33 @@
+### get
+GET http://{{hostname}}/api/ledgers/categories/5bde749e-6b31-406f-ac42-8bba3fa21ebd
+Accept: application/json
+
+### list
+GET http://{{hostname}}/api/ledgers/categories/
+Accept: application/json
+
+### list by ledger_id
+GET http://{{hostname}}/api/ledgers/categories?ledger_id=16a2f3ad-7da7-4ed4-ae3a-e61ac3ced3c9
+Accept: application/json
+
+### create
+POST http://{{hostname}}/api/ledgers/categories/
+Content-Type: application/json
+
+{
+  "ledgerId": "bede9fc0-3094-49a5-b272-ebfdf9c7b718",
+  "name": "电费1"
+}
+
+### update
+PUT http://{{hostname}}/api/ledgers/categories/b331e230-cb78-4cc2-b2ca-db941e9d1636
+Content-Type: application/json
+
+{
+  "ledgerId": "bede9fc0-3094-49a5-b272-ebfdf9c7b718",
+  "name": "电费1"
+}
+
+### delete
+DELETE http://{{hostname}}/api/ledgers/categories/fc6d74f9-14c3-4c72-b9c4-323ccfd0263f
+Content-Type: application/json
