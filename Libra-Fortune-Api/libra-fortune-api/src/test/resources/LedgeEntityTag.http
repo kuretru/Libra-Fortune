@@ -1,0 +1,60 @@
+### entityid 存在，tagid 存在  属于同一用户 // 重复添加
+POST http://{{hostname}}/api/entity-tags
+Content-Type: application/json
+
+{
+  "entityId": "06a1cf9e-84a1-49a1-8852-44dbb8f2ce62",
+  "tagId": "0c1e5428-f1eb-41aa-95f0-b18d7f95dbe3"
+
+}
+
+
+### entityid 存在，tagid 存在   但是 不属于同一用户
+POST http://{{hostname}}/api/entity-tags
+Content-Type: application/json
+
+{
+  "entityId": "a8a90001-4554-47a8-bda2-c4cf558e8be3",
+  "tagId": "0c1e5428-f1eb-41aa-95f0-b18d7f95dbe3"
+
+}
+
+
+### entityid 不存在，tagid 存在
+POST http://{{hostname}}/api/entity-tags
+Content-Type: application/json
+
+{
+  "entityId": "06a1cf9e-84a1-49a1-8852-44d338f2ce62",
+  "tagId": "a27b229a-6b38-42c0-aae7-e9b22c360a78"
+
+}
+
+### entityid 存在，tagid 不存在
+POST http://{{hostname}}/api/entity-tags
+Content-Type: application/json
+
+{
+  "entityId": "06a1cf9e-84a1-49a1-8852-44dbb8f2ce62",
+  "tagId": "8e299758-cf57-4e0a-b381-44dbb8f2ce62"
+
+}
+
+### entityid 不存在，tagid 不存在
+POST http://{{hostname}}/api/entity-tags
+Content-Type: application/json
+
+{
+  "entityId": "06a1cf9e-84a1-49a1-8852-44d338f2ce62",
+  "tagId": "06a1cf9e-84a1-49a1-8852-44d338f2ce62"
+
+}
+
+### 获得某个账目的所有tag
+GET http://{{hostname}}/api/entity-tags?entity_id=a204fd0b-b1f2-4eba-ac60-1b03cafe311a
+Accept: application/json
+
+
+### 获得tag的所有账目
+GET http://{{hostname}}/api/entity-tags?tag_id=3342605b-faef-45a8-baa4-77f97d08aac7
+Accept: application/json

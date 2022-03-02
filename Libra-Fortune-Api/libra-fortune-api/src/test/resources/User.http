@@ -1,0 +1,15 @@
+POST http://{{hostname}}/api/user
+Content-Type: application/json
+
+{
+  "username": "wqzzzzz",
+  "password": "123456"
+}
+
+###
+GET http://{{hostname}}/api/user/a204fd0b-b1f2-4eba-ac60-1b03cafe311a
+Accept: application/json
+
+###
+GET http://{{hostname}}/api/user/eb90d5bf-fff2-414f-aceb-b732d003cde6
+Accept: application/json
