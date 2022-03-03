@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.api.common.constant.code.ServiceErrorCodes;
 import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
@@ -14,6 +15,7 @@ import com.kuretru.web.libra.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -26,6 +28,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         super(mapper, LedgerCategoryDO.class, LedgerCategoryDTO.class);
         this.ledgerService = ledgerService;
     }
+
 
     @Override
     protected LedgerCategoryDTO doToDto(LedgerCategoryDO record) {
@@ -51,6 +54,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         if (ledgerDTO == null) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
         }
+
         QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
         queryWrapper.eq("name", record.getName());
@@ -60,4 +64,25 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         }
     }
 
+
+    @Override
+    public LedgerCategoryDTO update(LedgerCategoryDTO record) throws ServiceException {
+        verifyDTO(record);
+        LedgerCategoryDO data = dtoToDo(record);
+        data.setUpdateTime(Instant.now());
+        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        //  该类别属不属于该账本
+        queryWrapper.eq("uuid", data.getUuid());
+        queryWrapper.eq("ledger_id", data.getLedgerId());
+        if (null == mapper.selectOne(queryWrapper)) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可修改其他账本的类别");
+        }
+        int rows = mapper.update(data, queryWrapper);
+        if (0 == rows) {
+            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定资源不存在");
+        } else if (1 != rows) {
+            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "发现多个相同业务主键");
+        }
+        return get(record.getId());
+    }
 }

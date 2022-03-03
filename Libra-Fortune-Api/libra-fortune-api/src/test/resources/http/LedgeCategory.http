@@ -10,22 +10,22 @@ Accept: application/json
 GET http://{{hostname}}/api/ledgers/categories?ledger_id=16a2f3ad-7da7-4ed4-ae3a-e61ac3ced3c9
 Accept: application/json
 
-### create
+### create  DTO UUID 问题 去掉uuid上的@size
 POST http://{{hostname}}/api/ledgers/categories/
 Content-Type: application/json
 
 {
-  "ledgerId": "bede9fc0-3094-49a5-b272-ebfdf9c7b718",
-  "name": "电费1"
+  "ledgerId": "16a2f3ad-7da7-4ed4-ae3a-e61ac3ced3c9",
+  "name": "学费"
 }
 
 ### update
-PUT http://{{hostname}}/api/ledgers/categories/b331e230-cb78-4cc2-b2ca-db941e9d1636
+PUT http://{{hostname}}/api/ledgers/categories/153260c6-2468-4538-8f6b-634c139b8f21
 Content-Type: application/json
 
 {
-  "ledgerId": "bede9fc0-3094-49a5-b272-ebfdf9c7b718",
-  "name": "电费1"
+  "ledgerId": "16a2f3ad-7da7-4ed4-ae3a-e61ac3ced3c9",
+  "name": "零花钱"
 }
 
 ### delete

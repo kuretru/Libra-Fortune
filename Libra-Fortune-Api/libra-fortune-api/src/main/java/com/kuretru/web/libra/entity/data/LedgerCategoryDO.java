@@ -16,10 +16,14 @@ import lombok.ToString;
 @TableName("ledger_category")
 public class LedgerCategoryDO extends BaseDO {
 
-    /** 属于哪个账本 */
+    /**
+     * 属于哪个账本
+     */
     private String ledgerId;
 
-    /** 大分类的名称 */
+    /**
+     * 大分类的名称
+     */
     private String name;
 
 }

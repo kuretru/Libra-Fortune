@@ -16,14 +16,26 @@ import lombok.ToString;
 @TableName("ledger_permission")
 public class LedgerPermissionDO extends BaseDO {
 
-    /** 哪个用户 */
+    /**
+     * 哪个用户
+     */
     private String userId;
 
-    /** 对哪个账本 */
+    /**
+     * 对哪个账本
+     */
     private String ledgerId;
 
-    /** 是否可修改这个账本 */
+    /**
+     * 是否可修改这个账本
+     */
     @TableField("is_writable")
     private Boolean writable;
+
+    /**
+     * 是否可读这个账本 逻辑删除
+     */
+    @TableField("is_readable")
+    private Boolean readable;
 
 }

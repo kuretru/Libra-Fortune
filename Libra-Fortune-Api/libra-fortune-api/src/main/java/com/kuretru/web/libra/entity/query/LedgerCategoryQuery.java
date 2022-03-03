@@ -8,10 +8,12 @@ import java.util.UUID;
 
 @Data
 public class LedgerCategoryQuery {
-
     private UUID ledgerId;
 
     @Size(max = 16)
     private String name;
 
+    public void setLedger_id(UUID ledgerId) {
+        this.ledgerId = ledgerId;
+    }
 }

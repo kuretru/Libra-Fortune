@@ -1,0 +1,97 @@
+### list
+GET http://{{hostname}}/api/ledger/entities
+Accept: application/json
+
+### select by id
+GET http://{{hostname}}/api/ledger/entities/a8a90001-4554-47a8-bda2-c4cf558e8be3
+Accept: application/json
+
+### select by ledger_id
+GET http://{{hostname}}/api/ledger/entities?ledger_id=bede9fc0-3094-49a5-b272-ebfdf9c7b718
+Accept: application/json
+
+### select by ledger_id and category_id
+GET http://{{hostname}}/api/ledger/entities?ledger_id=bede9fc0-3094-49a5-b272-ebfdf9c7b718&category_id=b331e230-cb78-4cc2-b2ca-db941e9d1636
+Accept: application/json
+
+### select by ledger_id and category_id and date
+GET http://{{hostname}}/api/ledger/entities?ledger_id=bede9fc0-3094-49a5-b272-ebfdf9c7b718&category_id=b331e230-cb78-4cc2-b2ca-db941e9d1636&date=2022-03-08
+Accept: application/json
+
+
+
+###  如何传递参数，如何接受参数
+
+### select by user_id
+GET http://{{hostname}}/api/ledger/entities/user?userId=a204fd0b-b1f2-4eba-ac60-1b03cafe311a
+Accept: application/json
+
+### select by tag_id
+GET http://{{hostname}}/api/ledger/entities/
+Accept: application/json
+
+### 增加  判断 category 与 ledger  service应该怎么写
+### ledgerId 不包含，categoryId
+POST http://{{hostname}}/api/ledger/entities/
+Content-Type: application/json
+
+{
+  "ledgerId": "2046d97b-c46a-44b4-b760-a2f618af98cc",
+  "categoryId": "b331e230-cb78-4cc2-b2ca-db941e9d1636",
+  "date": "2022-03-07",
+  "amount": 10,
+  "remark": "手抓饼"
+}
+
+### ledgerId 无效，categoryId 无效
+POST http://{{hostname}}/api/ledger/entities/
+Content-Type: application/json
+
+{
+  "ledgerId": "2044d97b-c46a-44b4-b760-a2f618af98cc",
+  "categoryId": "5bde889e-6b31-406f-ac42-8bba3fa21ebd",
+  "date": "2022-03-07",
+  "amount": 10,
+  "remark": "手抓饼"
+}
+
+### ledgerId 无效，categoryId 有效
+POST http://{{hostname}}/api/ledger/entities/
+Content-Type: application/json
+
+{
+  "ledgerId": "2044d97b-c46a-44b4-b760-a2f618af98cc",
+  "categoryId": "5bde749e-6b31-406f-ac42-8bba3fa21ebd",
+  "date": "2022-03-07",
+  "amount": 10,
+  "remark": "手抓饼"
+}
+
+
+### ledgerId 有效，categoryId 无效
+POST http://{{hostname}}/api/ledger/entities/
+Content-Type: application/json
+
+{
+  "ledgerId": "2046d97b-c46a-44b4-b760-a2f618af98cc",
+  "categoryId": "5bde889e-6b31-406f-ac42-8bba3fa21ebd",
+  "date": "2022-03-07",
+  "amount": 10,
+  "remark": "手抓饼"
+}
+
+### ledgerId 有效，categoryId 有效
+POST http://{{hostname}}/api/ledger/entities/
+Content-Type: application/json
+
+{
+  "ledgerId": "16a2f3ad-7da7-4ed4-ae3a-e61ac3ced3c9",
+  "categoryId": "4814677e-bac9-4c19-baca-1a35a4f3fbba",
+  "date": "2022-03-07",
+  "amount": -2000,
+  "remark": ""
+}
+
+
+
+

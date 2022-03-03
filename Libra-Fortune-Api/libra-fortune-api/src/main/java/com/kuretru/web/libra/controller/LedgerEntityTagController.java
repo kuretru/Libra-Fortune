@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/entity-tags")
+@RequestMapping("/api/entities-tags")
 public class LedgerEntityTagController extends BaseRestController<LedgerEntityTagService, LedgerEntityTagDTO, LedgerEntityTagQuery> {
 
     @Autowired

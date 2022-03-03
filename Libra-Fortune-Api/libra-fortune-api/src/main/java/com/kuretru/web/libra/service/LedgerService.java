@@ -11,13 +11,4 @@ import java.util.UUID;
 
 public interface LedgerService extends BaseService<LedgerDTO, LedgerQuery> {
 
-    /**
-     * 查询指定用户的所有可用账本
-     *
-     * @param userId 指定用户ID
-     * @return 所有可用账本
-     * @throws ServiceException 业务异常
-     */
-    List<LedgerDTO> list(UUID userId) throws ServiceException;
-
 }

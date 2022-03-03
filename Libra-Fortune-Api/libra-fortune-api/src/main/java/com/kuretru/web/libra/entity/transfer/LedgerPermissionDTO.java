@@ -23,4 +23,7 @@ public class LedgerPermissionDTO extends BaseDTO {
     @NotNull
     private Boolean writable;
 
+    @NotNull
+    private Boolean readable;
+
 }

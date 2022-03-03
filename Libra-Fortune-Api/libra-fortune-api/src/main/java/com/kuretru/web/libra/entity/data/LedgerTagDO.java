@@ -14,9 +14,13 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @TableName("ledger_tag")
 public class LedgerTagDO extends BaseDO {
-    /** 哪个用户 */
+    /**
+     * 哪个用户
+     */
     private String userId;
-    /** 标签名称 */
+    /**
+     * 标签名称
+     */
     private String name;
 
 }

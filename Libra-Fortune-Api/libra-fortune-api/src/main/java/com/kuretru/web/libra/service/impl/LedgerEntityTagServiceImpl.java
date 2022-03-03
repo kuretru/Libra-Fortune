@@ -39,27 +39,27 @@ public class LedgerEntityTagServiceImpl extends BaseServiceImpl<LedgerEntityTagM
         this.ledgerService = ledgerService;
     }
 
-    @Override
-    public synchronized LedgerEntityTagDTO save(LedgerEntityTagDTO record) throws ServiceException {
-        LedgerEntityDTO ledgerEntityTagDTO = entityService.get(UUID.fromString(record.getEntityId()));
-        LedgerTagDTO ledgerTagDTO = tagService.get(UUID.fromString(record.getTagId()));
-        if (ledgerEntityTagDTO == null || ledgerTagDTO == null) {
-            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该账目或该tag不存在，不可操作");
-        }
-//        entityid 存在，tagid 存在   但是 不属于同一用户
-        LedgerDTO ledgerDTO = ledgerService.get(UUID.fromString(ledgerEntityTagDTO.getLedgerId()));
-        if (ledgerDTO == null || !ledgerDTO.getUserId().equals(ledgerTagDTO.getUserId())) {
-            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该tag不属于该用户，不可操作");
-        }
-//        重复添加
-        QueryWrapper<LedgerEntityTagDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("tag_id", record.getTagId());
-        queryWrapper.eq("entity_id", record.getEntityId());
-        if (mapper.selectOne(queryWrapper) != null) {
-            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该tag已存在，不可重复添加");
-        }
-        return super.save(record);
-    }
+//    @Override
+//    public synchronized LedgerEntityTagDTO save(LedgerEntityTagDTO record) throws ServiceException {
+//        LedgerEntityDTO ledgerEntityTagDTO = entityService.get(UUID.fromString(record.getEntityId()));
+//        LedgerTagDTO ledgerTagDTO = tagService.get(UUID.fromString(record.getTagId()));
+//        if (ledgerEntityTagDTO == null || ledgerTagDTO == null) {
+//            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该账目或该tag不存在，不可操作");
+//        }
+////        entityid 存在，tagid 存在   但是 不属于同一用户
+//        LedgerDTO ledgerDTO = ledgerService.get(UUID.fromString(ledgerEntityTagDTO.getLedgerId()));
+//        if (ledgerDTO == null || !ledgerDTO.getUserId().equals(ledgerTagDTO.getUserId())) {
+//            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该tag不属于该用户，不可操作");
+//        }
+////        重复添加
+//        QueryWrapper<LedgerEntityTagDO> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("tag_id", record.getTagId());
+//        queryWrapper.eq("entity_id", record.getEntityId());
+//        if (mapper.selectOne(queryWrapper) != null) {
+//            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该tag已存在，不可重复添加");
+//        }
+//        return super.save(record);
+//    }
 
 
 }

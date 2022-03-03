@@ -1,0 +1,53 @@
+### list
+GET http://{{hostname}}/api/ledgers
+Accept: application/json
+
+### select by id
+GET http://{{hostname}}/api/ledgers/2046d97b-c46a-44b4-b760-a2f618af98cc
+Accept: application/json
+
+
+### list by user_id   controller 如何收取 user_id
+GET http://{{hostname}}/api/ledgers?user_id=a204fd0b-b1f2-4eba-ac60-1b03cafe311a
+Accept: application/json
+
+### 新建账本  controller 如何收取 user_id
+POST http://{{hostname}}/api/ledgers
+Content-Type: application/json
+
+{
+  "userId": "eb90d5bf-fff2-414f-aceb-b732d003cde6",
+  "name": "个人账本",
+  "remark": ""
+}
+
+### update   改账本名字  之前也要判断是否属于 user_id
+PUT http://{{hostname}}/api/ledgers/16a2f3ad-7da7-4ed4-ae3a-e61ac3ced3c9
+Content-Type: application/json
+
+{
+  "name": "卡比费",
+  "remark": ""
+}
+
+### update   改自己权限 需要userid
+PUT http://{{hostname}}/api/ledgers/153260c6-2468-4538-8f6b-634c139b8f21
+Content-Type: application/json
+
+{
+  "ledgerId": "2046d97b-c46a-44b4-b760-a2f618af98cc",
+  "name": "油费",
+  "remark": ""
+}
+
+### delete controller 如何收取 user_id
+DELETE http://{{hostname}}/api/ledgers/categories/fc6d74f9-14c3-4c72-b9c4-323ccfd0263f
+Content-Type: application/json
+
+
+
+
+
+
+
+
