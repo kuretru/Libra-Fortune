@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuretru.web.libra.mapper.LedgerMapper">
+
+    <select id="listByUserId" parameterType="java.lang.String" resultType="com.kuretru.web.libra.entity.data.LedgerDO">
+        SELECT l.id,
+               l.uuid,
+               l.create_time,
+               l.update_time,
+               l.`name`,
+               l.remark
+        FROM ledger l,
+             ledger_permission lp
+        WHERE l.uuid = lp.ledger_id
+          AND lp.user_id = '${userId}'
+    </select>
+
+</mapper>

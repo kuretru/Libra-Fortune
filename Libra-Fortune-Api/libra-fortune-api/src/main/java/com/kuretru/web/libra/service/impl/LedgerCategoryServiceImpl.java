@@ -28,18 +28,6 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     }
 
     @Override
-    public synchronized LedgerCategoryDTO save(LedgerCategoryDTO record) throws ServiceException {
-        validDTO(record);
-        return super.save(record);
-    }
-
-    @Override
-    public LedgerCategoryDTO update(LedgerCategoryDTO record) throws ServiceException {
-        validDTO(record);
-        return super.update(record);
-    }
-
-    @Override
     protected LedgerCategoryDTO doToDto(LedgerCategoryDO record) {
         LedgerCategoryDTO result = super.doToDto(record);
         if (result != null) {
@@ -57,7 +45,8 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         return result;
     }
 
-    private void validDTO(LedgerCategoryDTO record) throws ServiceException {
+    @Override
+    protected void verifyDTO(LedgerCategoryDTO record) throws ServiceException {
         LedgerDTO ledgerDTO = ledgerService.get(record.getLedgerId());
         if (ledgerDTO == null) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");

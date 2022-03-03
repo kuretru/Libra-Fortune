@@ -37,9 +37,9 @@ public class LedgerEntityServiceImpl extends BaseServiceImpl<LedgerEntityMapper,
 //        column 是表的列
         queryWrapper.eq("uuid", record.getCategoryId());
         queryWrapper.eq("ledger_id", record.getLedgerId());
-        if (ledgerCategoryService.get(queryWrapper) == null) {
-            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该类型不属于该账本，不可操作");
-        }
+//        if (ledgerCategoryService.get(queryWrapper) == null) {
+//            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "该类型不属于该账本，不可操作");
+//        }
         record.setAmount(record.getAmount() * 10000);
         return super.save(record);
     }

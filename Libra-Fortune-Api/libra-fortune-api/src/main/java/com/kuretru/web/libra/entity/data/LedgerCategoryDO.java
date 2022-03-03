@@ -8,7 +8,7 @@ import lombok.ToString;
 
 
 /**
- * 账目的主分类
+ * 账目分类表
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * 账本的访问修改权限
+ * 账本用户权限表
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -22,12 +22,8 @@ public class LedgerPermissionDO extends BaseDO {
     /** 对哪个账本 */
     private String ledgerId;
 
-    /** 可读 */
-    @TableField("is_readable")
-    private Integer readable;
-
-    /** 可改 */
+    /** 是否可修改这个账本 */
     @TableField("is_writable")
-    private Integer writable;
+    private Boolean writable;
 
 }
