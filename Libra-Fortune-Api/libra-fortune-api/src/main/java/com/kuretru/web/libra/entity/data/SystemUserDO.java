@@ -12,7 +12,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("sys_user")
+@TableName("system_user")
 public class SystemUserDO extends BaseDO {
 
     private String username;
@@ -23,4 +23,5 @@ public class SystemUserDO extends BaseDO {
 
     private String nickname;
 
+    private String avatar;
 }

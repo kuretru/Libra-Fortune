@@ -1,0 +1,29 @@
+### list
+GET http://{{hostname}}/api/system/user/
+Accept: application/json
+
+### select by id
+GET http://{{hostname}}/api/system/user/7d81ae4b-966b-42e0-951a-141ec9a83c21
+Accept: application/json
+
+###
+POST http://{{hostname}}/api/system/user
+Content-Type: application/json
+
+{
+  "username": "wzzzzzz",
+  "password": "123456",
+  "nickname": "",
+  "salt": "",
+  "avatar": ""
+}
+
+###
+PUT http://{{hostname}}/api/system/user/aa344606-e54f-4e36-a444-8711bd3a59df
+Content-Type: application/json
+
+{
+  "username": "wzzzzzz",
+  "password": "123456",
+  "nickname": "wzz23w"
+}

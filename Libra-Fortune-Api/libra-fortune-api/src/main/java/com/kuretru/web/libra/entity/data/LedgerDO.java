@@ -13,15 +13,19 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("system_user")
-public class SystemUserDO extends BaseDO {
+public class LedgerDO extends BaseDO {
 
-    private String username;
+    private String name;
 
-    private String password;
+    private String remark;
 
-    private String salt;
+    private String ownerId;
 
-    private String nickname;
+    // &8 = 8 -> 合作账本, &1 = 1 普通账本, &2 =2 理财账本
+    private Short type;
 
-    private String avatar;
+    public void setOwner_id(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
 }
