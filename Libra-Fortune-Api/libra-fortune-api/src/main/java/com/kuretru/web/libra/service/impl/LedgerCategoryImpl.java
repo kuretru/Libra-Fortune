@@ -82,7 +82,7 @@ public class LedgerCategoryImpl extends BaseServiceImpl<LedgerCategoryMapper, Le
 //        if ((existLedger.getType() & 8) == 8) {
 //            查询co_ledger_user ledger_id +userId + is_writable = 1;
 //            如果查不到报错
-//            if (coLedgerUserService.getLedgerPermission(ledger_id, userId, isWritable) == null) {
+//            if (coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, isWritable) == null) {
 //                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
 //            }
 //        }
@@ -117,7 +117,7 @@ public class LedgerCategoryImpl extends BaseServiceImpl<LedgerCategoryMapper, Le
 //        if ((existLedger.getType() & 8) == 8) {
 //            查询co_ledger_user ledger_id +userId + is_writable = 1;
 //            如果查不到报错
-//            if (coLedgerUserService.getLedgerPermission(ledger_id, userId, isWritable) == null) {
+//            if (coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, isWritable) == null) {
 //                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
 //            }
 //        }
