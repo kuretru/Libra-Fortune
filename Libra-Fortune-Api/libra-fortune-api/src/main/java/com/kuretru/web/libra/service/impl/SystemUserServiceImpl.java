@@ -1,7 +1,6 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.api.common.constant.code.ServiceErrorCodes;
 import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.manager.PasswordSaltManager;
@@ -14,7 +13,7 @@ import com.kuretru.web.libra.service.SystemUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.util.UUID;
 
 @Service
 public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, SystemUserDO, SystemUserDTO, SystemUserQuery> implements SystemUserService {
@@ -51,31 +50,24 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
 
     @Override
     public SystemUserDTO update(SystemUserDTO record) throws ServiceException {
+//        判断传过来的user是否存在
         SystemUserDTO user = get(record.getId());
-        if (user == null) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该用户不存在");
-        }
-        if (record.getUsername().equals("")) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户名不可为空");
-        }
+//        如果操作的不是当前账户  或  传过来的user不存在
+//        if (userId != record.getId() || user == null) {
+//            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
+//        }
         if (!user.getUsername().equals(record.getUsername())) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户名不可更改");
         }
-        if (!record.getPassword().equals("")) {
-            String salt = passwordSaltManager.generateSalt();
-            String password = passwordSaltManager.mixSalt(record.getPassword(), salt);
-            user.setSalt(salt);
-            user.setPassword(password);
-        }
-        SystemUserDO recordDo = dtoToDo(record);
-        recordDo.setUpdateTime(Instant.now());
-        QueryWrapper<SystemUserDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("uuid", recordDo.getUuid());
-        int rows = mapper.update(recordDo, queryWrapper);
-        if (0 == rows) {
-        } else if (1 != rows) {
-            throw new ServiceException.InternalServerError(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "发现多个相同业务主键");
-        }
-        return get(record.getId());
+        return super.update(record);
+    }
+
+    @Override
+    public void remove(UUID uuid) throws ServiceException {
+//        如果操作的不是当前账户
+//        if (userId != uuid) {
+//            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
+//        }
+        super.remove(uuid);
     }
 }

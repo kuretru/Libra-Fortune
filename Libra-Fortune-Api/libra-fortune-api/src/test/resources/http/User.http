@@ -13,17 +13,23 @@ Content-Type: application/json
 {
   "username": "wzzzzzz",
   "password": "123456",
-  "nickname": "",
+  "nickname": "1111",
   "salt": "",
   "avatar": ""
 }
 
 ###
-PUT http://{{hostname}}/api/system/user/aa344606-e54f-4e36-a444-8711bd3a59df
+PUT http://{{hostname}}/api/system/user/a087c0e3-2577-4a17-b435-7b12f7aa51e0
 Content-Type: application/json
 
 {
   "username": "wzzzzzz",
-  "password": "123456",
-  "nickname": "wzz23w"
+  "password": "905B3FBBA05BEA6F12C2C4CB47C8F03F7D3FE3755804525FFA5BCAC2750FF212",
+  "nickname": "wzz23w",
+  "salt": "36BCDAD823265C51C4DCA0E13C8E2533277BDE98C2384461A4919C4D5B50AF05",
+  "avatar": ""
 }
+
+### delete by id   (应该用不到）
+DELETE http://{{hostname}}/api/system/user/aa344606-e54f-4e36-a444-8711bd3a59df
+Accept: application/json
