@@ -35,8 +35,8 @@ public class LedgerEntryImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEn
 
     @Override
     public synchronized LedgerEntryDTO save(LedgerEntryDTO record) throws ServiceException {
-        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
         LedgerCategoryDTO existCategory = ledgerCategoryService.get(record.getCategoryId());

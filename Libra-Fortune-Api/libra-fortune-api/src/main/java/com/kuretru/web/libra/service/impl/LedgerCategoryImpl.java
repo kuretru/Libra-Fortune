@@ -36,7 +36,7 @@ public class LedgerCategoryImpl extends BaseServiceImpl<LedgerCategoryMapper, Le
 
     @Override
     public synchronized LedgerCategoryDTO save(LedgerCategoryDTO record) throws ServiceException {
-        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
 
 //        账本不存在或当前用户不存在
@@ -68,7 +68,7 @@ public class LedgerCategoryImpl extends BaseServiceImpl<LedgerCategoryMapper, Le
 
     @Override
     public LedgerCategoryDTO update(LedgerCategoryDTO record) throws ServiceException {
-        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
 //        账本不存在或当前用户不存在
         if (existLedger == null || userService.get(userId) == null) {

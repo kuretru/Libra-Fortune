@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/co/ledgers-entries")
+@RequestMapping("/co/ledgers-users")
 public class CoLedgerUserController extends BaseRestController<CoLedgerUserService, CoLedgerUserDTO, CoLedgerUserQuery> {
 
     @Autowired

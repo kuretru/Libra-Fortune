@@ -36,19 +36,23 @@ public class CoLedgerEntryImpl extends BaseServiceImpl<CoLedgeEntryMapper, CoLed
 
     @Override
     public synchronized CoLedgerEntryDTO save(CoLedgerEntryDTO record) throws ServiceException {
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         LedgerEntryDTO ledgerEntry = ledgerEntryService.get(record.getEntryId());
         if (ledgerEntry == null) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无此条目");
         }
         LedgerDTO ledger = ledgerService.get(ledgerEntry.getLedgerId());
         if (ledger.getType().equals(LedgerTypeEnum.CO_COMMON)) {
-            if (!coLedgerUserService.getLedgerPermission(ledgerEntry.getLedgerId(), userId, true)) {
-
+            if (!userId.equals(record.getUserId()) || !coLedgerUserService.getLedgerPermission(ledgerEntry.getLedgerId(), userId, true)) {
+                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
             }
+            record.setAmount(record.getAmount() * 10000);
+            record.setUserId(userId);
+            return super.save(record);
         }
-
-        return super.save(record);
+        return null;
     }
 
     @Override

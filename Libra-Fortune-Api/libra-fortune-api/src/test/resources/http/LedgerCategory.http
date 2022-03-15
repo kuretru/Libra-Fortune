@@ -11,8 +11,8 @@ POST http://{{hostname}}/api/ledger/categories
 Content-Type: application/json
 
 {
-  "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
-  "name": "col2"
+  "ledgerId": "70e2885b-bcdf-4b1c-9067-572b72fc2403",
+  "name": "70e111"
 }
 
 ###

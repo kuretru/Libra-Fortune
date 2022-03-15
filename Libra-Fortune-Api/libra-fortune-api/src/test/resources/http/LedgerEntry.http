@@ -11,10 +11,10 @@ POST http://{{hostname}}/api/ledger/common/entries
 Content-Type: application/json
 
 {
-  "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
-  "categoryId":"a9152f73-0c8e-46da-a760-099db130dbfd",
-  "date": "2020-03-15",
-  "amount": "30",
+  "ledgerId": "70e2885b-bcdf-4b1c-9067-572b72fc2403",
+  "categoryId":"9219cf0d-ab07-4b1a-95c8-6db40638037a",
+  "date": "2020-03-16",
+  "amount": "1000",
   "remark": ""
 }
 
