@@ -68,40 +68,39 @@ public class LedgerCategoryImpl extends BaseServiceImpl<LedgerCategoryMapper, Le
 
     @Override
     public LedgerCategoryDTO update(LedgerCategoryDTO record) throws ServiceException {
-//        判断当前userId存在
-//        if (systemUserService.get(userId) == null) {
-//            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
-//        }
+        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
+//        账本不存在或当前用户不存在
+        if (existLedger == null || userService.get(userId) == null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本不存在");
+        }
 
-//       判断账本大类存在
-//        if (get(record.getLedgerId()) == null) {
-//            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "大类不存在");
-//        }
-
-//       判断账本存在
-//        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
-//        if (existLedger == null) {
-//            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本不存在");
-//        }
-
-//        单人账本/理财账本：如果账本的拥有者不为当前用户
-//        if (((existLedger.getType() & 2) == 2 || (existLedger.getType() & 1) == 1) && existLedger.getOwnerId() != userId) {
-//            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-//        }
-
-//        多人账本：拥有者不为当前用户 或者当前用户的 is writable = 0
-//        if ((existLedger.getType() & 8) == 8) {
+        if (existLedger.getType().equals(LedgerTypeEnum.COMMON) || existLedger.getType().equals(LedgerTypeEnum.FINANCIAL)) {
+//        单人普通/理财账本：如果账本的拥有者不为当前用户
+            if (!existLedger.getOwnerId().equals(userId)) {
+                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            }
+        } else {
+//            如果是合作普通/理财账本 用coLedgerUserService
 //            查询co_ledger_user ledger_id +userId + is_writable = 1;
 //            如果查不到报错
-//            if (coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, isWritable) == null) {
-//                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-//            }
-//        }
+            if (!coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, true)) {
+                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            }
+        }
+        //        不可重复添加
+        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger_id", record.getLedgerId().toString());
+        queryWrapper.eq("name", record.getName());
+        if (mapper.exists(queryWrapper)) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复");
+        }
         return super.update(record);
     }
 
-    @Override
-    public void remove(UUID uuid) throws ServiceException {
+//    先不管了
+//    @Override
+//    public void remove(UUID uuid) throws ServiceException {
 //        判断当前userId存在
 //        if (systemUserService.get(userId) == null) {
 //            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
@@ -132,8 +131,8 @@ public class LedgerCategoryImpl extends BaseServiceImpl<LedgerCategoryMapper, Le
 //                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
 //            }
 //        }
-        super.remove(uuid);
-    }
+//        super.remove(uuid);
+//    }
 
     @Override
     protected LedgerCategoryDTO doToDto(LedgerCategoryDO record) {

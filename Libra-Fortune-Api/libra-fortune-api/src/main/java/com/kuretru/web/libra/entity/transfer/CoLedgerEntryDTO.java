@@ -6,28 +6,20 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.time.LocalDate;
 import java.util.UUID;
 
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class LedgerEntryDTO extends BaseDTO {
+public class CoLedgerEntryDTO extends BaseDTO {
     @NotNull
-    private UUID ledgerId;
+    private UUID entryId;
 
     @NotNull
-    private UUID categoryId;
-
-    @NotNull
-    private LocalDate date;
+    private UUID userId;
 
     @NotNull
     private Long amount;
 
-    @NotNull
-    @Size(max = 64)
-    private String remark;
 }

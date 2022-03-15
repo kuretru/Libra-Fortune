@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.LocalDate;
+
 /**
  *
  */
@@ -19,8 +21,7 @@ public class LedgerEntryDO extends BaseDO {
 
     private String categoryId;
 
-//    忘记是什么类型了 之后查一查
-    private String date;
+    private LocalDate date;
 
     private Long amount;
 

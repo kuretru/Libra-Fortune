@@ -1,5 +1,5 @@
 ### list
-GET http://{{hostname}}/api/ledger/categories
+GET http://{{hostname}}/api/ledger/common/entries
 Accept: application/json
 
 ### select by id
@@ -7,21 +7,27 @@ GET http://{{hostname}}/api/ledger/categories/a97b67b7-5792-4504-851d-9321fee23e
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/ledger/categories
+POST http://{{hostname}}/api/ledger/common/entries
 Content-Type: application/json
 
 {
   "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
-  "name": "col2"
+  "categoryId":"a9152f73-0c8e-46da-a760-099db130dbfd",
+  "date": "2020-03-15",
+  "amount": "30",
+  "remark": ""
 }
 
 ###
-PUT http://{{hostname}}/api/ledger/categories/4f3283a1-4d51-4218-8de2-99fae1912b3a
+PUT http://{{hostname}}/api/ledger/common/entries/03f5986a-60d2-4035-b097-d06e4869dfb9
 Content-Type: application/json
 
 {
   "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
-  "name": "coc"
+  "categoryId":"a9152f73-0c8e-46da-a760-099db130dbfd",
+  "date": "2020-03-16",
+  "amount": "50",
+  "remark": ""
 }
 
 ### delete by id  还没测试

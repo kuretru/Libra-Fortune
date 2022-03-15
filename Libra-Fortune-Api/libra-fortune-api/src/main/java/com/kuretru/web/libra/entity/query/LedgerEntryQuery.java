@@ -1,8 +1,10 @@
 package com.kuretru.web.libra.entity.query;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.UUID;
 
 
@@ -13,8 +15,8 @@ public class LedgerEntryQuery {
 
     private UUID categoryId;
 
-    //    忘记是什么类型了 之后查一查
-    private String date;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate date;
 
     private Long amount;
 
