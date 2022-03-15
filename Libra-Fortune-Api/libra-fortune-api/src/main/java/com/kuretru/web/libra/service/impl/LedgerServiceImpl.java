@@ -35,9 +35,7 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
     @Override
     public synchronized LedgerDTO save(LedgerDTO record) throws ServiceException {
 //        判断当前userId存在
-//        存在的
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        不存在的
 //        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e77a298e68");
         if (userService.get(userId) == null) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
