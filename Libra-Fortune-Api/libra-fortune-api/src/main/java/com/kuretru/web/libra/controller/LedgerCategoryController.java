@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/ledger/categories")
+@RequestMapping("/ledger/categories")
 public class LedgerCategoryController extends BaseRestController<LedgerCategoryService, LedgerCategoryDTO, LedgerCategoryQuery> {
 
     @Autowired

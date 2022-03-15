@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.entity.transfer;
 
 import com.kuretru.api.common.entity.transfer.BaseDTO;
+import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -23,7 +24,9 @@ public class LedgerDTO extends BaseDTO {
     private UUID ownerId;
 
     @NotNull
-    @Size(max = 64)
-    private Short type;
+    private String remark;
+
+    @NotNull
+    private LedgerTypeEnum type;
 
 }

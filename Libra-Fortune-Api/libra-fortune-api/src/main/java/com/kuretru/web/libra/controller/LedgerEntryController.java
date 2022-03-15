@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.controller;
 
 import com.kuretru.api.common.controller.BaseRestController;
+import com.kuretru.api.common.entity.ApiResponse;
+import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.web.libra.entity.query.LedgerEntryQuery;
 import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
@@ -12,11 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/ledger/entries")
+@RequestMapping("/ledger/entries")
 public class LedgerEntryController extends BaseRestController<LedgerEntryService, LedgerEntryDTO, LedgerEntryQuery> {
 
     @Autowired
     public LedgerEntryController(LedgerEntryService service) {
         super(service);
     }
+
 }

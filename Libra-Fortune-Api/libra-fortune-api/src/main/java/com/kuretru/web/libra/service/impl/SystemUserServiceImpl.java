@@ -47,6 +47,15 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
         return super.save(record);
     }
 
+    @Override
+    public SystemUserDTO get(UUID uuid)  {
+        //        如果操作的不是当前账户
+        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+        if (!userId.equals(uuid)) {
+//            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
+        }
+        return super.get(uuid);
+    }
 
     @Override
     public SystemUserDTO update(SystemUserDTO record) throws ServiceException {
@@ -65,9 +74,10 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
     @Override
     public void remove(UUID uuid) throws ServiceException {
 //        如果操作的不是当前账户
-//        if (userId != uuid) {
-//            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
-//        }
+        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a338e68");
+        if (userId != uuid) {
+            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
+        }
         super.remove(uuid);
     }
 }

@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.kuretru.api.common.constant.code.UserErrorCodes;
+import com.kuretru.api.common.context.AccessTokenContext;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerEntryDO;
@@ -31,6 +32,8 @@ public class LedgerEntryImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEn
 
     @Override
     public synchronized LedgerEntryDTO save(LedgerEntryDTO record) throws ServiceException {
+
+        UUID userId= AccessTokenContext.getUserId();
 //        判断当前userId存在
 //        if (systemUserService.get(userId) == null) {
 //            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");

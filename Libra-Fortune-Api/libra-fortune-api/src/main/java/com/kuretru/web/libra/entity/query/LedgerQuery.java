@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.entity.query;
 
+import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import lombok.Data;
 
 import javax.validation.constraints.Size;
@@ -14,5 +15,5 @@ public class LedgerQuery {
 
     private UUID ownerId;
 
-    private Short type;
+    private LedgerTypeEnum type;
 }

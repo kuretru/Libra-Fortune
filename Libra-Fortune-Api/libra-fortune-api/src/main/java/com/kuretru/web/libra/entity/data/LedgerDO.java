@@ -2,6 +2,7 @@ package com.kuretru.web.libra.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.kuretru.api.common.entity.data.BaseDO;
+import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

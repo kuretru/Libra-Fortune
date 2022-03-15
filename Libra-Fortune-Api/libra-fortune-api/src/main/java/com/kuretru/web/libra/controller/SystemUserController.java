@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/system/users")
+@RequestMapping("/system/users")
 public class SystemUserController extends BaseRestController<SystemUserService, SystemUserDTO, SystemUserQuery> {
 
     @Autowired
