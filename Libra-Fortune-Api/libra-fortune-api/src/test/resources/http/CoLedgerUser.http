@@ -1,0 +1,31 @@
+### list
+GET http://{{hostname}}/api/co/ledgers-users
+Accept: application/json
+
+### select by id
+GET http://{{hostname}}/api/ledgers/a97b67b7-5792-4504-851d-9321fee23eb4
+Accept: application/json
+
+###
+POST http://{{hostname}}/api/co/ledgers-users
+Content-Type: application/json
+
+{
+  "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
+  "userId": "a7f39ae9-8a75-4914-8737-3f6a979ebb92",
+  "isWritable": "false"
+}
+
+###
+PUT http://{{hostname}}/api/co/ledgers-users/9e80d409-b394-4677-be76-5ae82395d3d7
+Content-Type: application/json
+
+{
+  "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
+  "userId": "a087c0e3-2577-4a17-b435-7b12f7aa51e0",
+  "isWritable": "true"
+}
+
+### delete by id  还没测试
+DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+Accept: application/json

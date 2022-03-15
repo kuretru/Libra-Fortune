@@ -12,11 +12,13 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class LedgerCategoryDTO extends BaseDTO {
+public class CoLedgerUserDTO extends BaseDTO {
     @NotNull
     private UUID ledgerId;
 
     @NotNull
-    private String name;
+    private UUID userId;
 
+    @NotNull
+    private Boolean isWritable;
 }

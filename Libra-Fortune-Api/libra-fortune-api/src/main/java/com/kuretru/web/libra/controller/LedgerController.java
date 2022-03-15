@@ -16,4 +16,5 @@ public class LedgerController extends BaseRestController<LedgerService, LedgerDT
     public LedgerController(LedgerService service) {
         super(service);
     }
+
 }

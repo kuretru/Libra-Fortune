@@ -17,6 +17,17 @@ Content-Type: application/json
   "ownerId": "a087c0e3-2577-4a17-b435-7b12f7aa51e0"
 }
 
+### 合作账本
+POST http://{{hostname}}/api/ledgers
+Content-Type: application/json
+
+{
+  "name": "合作理财账本wz1qx1",
+  "remark": "123456",
+  "type": "1",
+  "ownerId": "a087c0e3-2577-4a17-b435-7b12f7aa51e0"
+}
+
 ###
 PUT http://{{hostname}}/api/ledgers/1a2d875c-6b22-446f-a418-06833117eab2
 Content-Type: application/json
@@ -25,6 +36,17 @@ Content-Type: application/json
   "name": "qx个人理财账本1",
   "remark": "123456",
   "type": "2",
+  "ownerId": "56ec2b77-857f-435c-a44f-f6e74a298e68"
+}
+
+### 合作账本修改
+PUT http://{{hostname}}/api/ledgers/53ae9625-dfd6-4f4f-ab1c-377d556f184f
+Content-Type: application/json
+
+{
+  "name": "合作账本2",
+  "remark": "123456",
+  "type": "1",
   "ownerId": "56ec2b77-857f-435c-a44f-f6e74a298e68"
 }
 

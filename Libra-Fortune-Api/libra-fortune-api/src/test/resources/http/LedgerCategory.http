@@ -1,0 +1,29 @@
+### list
+GET http://{{hostname}}/api/ledger/categories
+Accept: application/json
+
+### select by id
+GET http://{{hostname}}/api/ledger/categories/a97b67b7-5792-4504-851d-9321fee23eb4
+Accept: application/json
+
+###
+POST http://{{hostname}}/api/ledger/categories
+Content-Type: application/json
+
+{
+  "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
+  "name": "col2"
+}
+
+###
+PUT http://{{hostname}}/api/ledger/categories/ac6571b1-e6fa-4b26-9e02-1b7b6a777c32
+Content-Type: application/json
+
+{
+  "ledgerId": "76779bfc-9b52-464f-ba7a-a7fb6fa29925",
+  "name": "personQX1"
+}
+
+### delete by id  还没测试
+DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+Accept: application/json
