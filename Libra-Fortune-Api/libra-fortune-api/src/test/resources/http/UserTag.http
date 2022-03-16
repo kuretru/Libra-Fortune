@@ -7,25 +7,21 @@ GET http://{{hostname}}/api/ledgers/a97b67b7-5792-4504-851d-9321fee23eb4
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/ledgers
+POST http://{{hostname}}/api/user/tags
 Content-Type: application/json
 
 {
-  "name": "个人账本wz1",
-  "remark": "123456",
-  "type": "2",
-  "ownerId": "a087c0e3-2577-4a17-b435-7b12f7aa51e0"
+  "userId": "56ec2b77-857f-435c-a44f-f6e74a298e68",
+  "name": "56ec tag3"
 }
 
-### 合作账本
-POST http://{{hostname}}/api/ledgers
+###
+PUT http://{{hostname}}/api/user/tags/87058ef5-e20f-49b9-8276-d7d807467d20
 Content-Type: application/json
 
 {
-  "name": "合作理财账本2",
-  "remark": "123456",
-  "type": "3",
-  "ownerId": "a087c0e3-2577-4a17-b435-7b12f7aa51e0"
+  "userId": "a7f39ae9-8a75-4914-8737-3f6a979ebb92",
+  "name": "a7f3 tag1"
 }
 
 ###

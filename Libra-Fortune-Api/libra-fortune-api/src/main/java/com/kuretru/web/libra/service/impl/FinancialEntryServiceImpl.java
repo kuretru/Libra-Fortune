@@ -20,13 +20,13 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class FinancialEntryImpl extends BaseServiceImpl<FinancialEntryMapper, FinancialEntryDO, FinancialEntryDTO, FinancialEntryQuery> implements FinancialEntryService {
+public class FinancialEntryServiceImpl extends BaseServiceImpl<FinancialEntryMapper, FinancialEntryDO, FinancialEntryDTO, FinancialEntryQuery> implements FinancialEntryService {
     private final LedgerService ledgerService;
     private final SystemUserService systemUserService;
     private final CoLedgerUserService coLedgerUserService;
 
     @Autowired
-    public FinancialEntryImpl(FinancialEntryMapper mapper, LedgerService ledgerService, SystemUserService systemUserService, CoLedgerUserService coLedgerUserService) {
+    public FinancialEntryServiceImpl(FinancialEntryMapper mapper, LedgerService ledgerService, SystemUserService systemUserService, CoLedgerUserService coLedgerUserService) {
         super(mapper, FinancialEntryDO.class, FinancialEntryDTO.class, FinancialEntryQuery.class);
         this.ledgerService = ledgerService;
         this.systemUserService = systemUserService;

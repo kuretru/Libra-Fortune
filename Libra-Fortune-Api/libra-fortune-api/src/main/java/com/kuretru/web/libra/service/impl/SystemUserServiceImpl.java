@@ -33,7 +33,7 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户名不可为空");
         }
         queryWrapper.eq("username", record.getUsername());
-        if (mapper.selectOne(queryWrapper) != null) {
+        if (mapper.exists(queryWrapper)) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该用户名已存在");
         }
         String salt = passwordSaltManager.generateSalt();

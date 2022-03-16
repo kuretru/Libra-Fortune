@@ -1,5 +1,5 @@
 ### list
-GET http://{{hostname}}/api/ledgers
+GET http://{{hostname}}/api/entry/tags/93f473ff-7eae-45ae-b979-a068ef78cabb
 Accept: application/json
 
 ### select by id
@@ -7,21 +7,21 @@ GET http://{{hostname}}/api/ledgers/a97b67b7-5792-4504-851d-9321fee23eb4
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/user/tags
+POST http://{{hostname}}/api/entry/tags
 Content-Type: application/json
 
 {
-  "userId": "56ec2b77-857f-435c-a44f-f6e74a298e68",
-  "name": "56ec tag3"
+  "entryId": "03f5986a-60d2-4035-b097-d06e4869dfb9",
+  "tagId": "fdf3bb17-b9d9-4c6d-af39-e3affcda24d6"
 }
 
 ###
-PUT http://{{hostname}}/api/user/tags/87058ef5-e20f-49b9-8276-d7d807467d20
+PUT http://{{hostname}}/api/entry/tags/93f473ff-7eae-45ae-b979-a068ef78cabb
 Content-Type: application/json
 
 {
-  "userId": "a7f39ae9-8a75-4914-8737-3f6a979ebb92",
-  "name": "a7f3 tag1"
+  "entryId": "69c265f2-f9a3-4e81-b701-d4df76e82cdb",
+  "tagId": "87058ef5-e20f-49b9-8276-d7d807467d20"
 }
 
 ###

@@ -1,19 +1,19 @@
 package com.kuretru.web.libra.controller;
 
 import com.kuretru.api.common.controller.BaseRestController;
-import com.kuretru.web.libra.entity.query.UserTagQuery;
-import com.kuretru.web.libra.entity.transfer.UserTagDTO;
-import com.kuretru.web.libra.service.UserTagService;
+import com.kuretru.web.libra.entity.query.EntryTagQuery;
+import com.kuretru.web.libra.entity.transfer.EntryTagDTO;
+import com.kuretru.web.libra.service.EntryTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/tags")
-public class UserTagController extends BaseRestController<UserTagService, UserTagDTO, UserTagQuery> {
+@RequestMapping("/entry/tags")
+public class EntryTagController extends BaseRestController<EntryTagService, EntryTagDTO, EntryTagQuery> {
 
     @Autowired
-    public UserTagController(UserTagService service) {
+    public EntryTagController(EntryTagService service) {
         super(service);
     }
 

@@ -1,9 +1,11 @@
 package com.kuretru.web.libra.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.CoLedgerEntryDO;
+import com.kuretru.web.libra.entity.data.EntryTagDO;
 import com.kuretru.web.libra.entity.query.CoLedgerEntryQuery;
 import com.kuretru.web.libra.entity.transfer.CoLedgerEntryDTO;
 import com.kuretru.web.libra.entity.transfer.FinancialEntryDTO;
@@ -17,17 +19,15 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class CoLedgerEntryImpl extends BaseServiceImpl<CoLedgeEntryMapper, CoLedgerEntryDO, CoLedgerEntryDTO, CoLedgerEntryQuery> implements CoLedgerEntryService {
+public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper, CoLedgerEntryDO, CoLedgerEntryDTO, CoLedgerEntryQuery> implements CoLedgerEntryService {
     private final LedgerEntryService ledgerEntryService;
-    private final LedgerService ledgerService;
     private final CoLedgerUserService coLedgerUserService;
     private final FinancialEntryService financialEntryService;
 
     @Autowired
-    public CoLedgerEntryImpl(CoLedgeEntryMapper mapper, LedgerEntryService ledgerEntryService, LedgerService ledgerService, CoLedgerUserService coLedgerUserService, FinancialEntryService financialEntryService) {
+    public CoLedgerEntryServiceImpl(CoLedgeEntryMapper mapper, LedgerEntryService ledgerEntryService,CoLedgerUserService coLedgerUserService, FinancialEntryService financialEntryService) {
         super(mapper, CoLedgerEntryDO.class, CoLedgerEntryDTO.class, CoLedgerEntryQuery.class);
         this.ledgerEntryService = ledgerEntryService;
-        this.ledgerService = ledgerService;
         this.coLedgerUserService = coLedgerUserService;
         this.financialEntryService = financialEntryService;
     }
@@ -117,5 +117,13 @@ public class CoLedgerEntryImpl extends BaseServiceImpl<CoLedgeEntryMapper, CoLed
         result.setEntryId(record.getEntryId().toString());
         result.setUserId(record.getUserId().toString());
         return result;
+    }
+
+    @Override
+    public Boolean getCoLedgerEntryExist(UUID userId, UUID entryId) {
+        QueryWrapper<CoLedgerEntryDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId.toString());
+        queryWrapper.eq("entry_id", entryId.toString());
+        return mapper.exists(queryWrapper);
     }
 }

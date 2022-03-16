@@ -21,13 +21,13 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class LedgerCategoryImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
+public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
     private final SystemUserService userService;
     private final LedgerService ledgerService;
     private final CoLedgerUserService coLedgerUserService;
 
     @Autowired
-    public LedgerCategoryImpl(LedgerCategoryMapper mapper, SystemUserService userService, LedgerService ledgerService, CoLedgerUserService coLedgerUserService) {
+    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, SystemUserService userService, LedgerService ledgerService, CoLedgerUserService coLedgerUserService) {
         super(mapper, LedgerCategoryDO.class, LedgerCategoryDTO.class, LedgerCategoryQuery.class);
         this.userService = userService;
         this.ledgerService = ledgerService;

@@ -6,33 +6,21 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.time.LocalDate;
-
 /**
  *
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("ledger_entry")
-public class LedgerEntryDO extends BaseDO {
+@TableName("user_tag")
+public class UserTagDO extends BaseDO {
 
-    private String ledgerId;
+    private String userId;
 
-    private String categoryId;
+    private String name;
 
-    private LocalDate date;
-
-    private Long amount;
-
-    private String remark;
-
-    public void setLedger_id(String ledgerId) {
-        this.ledgerId = ledgerId;
-    }
-
-    public void setCategory_id(String categoryId) {
-        this.categoryId = categoryId;
+    public void setUser_id(String userId) {
+        this.userId = userId;
     }
 
 }

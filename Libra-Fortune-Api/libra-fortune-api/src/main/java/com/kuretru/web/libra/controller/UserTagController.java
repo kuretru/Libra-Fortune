@@ -1,19 +1,19 @@
 package com.kuretru.web.libra.controller;
 
 import com.kuretru.api.common.controller.BaseRestController;
-import com.kuretru.web.libra.entity.query.CoLedgerEntryQuery;
-import com.kuretru.web.libra.entity.transfer.CoLedgerEntryDTO;
-import com.kuretru.web.libra.service.CoLedgerEntryService;
+import com.kuretru.web.libra.entity.query.UserTagQuery;
+import com.kuretru.web.libra.entity.transfer.UserTagDTO;
+import com.kuretru.web.libra.service.UserTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/co/ledgers-entries")
-public class CoLedgerEntryController extends BaseRestController<CoLedgerEntryService, CoLedgerEntryDTO, CoLedgerEntryQuery> {
+@RequestMapping("/user/tags")
+public class UserTagController extends BaseRestController<UserTagService, UserTagDTO, UserTagQuery> {
 
     @Autowired
-    public CoLedgerEntryController(CoLedgerEntryService service) {
+    public UserTagController(UserTagService service) {
         super(service);
     }
 

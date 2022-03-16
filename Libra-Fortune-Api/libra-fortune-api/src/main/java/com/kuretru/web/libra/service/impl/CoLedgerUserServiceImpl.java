@@ -23,12 +23,12 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Service
-public class CoLedgerUserImpl extends BaseServiceImpl<CoLedgerUserMapper, CoLedgerUserDO, CoLedgerUserDTO, CoLedgerUserQuery> implements CoLedgerUserService {
+public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper, CoLedgerUserDO, CoLedgerUserDTO, CoLedgerUserQuery> implements CoLedgerUserService {
     private final SystemUserService userService;
     private final LedgerService ledgerService;
 
     @Autowired
-    public CoLedgerUserImpl(CoLedgerUserMapper mapper, SystemUserService userService, @Lazy LedgerService ledgerService) {
+    public CoLedgerUserServiceImpl(CoLedgerUserMapper mapper, SystemUserService userService, @Lazy LedgerService ledgerService) {
         super(mapper, CoLedgerUserDO.class, CoLedgerUserDTO.class, CoLedgerUserQuery.class);
         this.userService = userService;
         this.ledgerService = ledgerService;

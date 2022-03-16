@@ -18,14 +18,14 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class LedgerEntryImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEntryDO, LedgerEntryDTO, LedgerEntryQuery> implements LedgerEntryService {
+public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEntryDO, LedgerEntryDTO, LedgerEntryQuery> implements LedgerEntryService {
     private final LedgerService ledgerService;
     private final LedgerCategoryService ledgerCategoryService;
     private final SystemUserService systemUserService;
     private final CoLedgerUserService coLedgerUserService;
 
     @Autowired
-    public LedgerEntryImpl(LedgerEntryMapper mapper, LedgerService ledgerService, LedgerCategoryService ledgerCategoryService, SystemUserService systemUserService, CoLedgerUserService coLedgerUserService) {
+    public LedgerEntryServiceImpl(LedgerEntryMapper mapper, LedgerService ledgerService, LedgerCategoryService ledgerCategoryService, SystemUserService systemUserService, CoLedgerUserService coLedgerUserService) {
         super(mapper, LedgerEntryDO.class, LedgerEntryDTO.class, LedgerEntryQuery.class);
         this.ledgerService = ledgerService;
         this.ledgerCategoryService = ledgerCategoryService;

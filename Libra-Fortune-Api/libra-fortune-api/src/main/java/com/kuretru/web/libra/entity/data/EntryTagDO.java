@@ -12,15 +12,19 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("user_tag")
-public class UserTagDO extends BaseDO {
+@TableName("entry_tag")
+public class EntryTagDO extends BaseDO {
 
-    private String userId;
+    private String entryId;
 
-    private String name;
+    private String tagId;
 
-    public void setUser_id(String userId) {
-        this.userId = userId;
+    public void setEntry_id(String entryId) {
+        this.entryId = entryId;
+    }
+
+    public void setTag_id(String tagId) {
+        this.tagId = tagId;
     }
 
 }
