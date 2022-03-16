@@ -11,9 +11,9 @@ POST http://{{hostname}}/api/ledger/financial/entries
 Content-Type: application/json
 
 {
-  "ledgerId": "d8a28a6e-b184-4fcf-96ff-b1b28183c9f5",
+  "ledgerId": "7b5315a5-54ac-44bd-9a23-a6f6fcf61372",
   "date": "2020-03-16",
-  "amount": "10",
+  "amount": "69",
   "remark": ""
 }
 
