@@ -14,12 +14,10 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("ledger_entry")
-public class LedgerEntryDO extends BaseDO {
+@TableName("financial_entry")
+public class FinancialEntryDO extends BaseDO {
 
     private String ledgerId;
-
-    private String categoryId;
 
     private LocalDate date;
 
@@ -31,8 +29,5 @@ public class LedgerEntryDO extends BaseDO {
         this.ledgerId = ledgerId;
     }
 
-    public void setCategory_id(String categoryId) {
-        this.categoryId = categoryId;
-    }
 
 }

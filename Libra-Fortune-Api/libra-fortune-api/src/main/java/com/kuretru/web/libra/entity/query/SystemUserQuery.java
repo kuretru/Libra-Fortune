@@ -1,6 +1,5 @@
 package com.kuretru.web.libra.entity.query;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.Size;

@@ -17,13 +17,13 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{hostname}}/api/co/ledgers-entries/9e80d409-b394-4677-be76-5ae82395d3d7
+PUT http://{{hostname}}/api/co/ledgers-entries/9489591a-7f69-4498-9c26-d2b091b55b97
 Content-Type: application/json
 
 {
-  "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
-  "userId": "a087c0e3-2577-4a17-b435-7b12f7aa51e0",
-  "isWritable": "true"
+  "entryId": "03f5986a-60d2-4035-b097-d06e4869dfb9",
+  "userId": "56ec2b77-857f-435c-a44f-f6e74a298e68",
+  "amount": "20"
 }
 
 ### delete by id  还没测试

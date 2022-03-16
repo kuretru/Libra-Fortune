@@ -41,7 +41,7 @@ public class CoLedgerUserImpl extends BaseServiceImpl<CoLedgerUserMapper, CoLedg
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
         LedgerDTO ledgerRecord = ledgerService.get(record.getLedgerId());
         SystemUserDTO userRecord = userService.get(record.getUserId());
-        if (userRecord == null || ledgerRecord == null || !ledgerRecord.getOwnerId().equals(userId) ) {
+        if (userRecord == null || ledgerRecord == null || !ledgerRecord.getOwnerId().equals(userId)) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户无权限");
         }
         QueryWrapper<CoLedgerUserDO> queryWrapper = new QueryWrapper<>();

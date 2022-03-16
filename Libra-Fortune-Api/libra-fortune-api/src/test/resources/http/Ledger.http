@@ -22,9 +22,9 @@ POST http://{{hostname}}/api/ledgers
 Content-Type: application/json
 
 {
-  "name": "合作账本2",
+  "name": "合作理财账本2",
   "remark": "123456",
-  "type": "1",
+  "type": "3",
   "ownerId": "a087c0e3-2577-4a17-b435-7b12f7aa51e0"
 }
 

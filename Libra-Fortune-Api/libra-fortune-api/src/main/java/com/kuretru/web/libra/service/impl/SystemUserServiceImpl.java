@@ -48,7 +48,7 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
     }
 
     @Override
-    public SystemUserDTO get(UUID uuid)  {
+    public SystemUserDTO get(UUID uuid) {
         //        如果操作的不是当前账户
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
         if (!userId.equals(uuid)) {

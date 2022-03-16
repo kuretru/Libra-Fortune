@@ -8,11 +8,9 @@ import java.util.UUID;
 
 
 @Data
-public class LedgerEntryQuery {
+public class FinancialEntryQuery {
 
     private UUID ledgerId;
-
-    private UUID categoryId;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate date;
