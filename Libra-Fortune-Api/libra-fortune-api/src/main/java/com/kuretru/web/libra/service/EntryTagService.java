@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface EntryTagService extends BaseService<EntryTagDTO, EntryTagQuery> {
     boolean getUserEntryPermission(UUID userId, UUID entryId) throws ServiceException.BadRequest;
 
+    void deleteByTagId(UUID id);
 }

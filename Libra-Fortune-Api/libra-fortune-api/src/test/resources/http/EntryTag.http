@@ -11,41 +11,12 @@ POST http://{{hostname}}/api/entries/{{entryId}}/tags/{{tagId}}/
 Content-Type: application/json
 
 {
-  "entryId": "a8a35dfb-7486-4ab2-9119-d6fe754933ba",
+  "entryId": "491344cf-c021-48af-bb9d-077c47f81fa0",
   "tagId": "ef25a9e0-3d7f-4230-b01d-ed54fe48e34a"
 }
 
-###
-PUT http://{{hostname}}/api/entries/{{entryId}}/tags/{{tagId}}/8051a517-30a9-4ed7-9467-bf294706a6fa
-Content-Type: application/json
-
-{
-  "entryId": "69c265f2-f9a3-4e81-b701-d4df76e82cdb",
-  "tagId": "87058ef5-e20f-49b9-8276-d7d807467d20"
-}
-
-###
-PUT http://{{hostname}}/api/ledgers/1a2d875c-6b22-446f-a418-06833117eab2
-Content-Type: application/json
-
-{
-  "name": "qx个人理财账本1",
-  "remark": "123456",
-  "type": "1",
-  "ownerId": "56ec2b77-857f-435c-a44f-f6e74a298e68"
-}
-
-### 合作账本修改
-PUT http://{{hostname}}/api/ledgers/53ae9625-dfd6-4f4f-ab1c-377d556f184f
-Content-Type: application/json
-
-{
-  "name": "合作账本2",
-  "remark": "123456",
-  "type": "1",
-  "ownerId": "56ec2b77-857f-435c-a44f-f6e74a298e68"
-}
+### 没有PUT方法！！！！！！不许更新！！！ 加就是加 删就是删
 
 ### delete by id  还没测试
-DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+DELETE http://{{hostname}}/api/entries/{{entryId}}/tags/{{tagId}}/68a79ceb-1188-4a7b-8a77-13d0fb6ed8d1
 Accept: application/json

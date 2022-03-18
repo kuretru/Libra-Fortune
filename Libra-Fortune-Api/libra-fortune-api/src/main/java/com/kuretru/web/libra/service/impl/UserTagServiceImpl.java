@@ -8,19 +8,22 @@ import com.kuretru.web.libra.entity.data.UserTagDO;
 import com.kuretru.web.libra.entity.query.UserTagQuery;
 import com.kuretru.web.libra.entity.transfer.UserTagDTO;
 import com.kuretru.web.libra.mapper.UserTagMapper;
+import com.kuretru.web.libra.service.EntryTagService;
 import com.kuretru.web.libra.service.UserTagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
 public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO, UserTagDTO, UserTagQuery> implements UserTagService {
-
+    private final EntryTagService entryTagService;
     @Autowired
-    public UserTagServiceImpl(UserTagMapper mapper) {
+    public UserTagServiceImpl(UserTagMapper mapper, @Lazy EntryTagService entryTagService) {
         super(mapper, UserTagDO.class, UserTagDTO.class, UserTagQuery.class);
 
+        this.entryTagService = entryTagService;
     }
 
     public synchronized UserTagDTO save(UserTagDTO record) throws ServiceException {
@@ -73,6 +76,24 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
         return super.update(record);
     }
 
+    @Override
+    public void remove(UUID uuid) throws ServiceException {
+                UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UserTagDTO oldUserTagDTO = get(uuid);
+        if (oldUserTagDTO == null) {
+            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "找不到该Tag");
+        }
+
+        //      Tag 用户不为当前登录用户
+        if (!userId.equals(oldUserTagDTO.getUserId())) {
+            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
+        }
+
+        super.remove(uuid);
+        entryTagService.deleteByTagId(uuid);
+    }
 
     @Override
     protected UserTagDTO doToDto(UserTagDO record) {

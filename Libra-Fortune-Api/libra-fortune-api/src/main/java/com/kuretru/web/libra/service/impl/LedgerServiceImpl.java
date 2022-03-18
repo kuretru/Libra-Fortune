@@ -42,7 +42,7 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
         }
         record.setOwnerId(userId);
         LedgerDTO ledgerDTO = super.save(record);
-//        如果是合作账本 去coLedgerUserService账本那边
+//        如果是合作账本 去coLedgerUserService账本那边再加一条
         if (record.getType().equals(LedgerTypeEnum.CO_COMMON) || record.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
             CoLedgerUserDTO coLedgerUserDTO = new CoLedgerUserDTO();
             coLedgerUserDTO.setLedgerId(ledgerDTO.getId());

@@ -7,11 +7,11 @@ GET http://{{hostname}}/api/ledger/categories/a97b67b7-5792-4504-851d-9321fee23e
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/ledgers/{ledgerId}/categories/{categoryId}/common/entries
+POST http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/{{categoryId}}/common/entries
 Content-Type: application/json
 
 {
-  "ledgerId": "70e2885b-bcdf-4b1c-9067-572b72fc2403",
+  "ledgerId":"fad79d78-a744-414b-b784-3d2247453af2",
   "categoryId":"9219cf0d-ab07-4b1a-95c8-6db40638037a",
   "date": "2020-03-16",
   "amount": "100000",
@@ -19,17 +19,17 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{hostname}}/api/ledgers/{ledgerId}/categories/{categoryId}/common/entries/03f5986a-60d2-4035-b097-d06e4869dfb9
+PUT http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/{{categoryId}}/common/entries/70a1d1af-ce23-42b6-869a-23bfdd36ebeb
 Content-Type: application/json
 
 {
-  "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
-  "categoryId":"a9152f73-0c8e-46da-a760-099db130dbfd",
+  "ledgerId": "7b5315a5-54ac-44bd-9a23-a6f6fcf61372",
+  "categoryId":"9219cf0d-ab07-4b1a-95c8-6db40638037a",
   "date": "2020-03-16",
   "amount": "50",
   "remark": ""
 }
 
 ### delete by id  还没测试
-DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+DELETE http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/{{categoryId}}/common/entries/66663975-c10c-4063-9c00-2d35dfd2a095
 Accept: application/json

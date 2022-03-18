@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user/tags")
+@RequestMapping("/users/tags")
 public class UserTagController extends BaseRestController<UserTagService, UserTagDTO, UserTagQuery> {
 
     @Autowired

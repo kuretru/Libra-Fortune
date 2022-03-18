@@ -7,23 +7,23 @@ GET http://{{hostname}}/api/ledger/categories/a97b67b7-5792-4504-851d-9321fee23e
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/ledgers/{ledgerId}/categories
+POST http://{{hostname}}/api/ledgers/{{ledgerId}}/categories
 Content-Type: application/json
 
 {
-  "ledgerId": "70e2885b-bcdf-4b1c-9067-572b72fc2403",
-  "name": "70e111"
+  "ledgerId": "7b5315a5-54ac-44bd-9a23-a6f6fcf61372",
+  "name": "70e123"
 }
 
 ###
-PUT http://{{hostname}}/api/ledgers/{ledgerId}/categories/4f3283a1-4d51-4218-8de2-99fae1912b3a
+PUT http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/4f3283a1-4d51-4218-8de2-99fae1912b3a
 Content-Type: application/json
 
 {
   "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",
-  "name": "coc"
+  "name": "coc33"
 }
 
 ### delete by id  还没测试
-DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+DELETE http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/9219cf0d-ab07-4b1a-95c8-6db40638037a
 Accept: application/json

@@ -16,36 +16,15 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{hostname}}/api/user/tags/87058ef5-e20f-49b9-8276-d7d807467d20
+PUT http://{{hostname}}/api/users/tags/fdf3bb17-b9d9-4c6d-af39-e3affcda24d6
 Content-Type: application/json
 
 {
-  "userId": "a7f39ae9-8a75-4914-8737-3f6a979ebb92",
-  "name": "a7f3 tag1"
+  "userId": "56ec2b77-857f-435c-a44f-f6e74a298e68",
+  "name": "56ec2 tag1"
 }
 
-###
-PUT http://{{hostname}}/api/ledgers/1a2d875c-6b22-446f-a418-06833117eab2
-Content-Type: application/json
 
-{
-  "name": "qx个人理财账本1",
-  "remark": "123456",
-  "type": "1",
-  "ownerId": "56ec2b77-857f-435c-a44f-f6e74a298e68"
-}
-
-### 合作账本修改
-PUT http://{{hostname}}/api/ledgers/53ae9625-dfd6-4f4f-ab1c-377d556f184f
-Content-Type: application/json
-
-{
-  "name": "合作账本2",
-  "remark": "123456",
-  "type": "1",
-  "ownerId": "56ec2b77-857f-435c-a44f-f6e74a298e68"
-}
-
-### delete by id  还没测试
-DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+### delete by id  / entry 对应的 tag也会删除
+DELETE http://{{hostname}}/api/users/tags/87058ef5-e20f-49b9-8276-d7d807467d20
 Accept: application/json

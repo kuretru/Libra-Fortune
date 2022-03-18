@@ -5,7 +5,6 @@ import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.CoLedgerEntryDO;
-import com.kuretru.web.libra.entity.data.EntryTagDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.CoLedgerEntryQuery;
 import com.kuretru.web.libra.entity.transfer.CoLedgerEntryDTO;
@@ -37,14 +36,14 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
 
     @Override
     public CoLedgerEntryDTO save(String ledgerId, CoLedgerEntryDTO record) throws ServiceException {
-        //        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         //        是否重复
         QueryWrapper<CoLedgerEntryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("entry_id", record.getEntryId().toString());
-        queryWrapper.eq("user_id", record.getUserId().toString());
-        if(mapper.exists(queryWrapper)){
+        queryWrapper.eq("user_id", userId.toString());
+        if (mapper.exists(queryWrapper)) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
         }
 
@@ -63,9 +62,7 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
             if (!ledgerEntry.getLedgerId().toString().equals(ledgerId)) {
                 throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目的ledgerId与url上的ledgerId不同");
             }
-        }
-
-        if (existLedger.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
+        } else if (existLedger.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
 //            去查entryId 对应的 ledgerEntry
             FinancialEntryDTO financialEntry = financialEntryService.get(record.getEntryId());
 //            如果查到的ledgerEntry的账本和传过来的账本id不同
@@ -87,10 +84,12 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
     }
 
 
+
+
     @Override
     public CoLedgerEntryDTO update(CoLedgerEntryDTO record) throws ServiceException {
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         CoLedgerEntryDTO oldCoLedgerEntry = get(record.getId());
         if (oldCoLedgerEntry == null) {
@@ -114,10 +113,43 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
         return super.update(record);
     }
 
-//    @Override
-//    public void remove(UUID uuid) throws ServiceException {
-//        super.remove(uuid);
-//    }
+    @Override
+    public void remove(UUID uuid) throws ServiceException {
+//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        CoLedgerEntryDTO oldCoLedgerEntry = get(uuid);
+        if (oldCoLedgerEntry == null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "寻找的合作条目不存在");
+        }
+
+        LedgerEntryDTO ledgerEntry = ledgerEntryService.get(oldCoLedgerEntry.getEntryId());
+        FinancialEntryDTO financialEntry = null;
+
+        if (ledgerEntry == null) {
+            financialEntry = financialEntryService.get(oldCoLedgerEntry.getEntryId());
+        }
+
+        if (!userId.equals(oldCoLedgerEntry.getUserId()) || !coLedgerUserService.getLedgerPermission(ledgerEntry == null ? financialEntry.getLedgerId() : ledgerEntry.getLedgerId(), userId, true)) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+        }
+        super.remove(uuid);
+    }
+
+    @Override
+    public void deleteByEntryId(UUID tagId) {
+        QueryWrapper<CoLedgerEntryDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("entry_id", tagId.toString());
+        mapper.delete(queryWrapper);
+    }
+
+    @Override
+    public Boolean getCoLedgerEntryExist(UUID userId, UUID entryId) {
+        QueryWrapper<CoLedgerEntryDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId.toString());
+        queryWrapper.eq("entry_id", entryId.toString());
+        return mapper.exists(queryWrapper);
+    }
 
     @Override
     protected CoLedgerEntryDTO doToDto(CoLedgerEntryDO record) {
@@ -137,14 +169,6 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
             result.setUserId(record.getUserId().toString());
         }
         return result;
-    }
-
-    @Override
-    public Boolean getCoLedgerEntryExist(UUID userId, UUID entryId) {
-        QueryWrapper<CoLedgerEntryDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId.toString());
-        queryWrapper.eq("entry_id", entryId.toString());
-        return mapper.exists(queryWrapper);
     }
 
 

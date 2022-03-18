@@ -7,27 +7,27 @@ GET http://{{hostname}}/api/ledger/categories/a97b67b7-5792-4504-851d-9321fee23e
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/ledgers/{ledgerId}/financial/entries
-Content-Type: application/json
-
-{
-  "ledgerId": "7b5315a5-54ac-44bd-9a23-a6f6fcf61372",
-  "date": "2020-03-16",
-  "amount": "69",
-  "remark": ""
-}
-
-###
-PUT http://{{hostname}}/api/ledgers/{ledgerId}/financial/entries/a8a35dfb-7486-4ab2-9119-d6fe754933ba
+POST http://{{hostname}}/api/ledgers/{{ledgerId}}/financial/entries
 Content-Type: application/json
 
 {
   "ledgerId": "1a2d875c-6b22-446f-a418-06833117eab2",
   "date": "2020-03-16",
-  "amount": "10",
+  "amount": "6900000",
+  "remark": ""
+}
+
+###
+PUT http://{{hostname}}/api/ledgers/{{ledgerId}}/financial/entries/e802fb3b-6cb3-4367-83ed-df319b14e043
+Content-Type: application/json
+
+{
+  "ledgerId": "1a2d875c-6b22-446f-a418-06833117eab2",
+  "date": "2020-03-16",
+  "amount": "99999",
   "remark": ""
 }
 
 ### delete by id  还没测试
-DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+DELETE http://{{hostname}}/api/ledgers/{{ledgerId}}/financial/entries/c2e2feb8-9469-4070-975a-cab16b0f8d31
 Accept: application/json

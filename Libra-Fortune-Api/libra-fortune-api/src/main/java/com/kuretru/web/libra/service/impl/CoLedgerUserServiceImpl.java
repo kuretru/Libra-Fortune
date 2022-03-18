@@ -34,7 +34,9 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
      * 给合作账本添加合作人
      */
     public synchronized CoLedgerUserDTO save(CoLedgerUserDTO record) throws ServiceException {
+//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
         if (existLedger == null || !existLedger.getOwnerId().equals(userId)) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "ledger不存在/user无权添加");

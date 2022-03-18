@@ -11,4 +11,7 @@ public interface CoLedgerEntryService extends BaseService<CoLedgerEntryDTO, CoLe
     Boolean getCoLedgerEntryExist(UUID userId, UUID entryId);
 
     CoLedgerEntryDTO save(String ledgerId, CoLedgerEntryDTO record) throws ServiceException;
+
+    void deleteByEntryId(UUID uuid);
+
 }

@@ -1,13 +1,5 @@
-### list
-GET http://{{hostname}}/api/co/ledgers-users
-Accept: application/json
-
-### select by id
-GET http://{{hostname}}/api/ledgers/a97b67b7-5792-4504-851d-9321fee23eb4
-Accept: application/json
-
 ###
-POST http://{{hostname}}/api/co-ledgers/{ledgerId}/users/
+POST http://{{hostname}}/api/co-ledgers/{{ledgerId}}/users/
 Content-Type: application/json
 
 {
@@ -17,7 +9,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{hostname}}/api/co-ledgers/{ledgerId}/users/9e80d409-b394-4677-be76-5ae82395d3d7
+PUT http://{{hostname}}/api/co-ledgers/{{ledgerId}}/users/9e80d409-b394-4677-be76-5ae82395d3d7
 Content-Type: application/json
 
 {
@@ -27,5 +19,5 @@ Content-Type: application/json
 }
 
 ### delete by id  还没测试
-DELETE http://{{hostname}}/api/system/users/aa344606-e54f-4e36-a444-8711bd3a59df
+DELETE http://{{hostname}}/api/co-ledgers/{{ledgerId}}/users/aa344606-e54f-4e36-a444-8711bd3a59df
 Accept: application/json
