@@ -11,7 +11,6 @@ import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.entity.transfer.LedgerEntryDTO;
 import com.kuretru.web.libra.mapper.LedgerEntryMapper;
 import com.kuretru.web.libra.service.*;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,15 +39,15 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
         LedgerCategoryDTO existCategory = ledgerCategoryService.get(record.getCategoryId());
-        if (systemUserService.get(userId) == null || existLedger == null || existCategory == null) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不存在");
+        if (existLedger == null || existCategory == null) {
+            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本/大类不存在");
         }
 
 //       账本大类属于该账本
         if (!existCategory.getLedgerId().equals(existLedger.getId())) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不存在此类");
+            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在此类");
         }
-        record.setAmount(record.getAmount() * 10000);
+
 //        个人普通账本/合作普通账本：如果账本的拥有者不为当前用户
         if (existLedger.getType().equals(LedgerTypeEnum.COMMON)) {
             if (!existLedger.getOwnerId().equals(userId)) {
@@ -69,23 +68,24 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 //        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
-        LedgerEntryDTO exist = get(record.getId());
-//       判断账目存在
-        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
-        LedgerCategoryDTO existCategory = ledgerCategoryService.get(record.getCategoryId());
-//        账户不存在， 当前用户不存在 大类不存在，大类不属于该账本
-        if (exist == null || systemUserService.get(userId) == null || existCategory == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+        LedgerEntryDTO oldRecord = get(record.getId());
+        LedgerCategoryDTO newCategory = ledgerCategoryService.get(record.getCategoryId());
+        if (oldRecord == null || newCategory == null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账目/大类不存在");
         }
 
-        if (!existCategory.getLedgerId().equals(existLedger.getId())) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不存在此类");
-        }
 
-        if (!exist.getLedgerId().equals(record.getLedgerId())) {
+        if (!oldRecord.getLedgerId().equals(record.getLedgerId())) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "属于账本不可变");
         }
-        record.setAmount(record.getAmount() * 10000);
+
+//        大类不属于该账本
+        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
+        if (!newCategory.getLedgerId().equals(existLedger.getId())) {
+            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在此类");
+        }
+
+
         if (existLedger.getType().equals(LedgerTypeEnum.COMMON)) {
             if (!existLedger.getOwnerId().equals(userId)) {
                 throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
@@ -132,29 +132,21 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 
     @Override
     protected LedgerEntryDTO doToDto(LedgerEntryDO record) {
-        if (record == null) {
-            return null;
+        LedgerEntryDTO result = super.doToDto(record);
+        if (record != null) {
+            result.setCategoryId(UUID.fromString(record.getCategoryId()));
+            result.setLedgerId(UUID.fromString(record.getLedgerId()));
         }
-        LedgerEntryDTO result = buildDTOInstance();
-        BeanUtils.copyProperties(record, result);
-        result.setId(UUID.fromString(record.getUuid()));
-        result.setCategoryId(UUID.fromString(record.getCategoryId()));
-        result.setLedgerId(UUID.fromString(record.getLedgerId()));
         return result;
     }
 
     @Override
     protected LedgerEntryDO dtoToDo(LedgerEntryDTO record) {
-        if (record == null) {
-            return null;
+        LedgerEntryDO result = super.dtoToDo(record);
+        if (result != null) {
+            result.setLedgerId(record.getLedgerId().toString());
+            result.setCategoryId(record.getCategoryId().toString());
         }
-        LedgerEntryDO result = buildDOInstance();
-        BeanUtils.copyProperties(record, result);
-        if (record.getId() != null) {
-            result.setUuid(record.getId().toString());
-        }
-        result.setLedgerId(record.getLedgerId().toString());
-        result.setCategoryId(record.getCategoryId().toString());
         return result;
     }
 }

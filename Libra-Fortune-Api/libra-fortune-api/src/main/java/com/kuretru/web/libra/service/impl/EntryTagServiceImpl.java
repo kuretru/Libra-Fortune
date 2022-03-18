@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
+import com.kuretru.web.libra.entity.data.CoLedgerUserDO;
 import com.kuretru.web.libra.entity.data.EntryTagDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.EntryTagQuery;
@@ -34,19 +35,22 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
         this.coLedgerEntryService = coLedgerEntryService;
     }
 
+
+
     @Override
     public synchronized EntryTagDTO save(EntryTagDTO record) throws ServiceException {
 //        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
 //        查看是否有权限添加tag
         if (!getUserEntryPermission(userId, record.getEntryId())) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权限添加");
         }
-//                    有权限 查看entryId 与tagId是否重复
+//                    有权限 查看userId 是否有tagId
         if (!userTagService.userExistTag(userId, record.getTagId())) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该用户没有该Tag");
         }
+//        是否重复
         QueryWrapper<EntryTagDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("entry_id", record.getEntryId().toString());
         queryWrapper.eq("tag_id", record.getTagId().toString());
@@ -61,15 +65,15 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
 //        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
 //        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
         UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
-        EntryTagDTO existRecord = get(record.getId());
-        if (existRecord == null) {
+        EntryTagDTO oldRecord = get(record.getId());
+        if (oldRecord == null) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "记录不存在");
         }
-        if (!existRecord.getEntryId().equals(record.getEntryId())) {
+        if (!oldRecord.getEntryId().equals(record.getEntryId())) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可修改entryId");
         }
 //        查看是否有权限修改tag
-        UserTagDTO userTag = userTagService.get(existRecord.getTagId());
+        UserTagDTO userTag = userTagService.get(oldRecord.getTagId());
         if (!getUserEntryPermission(userId, record.getEntryId()) || !userTag.getUserId().equals(userId)) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权限修改");
         }
@@ -112,31 +116,25 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
         return false;
     }
 
+
+
     @Override
     protected EntryTagDTO doToDto(EntryTagDO record) {
-        if (record == null) {
-            return null;
+        EntryTagDTO result = super.doToDto(record);
+        if (record != null) {
+            result.setEntryId(UUID.fromString(record.getEntryId()));
+            result.setTagId(UUID.fromString(record.getTagId()));
         }
-        EntryTagDTO result = buildDTOInstance();
-        BeanUtils.copyProperties(record, result);
-        result.setId(UUID.fromString(record.getUuid()));
-        result.setEntryId(UUID.fromString(record.getEntryId()));
-        result.setTagId(UUID.fromString(record.getTagId()));
         return result;
     }
 
     @Override
     protected EntryTagDO dtoToDo(EntryTagDTO record) {
-        if (record == null) {
-            return null;
+        EntryTagDO result = super.dtoToDo(record);
+        if (result != null) {
+            result.setEntryId(record.getEntryId().toString());
+            result.setTagId(record.getTagId().toString());
         }
-        EntryTagDO result = buildDOInstance();
-        BeanUtils.copyProperties(record, result);
-        if (record.getId() != null) {
-            result.setUuid(record.getId().toString());
-        }
-        result.setEntryId(record.getEntryId().toString());
-        result.setTagId(record.getTagId().toString());
         return result;
     }
 }

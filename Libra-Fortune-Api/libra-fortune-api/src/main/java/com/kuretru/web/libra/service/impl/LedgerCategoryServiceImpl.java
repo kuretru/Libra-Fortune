@@ -13,8 +13,6 @@ import com.kuretru.web.libra.mapper.LedgerCategoryMapper;
 import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerCategoryService;
 import com.kuretru.web.libra.service.LedgerService;
-import com.kuretru.web.libra.service.SystemUserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,14 +20,12 @@ import java.util.UUID;
 
 @Service
 public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
-    private final SystemUserService userService;
     private final LedgerService ledgerService;
     private final CoLedgerUserService coLedgerUserService;
 
     @Autowired
-    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, SystemUserService userService, LedgerService ledgerService, CoLedgerUserService coLedgerUserService) {
+    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, LedgerService ledgerService, CoLedgerUserService coLedgerUserService) {
         super(mapper, LedgerCategoryDO.class, LedgerCategoryDTO.class, LedgerCategoryQuery.class);
-        this.userService = userService;
         this.ledgerService = ledgerService;
         this.coLedgerUserService = coLedgerUserService;
     }
@@ -38,10 +34,8 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     public synchronized LedgerCategoryDTO save(LedgerCategoryDTO record) throws ServiceException {
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
-
-//        账本不存在或当前用户不存在
-        if (existLedger == null || userService.get(userId) == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本不存在");
+        if (existLedger == null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "ledger不存在");
         }
 //        不可重复添加
         QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
@@ -50,6 +44,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         if (mapper.exists(queryWrapper)) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
         }
+
         if (existLedger.getType().equals(LedgerTypeEnum.COMMON) || existLedger.getType().equals(LedgerTypeEnum.FINANCIAL)) {
 //        单人普通/理财账本：如果账本的拥有者不为当前用户
             if (!existLedger.getOwnerId().equals(userId)) {
@@ -69,12 +64,17 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     @Override
     public LedgerCategoryDTO update(LedgerCategoryDTO record) throws ServiceException {
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
-//        账本不存在或当前用户不存在
-        if (existLedger == null || userService.get(userId) == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本不存在");
+        LedgerCategoryDTO oldRecord = get(record.getId());
+        if (oldRecord == null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定LedgerCategory不存在");
         }
 
+        if (!record.getLedgerId().equals(oldRecord.getLedgerId())) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可修改ledgerId");
+        }
+        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
+
+//        查看账本是否是合作账本
         if (existLedger.getType().equals(LedgerTypeEnum.COMMON) || existLedger.getType().equals(LedgerTypeEnum.FINANCIAL)) {
 //        单人普通/理财账本：如果账本的拥有者不为当前用户
             if (!existLedger.getOwnerId().equals(userId)) {
@@ -136,27 +136,19 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
 
     @Override
     protected LedgerCategoryDTO doToDto(LedgerCategoryDO record) {
-        if (record == null) {
-            return null;
+        LedgerCategoryDTO result = super.doToDto(record);
+        if (record != null) {
+            result.setLedgerId(UUID.fromString(record.getLedgerId()));
         }
-        LedgerCategoryDTO result = buildDTOInstance();
-        BeanUtils.copyProperties(record, result);
-        result.setId(UUID.fromString(record.getUuid()));
-        result.setLedgerId(UUID.fromString(record.getLedgerId()));
         return result;
     }
 
     @Override
     protected LedgerCategoryDO dtoToDo(LedgerCategoryDTO record) {
-        if (record == null) {
-            return null;
+        LedgerCategoryDO result = super.dtoToDo(record);
+        if (result != null) {
+            result.setLedgerId(record.getLedgerId().toString());
         }
-        LedgerCategoryDO result = buildDOInstance();
-        BeanUtils.copyProperties(record, result);
-        if (record.getId() != null) {
-            result.setUuid(record.getId().toString());
-        }
-        result.setLedgerId(record.getLedgerId().toString());
         return result;
     }
 }

@@ -7,19 +7,19 @@ GET http://{{hostname}}/api/ledger/categories/a97b67b7-5792-4504-851d-9321fee23e
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/ledger/common/entries
+POST http://{{hostname}}/api/ledgers/{ledgerId}/categories/{categoryId}/common/entries
 Content-Type: application/json
 
 {
   "ledgerId": "70e2885b-bcdf-4b1c-9067-572b72fc2403",
   "categoryId":"9219cf0d-ab07-4b1a-95c8-6db40638037a",
   "date": "2020-03-16",
-  "amount": "1000",
+  "amount": "100000",
   "remark": ""
 }
 
 ###
-PUT http://{{hostname}}/api/ledger/common/entries/03f5986a-60d2-4035-b097-d06e4869dfb9
+PUT http://{{hostname}}/api/ledgers/{ledgerId}/categories/{categoryId}/common/entries/03f5986a-60d2-4035-b097-d06e4869dfb9
 Content-Type: application/json
 
 {

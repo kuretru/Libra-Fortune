@@ -7,7 +7,7 @@ GET http://{{hostname}}/api/ledger/categories/a97b67b7-5792-4504-851d-9321fee23e
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/ledger/financial/entries
+POST http://{{hostname}}/api/ledgers/{ledgerId}/financial/entries
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{hostname}}/api/ledger/financial/entries/a8a35dfb-7486-4ab2-9119-d6fe754933ba
+PUT http://{{hostname}}/api/ledgers/{ledgerId}/financial/entries/a8a35dfb-7486-4ab2-9119-d6fe754933ba
 Content-Type: application/json
 
 {

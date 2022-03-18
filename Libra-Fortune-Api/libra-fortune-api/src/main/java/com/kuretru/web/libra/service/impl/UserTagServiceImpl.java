@@ -6,12 +6,9 @@ import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.UserTagDO;
 import com.kuretru.web.libra.entity.query.UserTagQuery;
-import com.kuretru.web.libra.entity.transfer.SystemUserDTO;
 import com.kuretru.web.libra.entity.transfer.UserTagDTO;
 import com.kuretru.web.libra.mapper.UserTagMapper;
-import com.kuretru.web.libra.service.SystemUserService;
 import com.kuretru.web.libra.service.UserTagService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +16,10 @@ import java.util.UUID;
 
 @Service
 public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO, UserTagDTO, UserTagQuery> implements UserTagService {
-    private final SystemUserService systemUserService;
-
 
     @Autowired
-    public UserTagServiceImpl(UserTagMapper mapper, SystemUserService systemUserService) {
+    public UserTagServiceImpl(UserTagMapper mapper) {
         super(mapper, UserTagDO.class, UserTagDTO.class, UserTagQuery.class);
-        this.systemUserService = systemUserService;
 
     }
 
@@ -36,13 +30,11 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
         if (!userId.equals(record.getUserId())) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
         }
-        SystemUserDTO existUser = systemUserService.get(record.getUserId());
-        if (existUser == null) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
-        }
+
         if (record.getName().equals("")) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "Tag不可为空");
         }
+
         QueryWrapper<UserTagDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", record.getName());
         if (mapper.exists(queryWrapper)) {
@@ -58,8 +50,9 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
         UserTagDTO oldUserTagDTO = get(record.getId());
         if (oldUserTagDTO == null) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "找不到该Tag");
-
         }
+
+        //      Tag 用户不为当前登录用户
         if (!userId.equals(oldUserTagDTO.getUserId())) {
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
         }
@@ -68,13 +61,10 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
             throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可更该用户");
         }
 
-        SystemUserDTO existUser = systemUserService.get(record.getUserId());
-        if (existUser == null) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
-        }
         if (record.getName().equals("")) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "Tag不可为空");
         }
+
         QueryWrapper<UserTagDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", record.getName());
         if (mapper.exists(queryWrapper)) {
@@ -86,27 +76,19 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
 
     @Override
     protected UserTagDTO doToDto(UserTagDO record) {
-        if (record == null) {
-            return null;
+        UserTagDTO result = super.doToDto(record);
+        if (record != null) {
+            result.setUserId(UUID.fromString(record.getUserId()));
         }
-        UserTagDTO result = buildDTOInstance();
-        BeanUtils.copyProperties(record, result);
-        result.setId(UUID.fromString(record.getUuid()));
-        result.setUserId(UUID.fromString(record.getUserId()));
         return result;
     }
 
     @Override
     protected UserTagDO dtoToDo(UserTagDTO record) {
-        if (record == null) {
-            return null;
+        UserTagDO result = super.dtoToDo(record);
+        if (result != null) {
+            result.setUserId(record.getUserId().toString());
         }
-        UserTagDO result = buildDOInstance();
-        BeanUtils.copyProperties(record, result);
-        if (record.getId() != null) {
-            result.setUuid(record.getId().toString());
-        }
-        result.setUserId(record.getUserId().toString());
         return result;
     }
 

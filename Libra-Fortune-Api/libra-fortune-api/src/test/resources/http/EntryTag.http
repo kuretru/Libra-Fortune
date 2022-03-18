@@ -7,16 +7,16 @@ GET http://{{hostname}}/api/ledgers/a97b67b7-5792-4504-851d-9321fee23eb4
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/entry/tags
+POST http://{{hostname}}/api/entries/{{entryId}}/tags/{{tagId}}/
 Content-Type: application/json
 
 {
-  "entryId": "03f5986a-60d2-4035-b097-d06e4869dfb9",
-  "tagId": "fdf3bb17-b9d9-4c6d-af39-e3affcda24d6"
+  "entryId": "a8a35dfb-7486-4ab2-9119-d6fe754933ba",
+  "tagId": "ef25a9e0-3d7f-4230-b01d-ed54fe48e34a"
 }
 
 ###
-PUT http://{{hostname}}/api/entry/tags/93f473ff-7eae-45ae-b979-a068ef78cabb
+PUT http://{{hostname}}/api/entries/{{entryId}}/tags/{{tagId}}/8051a517-30a9-4ed7-9467-bf294706a6fa
 Content-Type: application/json
 
 {

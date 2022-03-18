@@ -7,7 +7,7 @@ GET http://{{hostname}}/api/ledgers/a97b67b7-5792-4504-851d-9321fee23eb4
 Accept: application/json
 
 ###
-POST http://{{hostname}}/api/co/ledgers-entries
+POST http://{{hostname}}/api/co-ledgers/{ledgerId}/entries/{entryId}
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://{{hostname}}/api/co/ledgers-entries/9489591a-7f69-4498-9c26-d2b091b55b97
+PUT http://{{hostname}}/api/co-ledgers/{ledgerId}/entries/{entryId}/9489591a-7f69-4498-9c26-d2b091b55b97
 Content-Type: application/json
 
 {
