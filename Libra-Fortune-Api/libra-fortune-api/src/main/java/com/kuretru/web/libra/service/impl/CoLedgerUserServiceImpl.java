@@ -11,7 +11,6 @@ import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.mapper.CoLedgerUserMapper;
 import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerService;
-import com.kuretru.web.libra.service.SystemUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -20,13 +19,11 @@ import java.util.UUID;
 
 @Service
 public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper, CoLedgerUserDO, CoLedgerUserDTO, CoLedgerUserQuery> implements CoLedgerUserService {
-    private final SystemUserService userService;
     private final LedgerService ledgerService;
 
     @Autowired
-    public CoLedgerUserServiceImpl(CoLedgerUserMapper mapper, SystemUserService userService, @Lazy LedgerService ledgerService) {
+    public CoLedgerUserServiceImpl(CoLedgerUserMapper mapper, @Lazy LedgerService ledgerService) {
         super(mapper, CoLedgerUserDO.class, CoLedgerUserDTO.class, CoLedgerUserQuery.class);
-        this.userService = userService;
         this.ledgerService = ledgerService;
     }
 
@@ -44,7 +41,7 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         QueryWrapper<CoLedgerUserDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
         queryWrapper.eq("user_id", record.getUserId().toString());
-        if (!list(queryWrapper).isEmpty()) {
+        if (mapper.exists(queryWrapper)) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
         }
         return super.save(record);
@@ -52,8 +49,9 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
 
     @Override
     public CoLedgerUserDTO update(CoLedgerUserDTO record) throws ServiceException {
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         CoLedgerUserDTO oldRecord = get(record.getId());
 //        这条记录不存在
         if (oldRecord == null) {
@@ -61,18 +59,44 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         }
 //        这条记录账本的ownerId才可以更新合作人信息
         LedgerDTO ledger = ledgerService.get(record.getLedgerId());
+
         if (!ledger.getOwnerId().equals(userId)) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权修改");
         }
 //        owner不要更改自己的权限
         if (ledger.getOwnerId().equals(record.getUserId())) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不要更改自己的权限");
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "owner不要更改自己的权限");
         }
 //        更改了这条记录的ledgerId/userId
         if (!oldRecord.getLedgerId().equals(record.getLedgerId()) || !oldRecord.getUserId().equals(record.getUserId())) {
             throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可修改ledgerId和userId");
         }
         return super.update(record);
+    }
+
+    @Override
+    public void remove(UUID uuid) throws ServiceException {
+        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
+//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        CoLedgerUserDTO oldRecord = get(uuid);
+//        这条记录不存在
+        if (oldRecord == null) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该记录不存在");
+        }
+        LedgerDTO ledger = ledgerService.get(oldRecord.getLedgerId());
+
+//        owner不要删除自己
+        if (ledger.getOwnerId().equals(oldRecord.getUserId())) {
+            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不要删除自己");
+        }
+//        自己可以删除自己
+//        owner可以删除别人    自己在该账本里可以退出
+        if (ledger.getOwnerId().equals(userId) || getDeletePermission(ledger.getId(), userId)) {
+            super.remove(uuid);
+            return;
+        }
+        throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权删除");
     }
 
     @Override
@@ -84,12 +108,12 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         return mapper.exists(queryWrapper);
     }
 
-
-//    @Override
-//    删除先不管
-//    public void remove(UUID uuid) throws ServiceException {
-//        super.remove(uuid);
-//    }
+    private Boolean getDeletePermission(UUID ledgerId, UUID userId) {
+        QueryWrapper<CoLedgerUserDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger_id", ledgerId.toString());
+        queryWrapper.eq("user_id", userId.toString());
+        return mapper.exists(queryWrapper);
+    }
 
     @Override
     protected CoLedgerUserDTO doToDto(CoLedgerUserDO record) {

@@ -83,9 +83,6 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
         return super.save(record);
     }
 
-
-
-
     @Override
     public CoLedgerEntryDTO update(CoLedgerEntryDTO record) throws ServiceException {
 //        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");

@@ -19,6 +19,7 @@ import java.util.UUID;
 @Service
 public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO, UserTagDTO, UserTagQuery> implements UserTagService {
     private final EntryTagService entryTagService;
+
     @Autowired
     public UserTagServiceImpl(UserTagMapper mapper, @Lazy EntryTagService entryTagService) {
         super(mapper, UserTagDO.class, UserTagDTO.class, UserTagQuery.class);
@@ -78,7 +79,7 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
 
     @Override
     public void remove(UUID uuid) throws ServiceException {
-                UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
 //        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         UserTagDTO oldUserTagDTO = get(uuid);

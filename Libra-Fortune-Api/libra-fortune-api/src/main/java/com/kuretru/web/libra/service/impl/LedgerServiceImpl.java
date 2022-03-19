@@ -4,18 +4,14 @@ import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
 import com.kuretru.api.common.util.EnumUtils;
-import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
 import com.kuretru.web.libra.entity.data.LedgerDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.CoLedgerUserDTO;
-import com.kuretru.web.libra.entity.transfer.LedgerCategoryDTO;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.mapper.LedgerMapper;
 import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerService;
-import com.kuretru.web.libra.service.SystemUserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

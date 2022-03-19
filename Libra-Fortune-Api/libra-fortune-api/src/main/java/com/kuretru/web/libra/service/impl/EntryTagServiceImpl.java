@@ -1,7 +1,6 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.api.common.constant.code.ServiceErrorCodes;
 import com.kuretru.api.common.constant.code.UserErrorCodes;
 import com.kuretru.api.common.exception.ServiceException;
 import com.kuretru.api.common.service.impl.BaseServiceImpl;
