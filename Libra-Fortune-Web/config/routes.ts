@@ -9,6 +9,19 @@ export default [
   },
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
   {
+    path: '/ledgers',
+    name: '账本管理',
+    icon: 'snippets',
+    routes: [
+      {
+        path: '/ledgers',
+        component: './Ledger/Ledger',
+        name: '账本管理',
+      },
+    ],
+  },
+
+  {
     path: '/admin',
     name: '管理页',
     icon: 'crown',

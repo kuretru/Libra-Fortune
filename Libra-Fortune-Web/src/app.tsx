@@ -1,8 +1,8 @@
+import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
+import { ErrorShowType, history, Link } from 'umi';
+import type { RequestOptionsInit } from 'umi-request';
+import { PageLoading, SettingDrawer } from '@ant-design/pro-layout';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
-import { SettingDrawer } from '@ant-design/pro-layout';
-import { PageLoading } from '@ant-design/pro-layout';
-import type { RunTimeLayoutConfig } from 'umi';
-import { history, Link } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
@@ -49,6 +49,48 @@ export async function getInitialState(): Promise<{
     settings: defaultSettings,
   };
 }
+
+/** Request的AccessToken拦截器 */
+const accessTokenInterceptor = (url: string, options: RequestOptionsInit) => {
+  const id = sessionStorage.getItem('accessTokenId');
+  if (!id) {
+    return {
+      url: `${url}`,
+      options: options,
+    };
+  }
+
+  const authHeader = {
+    'Access-Token-ID': id,
+    'Access-Token': sessionStorage.getItem('accessToken'),
+  };
+  return {
+    url: `${url}`,
+    options: { ...options, interceptors: true, headers: authHeader },
+  };
+};
+
+/** 全局Request配置 */
+export const request: RequestConfig = {
+  errorConfig: {
+    adaptor: (resData: any) => {
+      if (resData.code && resData.code >= 10000) {
+        return {
+          ...resData,
+          success: false,
+          errorCode: String(resData.code),
+          errorMessage: `${resData.message}: ${resData.data}`,
+          showType: ErrorShowType.ERROR_MESSAGE,
+        };
+      }
+      return {
+        ...resData,
+        success: true,
+      };
+    },
+  },
+  requestInterceptors: [accessTokenInterceptor],
+};
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
