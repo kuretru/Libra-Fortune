@@ -1,10 +1,10 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.api.common.constant.code.UserErrorCodes;
-import com.kuretru.api.common.exception.ServiceException;
-import com.kuretru.api.common.manager.PasswordSaltManager;
-import com.kuretru.api.common.service.impl.BaseServiceImpl;
+import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.exception.ServiceException;
+import com.kuretru.microservices.web.manager.PasswordSaltManager;
+import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.SystemUserDO;
 import com.kuretru.web.libra.entity.query.SystemUserQuery;
 import com.kuretru.web.libra.entity.transfer.SystemUserDTO;
@@ -30,11 +30,11 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
     public synchronized SystemUserDTO save(SystemUserDTO record) throws ServiceException {
         QueryWrapper<SystemUserDO> queryWrapper = new QueryWrapper<>();
         if (record.getUsername().equals("")) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户名不可为空");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户名不可为空");
         }
         queryWrapper.eq("username", record.getUsername());
         if (mapper.exists(queryWrapper)) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该用户名已存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该用户名已存在");
         }
         String salt = passwordSaltManager.generateSalt();
         String password = passwordSaltManager.mixSalt(record.getPassword(), salt);
@@ -66,7 +66,7 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
 //            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
 //        }
         if (!user.getUsername().equals(record.getUsername())) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户名不可更改");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户名不可更改");
         }
         return super.update(record);
     }
@@ -76,8 +76,9 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
 //        如果操作的不是当前账户
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a338e68");
         if (userId != uuid) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "用户不存在");
         }
         super.remove(uuid);
     }
+
 }

@@ -1,8 +1,8 @@
 package com.kuretru.web.libra.service.impl;
 
-import com.kuretru.api.common.constant.code.UserErrorCodes;
-import com.kuretru.api.common.exception.ServiceException;
-import com.kuretru.api.common.service.impl.BaseServiceImpl;
+import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.exception.ServiceException;
+import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.FinancialEntryDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.FinancialEntryQuery;
@@ -21,6 +21,7 @@ import java.util.UUID;
 
 @Service
 public class FinancialEntryServiceImpl extends BaseServiceImpl<FinancialEntryMapper, FinancialEntryDO, FinancialEntryDTO, FinancialEntryQuery> implements FinancialEntryService {
+
     private final LedgerService ledgerService;
     private final CoLedgerUserService coLedgerUserService;
     private final CoLedgerEntryService coLedgerEntryService;
@@ -40,20 +41,20 @@ public class FinancialEntryServiceImpl extends BaseServiceImpl<FinancialEntryMap
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
         if (existLedger == null) {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
         }
 
 //        个人普通账本/合作普通账本：如果账本的拥有者不为当前用户
         if (existLedger.getType().equals(LedgerTypeEnum.FINANCIAL)) {
             if (!existLedger.getOwnerId().equals(userId)) {
-                throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
             }
         } else if (existLedger.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
             if (!coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, true)) {
-                throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
             }
         } else {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
         }
         return super.save(record);
     }
@@ -67,24 +68,24 @@ public class FinancialEntryServiceImpl extends BaseServiceImpl<FinancialEntryMap
         FinancialEntryDTO oldRecord = get(record.getId());
 //        账目不存在
         if (oldRecord == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账目不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账目不存在");
         }
 
         if (!oldRecord.getLedgerId().equals(record.getLedgerId())) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "属于账本不可变");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "属于账本不可变");
         }
 
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
         if (existLedger.getType().equals(LedgerTypeEnum.FINANCIAL)) {
             if (!existLedger.getOwnerId().equals(userId)) {
-                throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
             }
         } else if (existLedger.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
             if (!coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, true)) {
-                throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
             }
         } else {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
         }
         return super.update(record);
     }
@@ -96,7 +97,7 @@ public class FinancialEntryServiceImpl extends BaseServiceImpl<FinancialEntryMap
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         FinancialEntryDTO oldLedgerEntry = get(uuid);
         if (oldLedgerEntry == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账目不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账目不存在");
         }
 
 //       找到账本
@@ -104,14 +105,14 @@ public class FinancialEntryServiceImpl extends BaseServiceImpl<FinancialEntryMap
 //        个人普通账本/合作普通账本：如果账本的拥有者不为当前用户
         if (existLedger.getType().equals(LedgerTypeEnum.FINANCIAL)) {
             if (!existLedger.getOwnerId().equals(userId)) {
-                throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
             }
         } else if (existLedger.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
             if (!coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, true)) {
-                throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
             }
         } else {
-            throw new ServiceException.NotFound(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
         }
 
         super.remove(uuid);
@@ -136,4 +137,5 @@ public class FinancialEntryServiceImpl extends BaseServiceImpl<FinancialEntryMap
         }
         return result;
     }
+
 }

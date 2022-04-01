@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.kuretru.api.common.entity.data.BaseDO;
+import com.kuretru.microservices.web.entity.data.BaseDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -24,4 +24,5 @@ public class SystemUserDO extends BaseDO {
     private String nickname;
 
     private String avatar;
+
 }

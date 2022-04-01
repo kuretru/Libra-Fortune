@@ -11,4 +11,5 @@ public class EntryTagQuery {
     private UUID entryId;
 
     private UUID tagId;
+
 }

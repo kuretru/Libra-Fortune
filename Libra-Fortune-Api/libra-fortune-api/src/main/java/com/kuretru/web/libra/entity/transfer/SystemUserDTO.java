@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.entity.transfer;
 
-import com.kuretru.api.common.entity.transfer.BaseDTO;
+import com.kuretru.microservices.web.entity.transfer.BaseDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

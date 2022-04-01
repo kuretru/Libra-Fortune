@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.service;
 
-import com.kuretru.api.common.service.BaseService;
+import com.kuretru.microservices.web.service.BaseService;
 import com.kuretru.web.libra.entity.query.SystemUserQuery;
 import com.kuretru.web.libra.entity.transfer.SystemUserDTO;
 

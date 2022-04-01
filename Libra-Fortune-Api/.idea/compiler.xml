@@ -7,12 +7,28 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="galaxy-common" />
+        <module name="galaxy-oauth2-common" />
         <module name="Libra-Fortune-Api" />
-        <module name="Api-Common-Utils" />
+        <module name="galaxy-web" />
+      </profile>
+      <profile name="Annotation profile for galaxy-oauth2-client" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../../../Repository/Maven/org/projectlombok/lombok/1.18.22/lombok-1.18.22.jar" />
+          <entry name="$PROJECT_DIR$/../../../Repository/Maven/org/springframework/boot/spring-boot-configuration-processor/2.6.5/spring-boot-configuration-processor-2.6.5.jar" />
+        </processorPath>
+        <module name="galaxy-oauth2-client" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Api-Common-Utils" target="17" />
+      <module name="galaxy-common" target="17" />
+      <module name="galaxy-oauth2-client" target="17" />
+      <module name="galaxy-oauth2-common" target="17" />
+      <module name="galaxy-web" target="17" />
       <module name="Libra-Fortune-Api" target="17" />
     </bytecodeTargetLevel>
   </component>
@@ -20,6 +36,10 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Api-Common-Utils" options="-parameters" />
       <module name="Libra-Fortune-Api" options="-parameters" />
+      <module name="galaxy-common" options="-parameters" />
+      <module name="galaxy-oauth2-client" options="-parameters" />
+      <module name="galaxy-oauth2-common" options="-parameters" />
+      <module name="galaxy-web" options="-parameters" />
     </option>
   </component>
 </project>

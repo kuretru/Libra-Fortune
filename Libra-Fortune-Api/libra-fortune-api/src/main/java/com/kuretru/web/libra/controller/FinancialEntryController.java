@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.controller;
 
-import com.kuretru.api.common.controller.BaseRestController;
+import com.kuretru.microservices.web.controller.BaseRestController;
 import com.kuretru.web.libra.entity.query.FinancialEntryQuery;
 import com.kuretru.web.libra.entity.transfer.FinancialEntryDTO;
 import com.kuretru.web.libra.service.FinancialEntryService;

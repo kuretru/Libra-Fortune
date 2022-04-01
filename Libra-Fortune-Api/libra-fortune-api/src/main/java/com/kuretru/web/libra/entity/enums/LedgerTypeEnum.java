@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.entity.enums;
 
-import com.kuretru.api.common.entity.enums.BaseEnum;
+import com.kuretru.microservices.common.entity.enums.BaseEnum;
 import lombok.Getter;
 
 @Getter

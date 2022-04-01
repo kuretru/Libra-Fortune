@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/api-common-utils/Api-Common-Utils.iml" filepath="$PROJECT_DIR$/api-common-utils/Api-Common-Utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/libra-fortune-api/Libra-Fortune-Api.iml" filepath="$PROJECT_DIR$/libra-fortune-api/Libra-Fortune-Api.iml" />
       <module fileurl="file://$PROJECT_DIR$/Libra-Fortune-Parent.iml" filepath="$PROJECT_DIR$/Libra-Fortune-Parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Galaxy-Microservices/galaxy-common/galaxy-common.iml" filepath="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-common/galaxy-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Galaxy-Microservices/galaxy-oauth2-client/galaxy-oauth2-client.iml" filepath="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-oauth2-client/galaxy-oauth2-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Galaxy-Microservices/galaxy-oauth2-common/galaxy-oauth2-common.iml" filepath="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-oauth2-common/galaxy-oauth2-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Galaxy-Microservices/galaxy-web/galaxy-web.iml" filepath="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-web/galaxy-web.iml" />
     </modules>
   </component>
 </project>

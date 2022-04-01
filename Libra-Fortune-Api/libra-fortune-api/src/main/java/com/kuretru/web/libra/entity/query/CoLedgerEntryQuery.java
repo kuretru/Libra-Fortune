@@ -7,9 +7,11 @@ import java.util.UUID;
 
 @Data
 public class CoLedgerEntryQuery {
+
     private UUID entryId;
 
     private UUID userId;
 
     private Long amount;
+
 }

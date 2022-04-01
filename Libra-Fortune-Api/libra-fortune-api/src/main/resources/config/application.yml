@@ -8,3 +8,8 @@ spring:
     username: ${mysql.username:libra}
     password: ${mysql.password:123456}
     url: jdbc:mysql://${mysql.hostname:127.0.0.1}:${mysql.port:3306}/${mysql.schema}?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+  redis:
+    host: ${redis.host:127.0.0.1}
+    password: ${redis.password:}
+    port: ${redis.port:6379}
+    database: ${redis.database:4}

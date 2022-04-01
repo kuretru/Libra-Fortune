@@ -1,9 +1,9 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.api.common.constant.code.UserErrorCodes;
-import com.kuretru.api.common.exception.ServiceException;
-import com.kuretru.api.common.service.impl.BaseServiceImpl;
+import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.exception.ServiceException;
+import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.CoLedgerEntryDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.CoLedgerEntryQuery;
@@ -20,6 +20,7 @@ import java.util.UUID;
 
 @Service
 public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper, CoLedgerEntryDO, CoLedgerEntryDTO, CoLedgerEntryQuery> implements CoLedgerEntryService {
+
     private final LedgerEntryService ledgerEntryService;
     private final CoLedgerUserService coLedgerUserService;
     private final FinancialEntryService financialEntryService;
@@ -36,20 +37,18 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
 
     @Override
     public CoLedgerEntryDTO save(String ledgerId, CoLedgerEntryDTO record) throws ServiceException {
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
         UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         //        是否重复
         QueryWrapper<CoLedgerEntryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("entry_id", record.getEntryId().toString());
         queryWrapper.eq("user_id", userId.toString());
         if (mapper.exists(queryWrapper)) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
         }
 
         LedgerDTO existLedger = ledgerService.get(UUID.fromString(ledgerId));
         if (existLedger == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
         }
 //        如果账本是普通合作账本
         if (existLedger.getType().equals(LedgerTypeEnum.CO_COMMON)) {
@@ -57,27 +56,27 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
             LedgerEntryDTO ledgerEntry = ledgerEntryService.get(record.getEntryId());
 //            如果查到的ledgerEntry的账本和传过来的账本id不同
             if (ledgerEntry == null) {
-                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该entry不存在");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该entry不存在");
             }
             if (!ledgerEntry.getLedgerId().toString().equals(ledgerId)) {
-                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目的ledgerId与url上的ledgerId不同");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目的ledgerId与url上的ledgerId不同");
             }
         } else if (existLedger.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
 //            去查entryId 对应的 ledgerEntry
             FinancialEntryDTO financialEntry = financialEntryService.get(record.getEntryId());
 //            如果查到的ledgerEntry的账本和传过来的账本id不同
             if (financialEntry == null) {
-                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该entry不存在");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该entry不存在");
             }
             if (!financialEntry.getLedgerId().toString().equals(ledgerId)) {
-                throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目的ledgerId与url上的ledgerId不同");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目的ledgerId与url上的ledgerId不同");
             }
         } else {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型错误");
         }
 
         if (!coLedgerUserService.getLedgerPermission(UUID.fromString(ledgerId), userId, true)) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权添加");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权添加");
         }
         record.setUserId(userId);
         return super.save(record);
@@ -85,16 +84,14 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
 
     @Override
     public CoLedgerEntryDTO update(CoLedgerEntryDTO record) throws ServiceException {
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
         UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         CoLedgerEntryDTO oldCoLedgerEntry = get(record.getId());
         if (oldCoLedgerEntry == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "寻找的合作条目不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "寻找的合作条目不存在");
         }
 
         if (!record.getEntryId().equals(oldCoLedgerEntry.getEntryId()) || !record.getUserId().equals(oldCoLedgerEntry.getUserId())) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目与用户不可修改");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目与用户不可修改");
         }
 
         LedgerEntryDTO ledgerEntry = ledgerEntryService.get(oldCoLedgerEntry.getEntryId());
@@ -105,7 +102,7 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
         }
 
         if (!userId.equals(record.getUserId()) || !coLedgerUserService.getLedgerPermission(ledgerEntry == null ? financialEntry.getLedgerId() : ledgerEntry.getLedgerId(), userId, true)) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
         return super.update(record);
     }
@@ -117,7 +114,7 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
 //        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
         CoLedgerEntryDTO oldCoLedgerEntry = get(uuid);
         if (oldCoLedgerEntry == null) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "寻找的合作条目不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "寻找的合作条目不存在");
         }
 
         LedgerEntryDTO ledgerEntry = ledgerEntryService.get(oldCoLedgerEntry.getEntryId());
@@ -128,7 +125,7 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
         }
 
         if (!userId.equals(oldCoLedgerEntry.getUserId()) || !coLedgerUserService.getLedgerPermission(ledgerEntry == null ? financialEntry.getLedgerId() : ledgerEntry.getLedgerId(), userId, true)) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
         super.remove(uuid);
     }

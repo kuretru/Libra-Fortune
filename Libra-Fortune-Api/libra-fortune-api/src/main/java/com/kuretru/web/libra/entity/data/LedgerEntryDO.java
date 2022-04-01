@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.kuretru.api.common.entity.data.BaseDO;
+import com.kuretru.microservices.web.entity.data.BaseDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -26,13 +26,5 @@ public class LedgerEntryDO extends BaseDO {
     private Long amount;
 
     private String remark;
-
-    public void setLedger_id(String ledgerId) {
-        this.ledgerId = ledgerId;
-    }
-
-    public void setCategory_id(String categoryId) {
-        this.categoryId = categoryId;
-    }
 
 }

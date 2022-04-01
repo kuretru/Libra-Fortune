@@ -3,8 +3,11 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/api-common-utils/pom.xml" />
         <option value="$PROJECT_DIR$/libra-fortune-api/pom.xml" />
+        <option value="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-web/pom.xml" />
+        <option value="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-oauth2-client/pom.xml" />
+        <option value="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-oauth2-common/pom.xml" />
+        <option value="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-common/pom.xml" />
       </list>
     </option>
   </component>

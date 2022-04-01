@@ -16,4 +16,5 @@ public class SystemUserQuery {
 
     @Size(max = 16)
     private String nickname;
+
 }

@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.entity.transfer;
 
-import com.kuretru.api.common.entity.transfer.BaseDTO;
+import com.kuretru.microservices.web.entity.transfer.BaseDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -15,6 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class FinancialEntryDTO extends BaseDTO {
+
     @NotNull
     private UUID ledgerId;
 
@@ -27,4 +28,5 @@ public class FinancialEntryDTO extends BaseDTO {
     @NotNull
     @Size(max = 64)
     private String remark;
+
 }

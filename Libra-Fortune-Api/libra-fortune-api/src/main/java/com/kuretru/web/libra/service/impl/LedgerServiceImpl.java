@@ -1,9 +1,9 @@
 package com.kuretru.web.libra.service.impl;
 
-import com.kuretru.api.common.constant.code.UserErrorCodes;
-import com.kuretru.api.common.exception.ServiceException;
-import com.kuretru.api.common.service.impl.BaseServiceImpl;
-import com.kuretru.api.common.util.EnumUtils;
+import com.kuretru.microservices.common.utils.EnumUtils;
+import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.exception.ServiceException;
+import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.LedgerQuery;
@@ -20,6 +20,7 @@ import java.util.UUID;
 
 @Service
 public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery> implements LedgerService {
+
     private final CoLedgerUserService coLedgerUserService;
 
     @Autowired
@@ -34,7 +35,7 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
         UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
 //        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e77a298e68");
         if (!(Arrays.asList(LedgerTypeEnum.values()).contains(record.getType()))) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "请输入正确的类型");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "请输入正确的类型");
         }
         record.setOwnerId(userId);
         LedgerDTO ledgerDTO = super.save(record);
@@ -61,10 +62,10 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
 //        如果账本的owner不为当前用户
 //        该用户改了这个账本的ownerId
         if (oldRecord == null || !oldRecord.getOwnerId().equals(userId) || !record.getOwnerId().equals(userId)) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
         if (!oldRecord.getType().equals(record.getType()) || oldRecord.getOwnerId().equals(record.getOwnerId())) {
-            throw new ServiceException.BadRequest(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型不可变/账本拥有者不可变");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型不可变/账本拥有者不可变");
         }
         return super.update(record);
     }
@@ -110,4 +111,5 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
         }
         return result;
     }
+
 }
