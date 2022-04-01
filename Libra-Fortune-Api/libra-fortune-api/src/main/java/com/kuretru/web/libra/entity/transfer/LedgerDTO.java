@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
@@ -16,14 +17,15 @@ import java.util.UUID;
 @ToString(callSuper = true)
 public class LedgerDTO extends BaseDTO {
 
-    @NotNull
+    @NotEmpty
     @Size(max = 16)
     private String name;
 
     @NotNull
     private UUID ownerId;
 
-    @NotNull
+    @NotEmpty
+    @Size(max = 64)
     private String remark;
 
     @NotNull

@@ -16,4 +16,5 @@ public class LedgerQuery {
     private UUID ownerId;
 
     private LedgerTypeEnum type;
+
 }
