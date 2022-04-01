@@ -2,3 +2,10 @@ spring:
   config:
     activate:
       on-profile: stage
+galaxy:
+  oauth2:
+    client:
+      gemini:
+        server-url: https://oauth2.i5zhen.com
+        application-id: ${gemini.application-id:}
+        application-secret: ${gemini.application-secret:}
