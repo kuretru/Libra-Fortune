@@ -8,6 +8,7 @@ import lombok.ToString;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -28,5 +29,7 @@ public class UserDTO extends BaseDTO {
 
     @NotNull
     private UUID geminiId;
+
+    private Instant lastLogin;
 
 }

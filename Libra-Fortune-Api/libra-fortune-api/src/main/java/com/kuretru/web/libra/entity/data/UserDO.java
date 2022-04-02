@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.Instant;
+
 /**
  * 用户表
  *
@@ -25,5 +27,8 @@ public class UserDO extends BaseDO {
 
     /** 绑定的双子身份验证中心用户ID */
     private String geminiId;
+
+    /** 上一次登录的时间 */
+    private Instant lastLogin;
 
 }
