@@ -2,10 +2,17 @@ spring:
   config:
     activate:
       on-profile: stage
+logging:
+  level:
+    com:
+      kuretru:
+        web:
+          libra:
+            mapper: debug
 galaxy:
   oauth2:
     client:
       gemini:
         server-url: https://oauth2.i5zhen.com
-        application-id: ${gemini.application-id:}
-        application-secret: ${gemini.application-secret:}
+        application-id: ${GEMINI_APPLICATION_ID:}
+        application-secret: ${GEMINI_APPLICATION_SECRET:}
