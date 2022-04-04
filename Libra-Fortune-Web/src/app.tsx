@@ -5,12 +5,13 @@ import { PageLoading, SettingDrawer } from '@ant-design/pro-layout';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
+import { get as getUser } from '@/services/libra-fortune-web/user';
 
 const isDev = process.env.NODE_ENV === 'development';
-const loginPath = '/user/login';
+const loginPath = '/users/login';
+const callbackPath = '/users/login/callback';
 
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -24,35 +25,43 @@ export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<API.User.UserDTO | undefined>;
 }> {
   const fetchUserInfo = async () => {
     try {
-      const msg = await queryCurrentUser();
+      const userid = localStorage.getItem('userId');
+      if (!userid) return undefined;
+      const msg = await getUser(userid);
       return msg.data;
     } catch (error) {
-      history.push(loginPath);
+      history.push({
+        pathname: loginPath,
+        query: {
+          redirect: history.location.pathname,
+          ...history.location.query,
+        },
+      });
     }
     return undefined;
   };
   // 如果是登录页面，不执行
-  if (history.location.pathname !== loginPath) {
+  if (history.location.pathname !== loginPath && history.location.pathname !== callbackPath) {
     const currentUser = await fetchUserInfo();
     return {
-      fetchUserInfo,
-      currentUser,
       settings: defaultSettings,
+      currentUser,
+      fetchUserInfo,
     };
   }
   return {
-    fetchUserInfo,
     settings: defaultSettings,
+    fetchUserInfo,
   };
 }
 
 /** Request的AccessToken拦截器 */
 const accessTokenInterceptor = (url: string, options: RequestOptionsInit) => {
-  const id = sessionStorage.getItem('accessTokenId');
+  const id = localStorage.getItem('accessTokenId');
   if (!id) {
     return {
       url: `${url}`,
@@ -62,7 +71,7 @@ const accessTokenInterceptor = (url: string, options: RequestOptionsInit) => {
 
   const authHeader = {
     'Access-Token-ID': id,
-    'Access-Token': sessionStorage.getItem('accessToken'),
+    'Access-Token': localStorage.getItem('accessToken'),
   };
   return {
     url: `${url}`,
@@ -104,8 +113,18 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
-        history.push(loginPath);
+      if (
+        !initialState?.currentUser &&
+        location.pathname !== loginPath &&
+        location.pathname !== callbackPath
+      ) {
+        history.push({
+          pathname: loginPath,
+          query: {
+            redirect: history.location.pathname,
+            ...history.location.query,
+          },
+        });
       }
     },
     links: isDev

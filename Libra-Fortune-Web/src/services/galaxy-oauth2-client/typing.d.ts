@@ -3,4 +3,9 @@ declare namespace Galaxy.OAuth2.Client {
     scopes?: string[];
     redirectUri?: string;
   };
+
+  type OAuth2AuthorizeResponseDTO = {
+    code: string;
+    state: string;
+  };
 }

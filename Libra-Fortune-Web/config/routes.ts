@@ -1,9 +1,15 @@
 export default [
   {
-    path: '/user',
+    path: '/users',
     layout: false,
     routes: [
-      { path: '/user', routes: [{ name: '登录', path: '/user/login', component: './user/Login' }] },
+      {
+        path: '/users',
+        routes: [
+          { name: '登录', path: '/users/login', component: './user/Login' },
+          { name: '回调', path: '/users/login/callback', component: './user/Callback' },
+        ],
+      },
       { component: './404' },
     ],
   },

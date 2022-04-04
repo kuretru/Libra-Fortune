@@ -6,3 +6,10 @@ export async function galaxyAuthorize(record: Galaxy.OAuth2.Client.OAuth2Authori
     data: record,
   });
 }
+
+export async function galaxyCallback(record: Galaxy.OAuth2.Client.OAuth2AuthorizeResponseDTO) {
+  return request('/oauth2/galaxy/callback', {
+    method: 'POST',
+    data: record,
+  });
+}
