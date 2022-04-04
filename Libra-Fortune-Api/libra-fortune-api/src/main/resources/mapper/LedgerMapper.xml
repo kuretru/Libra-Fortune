@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuretru.web.libra.mapper.LedgerMapper">
+
+    <select id="selectList"
+            resultType="com.kuretru.web.libra.entity.data.LedgerDO">
+        select ledger.id,
+               ledger.uuid,
+               ledger.create_time,
+               ledger.update_time,
+               ledger.name,
+               ledger.owner_id,
+               ledger.remark,
+               ledger.type
+        from ledger
+                 left join co_ledger_user co
+                           on ledger.uuid = co.ledger_id
+        where
+            ${ew.sqlSegment}
+    </select>
+
+    <select id="selectPage" resultType="com.kuretru.web.libra.entity.data.LedgerDO">
+        select ledger.id,
+               ledger.uuid,
+               ledger.create_time,
+               ledger.update_time,
+               ledger.name,
+               ledger.owner_id,
+               ledger.remark,
+               ledger.type
+        from ledger
+                 left join co_ledger_user co
+                           on ledger.uuid = co.ledger_id
+        where
+            ${ew.sqlSegment}
+    </select>
+</mapper>

@@ -12,13 +12,13 @@
         <module name="galaxy-oauth2-common" />
         <module name="galaxy-web" />
       </profile>
-      <profile name="Annotation profile for galaxy-oauth2-client" enabled="true">
+      <profile name="Annotation profile for libra-fortune-parent" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../../../Repository/Maven/org/projectlombok/lombok/1.18.22/lombok-1.18.22.jar" />
-          <entry name="$PROJECT_DIR$/../../../Repository/Maven/org/springframework/boot/spring-boot-configuration-processor/2.6.5/spring-boot-configuration-processor-2.6.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.22/lombok-1.18.22.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/2.6.5/spring-boot-configuration-processor-2.6.5.jar" />
         </processorPath>
         <module name="galaxy-authentication" />
         <module name="galaxy-oauth2-client" />
@@ -32,6 +32,7 @@
       <module name="galaxy-oauth2-common" target="17" />
       <module name="galaxy-web" target="17" />
       <module name="libra-fortune-api" target="17" />
+      <module name="libra-fortune-parent" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

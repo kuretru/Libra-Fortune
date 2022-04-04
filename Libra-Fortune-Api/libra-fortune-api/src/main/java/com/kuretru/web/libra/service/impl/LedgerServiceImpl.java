@@ -1,7 +1,13 @@
 package com.kuretru.web.libra.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
+import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.common.utils.EnumUtils;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.entity.PaginationQuery;
+import com.kuretru.microservices.web.entity.PaginationResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerDO;
@@ -14,11 +20,14 @@ import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery> implements LedgerService {
 
     private final CoLedgerUserService coLedgerUserService;
@@ -32,30 +41,25 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
     @Override
     public synchronized LedgerDTO save(LedgerDTO record) throws ServiceException {
 //        判断当前userId存在
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e77a298e68");
+        UUID userId = AccessTokenContext.getUserId();
         if (!(Arrays.asList(LedgerTypeEnum.values()).contains(record.getType()))) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "请输入正确的类型");
         }
         record.setOwnerId(userId);
         LedgerDTO ledgerDTO = super.save(record);
-//        如果是合作账本 去coLedgerUserService账本那边再加一条
-        if (record.getType().equals(LedgerTypeEnum.CO_COMMON) || record.getType().equals(LedgerTypeEnum.CO_FINANCIAL)) {
-            CoLedgerUserDTO coLedgerUserDTO = new CoLedgerUserDTO();
-            coLedgerUserDTO.setLedgerId(ledgerDTO.getId());
-            coLedgerUserDTO.setUserId(userId);
-            coLedgerUserDTO.setIsWritable(true);
-            coLedgerUserService.save(coLedgerUserDTO);
-        }
+//        去coLedgerUserService账本那边再加一条
+        CoLedgerUserDTO coLedgerUserDTO = new CoLedgerUserDTO();
+        coLedgerUserDTO.setLedgerId(ledgerDTO.getId());
+        coLedgerUserDTO.setUserId(userId);
+        coLedgerUserDTO.setIsWritable(true);
+        coLedgerUserService.save(coLedgerUserDTO);
         return ledgerDTO;
     }
 
 
     @Override
     public LedgerDTO update(LedgerDTO record) throws ServiceException {
-//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-
+        UUID userId = AccessTokenContext.getUserId();
 //       判断账本存在
         LedgerDTO oldRecord = get(record.getId());
 //        账户不存在
@@ -64,7 +68,7 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
         if (oldRecord == null || !oldRecord.getOwnerId().equals(userId) || !record.getOwnerId().equals(userId)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
-        if (!oldRecord.getType().equals(record.getType()) || oldRecord.getOwnerId().equals(record.getOwnerId())) {
+        if (!oldRecord.getType().equals(record.getType()) || !oldRecord.getOwnerId().equals(record.getOwnerId())) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型不可变/账本拥有者不可变");
         }
         return super.update(record);
@@ -91,6 +95,13 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
 //        }
 //    }
 
+    @Override
+    protected QueryWrapper<LedgerDO> buildQueryWrapper(LedgerQuery query) {
+        UUID userId = AccessTokenContext.getUserId();
+        QueryWrapper<LedgerDO> queryWrapper= super.buildQueryWrapper(query);
+        queryWrapper.eq("co.user_id",userId.toString());
+        return queryWrapper;
+    }
 
     @Override
     protected LedgerDTO doToDto(LedgerDO record) {

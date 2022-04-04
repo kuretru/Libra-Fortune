@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
+import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
@@ -12,10 +14,12 @@ import com.kuretru.web.libra.mapper.EntryTagMapper;
 import com.kuretru.web.libra.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@Transactional
 public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTagDO, EntryTagDTO, EntryTagQuery> implements EntryTagService {
 
     private final UserTagService userTagService;
@@ -37,9 +41,7 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
 
     @Override
     public synchronized EntryTagDTO save(EntryTagDTO record) throws ServiceException {
-//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
 //        查看是否有权限添加tag
         if (!getUserEntryPermission(userId, record.getEntryId())) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权限添加");
@@ -66,9 +68,7 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
 
     @Override
     public void remove(UUID uuid) throws ServiceException {
-        //        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         EntryTagDTO oldRecord = get(uuid);
         if (oldRecord == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "记录不存在");

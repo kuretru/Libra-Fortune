@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
+import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
@@ -17,10 +19,12 @@ import com.kuretru.web.libra.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@Transactional
 public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
 
     private final LedgerService ledgerService;
@@ -37,9 +41,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
 
     @Override
     public synchronized LedgerCategoryDTO save(LedgerCategoryDTO record) throws ServiceException {
-//      UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
         if (existLedger == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "ledger不存在");
@@ -73,9 +75,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
 
     @Override
     public LedgerCategoryDTO update(LedgerCategoryDTO record) throws ServiceException {
-//          UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         LedgerCategoryDTO oldRecord = get(record.getId());
         if (oldRecord == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定LedgerCategory不存在");
@@ -115,9 +115,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     //    先不管了
     @Override
     public void remove(UUID uuid) throws ServiceException {
-//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         LedgerCategoryDTO oldRecord = get(uuid);
         if (oldRecord == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定LedgerCategory不存在");

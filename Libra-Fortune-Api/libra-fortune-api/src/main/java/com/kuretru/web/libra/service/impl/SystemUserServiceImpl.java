@@ -12,10 +12,12 @@ import com.kuretru.web.libra.mapper.SystemUserMapper;
 import com.kuretru.web.libra.service.SystemUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@Transactional
 public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, SystemUserDO, SystemUserDTO, SystemUserQuery> implements SystemUserService {
 
     private final PasswordSaltManager passwordSaltManager;
@@ -27,6 +29,7 @@ public class SystemUserServiceImpl extends BaseServiceImpl<SystemUserMapper, Sys
     }
 
     @Override
+
     public synchronized SystemUserDTO save(SystemUserDTO record) throws ServiceException {
         QueryWrapper<SystemUserDO> queryWrapper = new QueryWrapper<>();
         if (record.getUsername().equals("")) {

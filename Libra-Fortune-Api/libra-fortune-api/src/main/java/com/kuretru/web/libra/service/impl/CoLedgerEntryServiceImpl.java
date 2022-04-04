@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
+import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
@@ -15,10 +17,12 @@ import com.kuretru.web.libra.mapper.CoLedgeEntryMapper;
 import com.kuretru.web.libra.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@Transactional
 public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper, CoLedgerEntryDO, CoLedgerEntryDTO, CoLedgerEntryQuery> implements CoLedgerEntryService {
 
     private final LedgerEntryService ledgerEntryService;
@@ -36,8 +40,8 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
     }
 
     @Override
-    public CoLedgerEntryDTO save(String ledgerId, CoLedgerEntryDTO record) throws ServiceException {
-        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+    public synchronized CoLedgerEntryDTO save(String ledgerId, CoLedgerEntryDTO record) throws ServiceException {
+        UUID userId = AccessTokenContext.getUserId();
         //        是否重复
         QueryWrapper<CoLedgerEntryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("entry_id", record.getEntryId().toString());
@@ -84,7 +88,7 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
 
     @Override
     public CoLedgerEntryDTO update(CoLedgerEntryDTO record) throws ServiceException {
-        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
+        UUID userId = AccessTokenContext.getUserId();
         CoLedgerEntryDTO oldCoLedgerEntry = get(record.getId());
         if (oldCoLedgerEntry == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "寻找的合作条目不存在");
@@ -109,14 +113,11 @@ public class CoLedgerEntryServiceImpl extends BaseServiceImpl<CoLedgeEntryMapper
 
     @Override
     public void remove(UUID uuid) throws ServiceException {
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         CoLedgerEntryDTO oldCoLedgerEntry = get(uuid);
         if (oldCoLedgerEntry == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "寻找的合作条目不存在");
         }
-
         LedgerEntryDTO ledgerEntry = ledgerEntryService.get(oldCoLedgerEntry.getEntryId());
         FinancialEntryDTO financialEntry = null;
 

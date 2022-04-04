@@ -15,6 +15,7 @@ import com.kuretru.web.libra.mapper.UserMapper;
 import com.kuretru.web.libra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -23,6 +24,7 @@ import java.util.UUID;
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Service
+@Transactional
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, UserDO, UserDTO, UserQuery> implements UserService {
 
     private final AccessTokenManager accessTokenManager;

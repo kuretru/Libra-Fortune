@@ -9,7 +9,13 @@
         <option value="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-oauth2-common/pom.xml" />
         <option value="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-common/pom.xml" />
         <option value="$PROJECT_DIR$/../Galaxy-Microservices/galaxy-authentication/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="temurin-17" project-jdk-type="JavaSDK">

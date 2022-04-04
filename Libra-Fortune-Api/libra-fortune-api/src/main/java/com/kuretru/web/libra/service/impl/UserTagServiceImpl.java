@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
+import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
@@ -13,10 +15,12 @@ import com.kuretru.web.libra.service.UserTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
+@Transactional
 public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO, UserTagDTO, UserTagQuery> implements UserTagService {
 
     private final EntryTagService entryTagService;
@@ -28,10 +32,9 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
         this.entryTagService = entryTagService;
     }
 
+    @Override
     public synchronized UserTagDTO save(UserTagDTO record) throws ServiceException {
-//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         if (!userId.equals(record.getUserId())) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操作");
         }
@@ -48,10 +51,9 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
         return super.save(record);
     }
 
+    @Override
     public UserTagDTO update(UserTagDTO record) throws ServiceException {
-//        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         UserTagDTO oldUserTagDTO = get(record.getId());
         if (oldUserTagDTO == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "找不到该Tag");
@@ -80,9 +82,7 @@ public class UserTagServiceImpl extends BaseServiceImpl<UserTagMapper, UserTagDO
 
     @Override
     public void remove(UUID uuid) throws ServiceException {
-        UUID userId = UUID.fromString("a087c0e3-2577-4a17-b435-7b12f7aa51e0");
-//        UUID userId = UUID.fromString("56ec2b77-857f-435c-a44f-f6e74a298e68");
-//        UUID userId = UUID.fromString("a7f39ae9-8a75-4914-8737-3f6a979ebb92");
+        UUID userId = AccessTokenContext.getUserId();
         UserTagDTO oldUserTagDTO = get(uuid);
         if (oldUserTagDTO == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "找不到该Tag");
