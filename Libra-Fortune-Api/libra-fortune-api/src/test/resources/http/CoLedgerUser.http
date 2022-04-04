@@ -1,6 +1,8 @@
 ###
 POST http://{{hostname}}/api/co-ledgers/{{ledgerId}}/users/
 Content-Type: application/json
+Access-Token-ID: {{access-token-id}}
+Access-Token: {{access-token-secret}}
 
 {
   "ledgerId": "7b5315a5-54ac-44bd-9a23-a6f6fcf61372",
@@ -11,6 +13,8 @@ Content-Type: application/json
 ###
 PUT http://{{hostname}}/api/co-ledgers/{{ledgerId}}/users/d8683e62-3dc0-4aa7-87e9-ab2d14a9cd59
 Content-Type: application/json
+Access-Token-ID: {{access-token-id}}
+Access-Token: {{access-token-secret}}
 
 {
   "ledgerId": "fad79d78-a744-414b-b784-3d2247453af2",

@@ -85,7 +85,6 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该记录不存在");
         }
         LedgerDTO ledger = ledgerService.get(oldRecord.getLedgerId());
-
 //        owner不要删除自己
         if (ledger.getOwnerId().equals(oldRecord.getUserId())) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不要删除自己");
@@ -98,6 +97,8 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         }
         throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权删除");
     }
+
+
 
     @Override
     public Boolean getLedgerPermission(UUID ledgerId, UUID userId, boolean isWritable) {

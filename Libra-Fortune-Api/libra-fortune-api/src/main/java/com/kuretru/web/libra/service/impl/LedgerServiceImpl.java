@@ -103,6 +103,15 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
         return queryWrapper;
     }
 
+    public LedgerDTO get(UUID uuid) {
+        UUID userId = AccessTokenContext.getUserId();
+        QueryWrapper<LedgerDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger.uuid", uuid.toString());
+        queryWrapper.eq("co.user_id", userId.toString());
+        LedgerDO record = mapper.selectOne(queryWrapper);
+        return doToDto(record);
+    }
+
     @Override
     protected LedgerDTO doToDto(LedgerDO record) {
         LedgerDTO result = super.doToDto(record);

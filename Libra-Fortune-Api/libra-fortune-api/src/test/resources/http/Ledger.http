@@ -31,3 +31,8 @@ Accept: application/json
 Access-Token-ID: {{access-token-id}}
 Access-Token: {{access-token-secret}}
 
+### get by id
+GET http://{{hostname}}/api/ledgers/a54b45e2-dbec-447e-91fe-6005d9108e01
+Accept: application/json
+Access-Token-ID: {{access-token-id}}
+Access-Token: {{access-token-secret}}

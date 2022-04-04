@@ -1,21 +1,17 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
-import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.LedgerCategoryQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerCategoryDTO;
-import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.mapper.LedgerCategoryMapper;
 import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerCategoryService;
 import com.kuretru.web.libra.service.LedgerEntryService;
-import com.kuretru.web.libra.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -26,15 +22,12 @@ import java.util.UUID;
 @Service
 @Transactional
 public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
-
-    private final LedgerService ledgerService;
     private final CoLedgerUserService coLedgerUserService;
     private final LedgerEntryService ledgerEntryService;
 
     @Autowired
-    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, LedgerService ledgerService, CoLedgerUserService coLedgerUserService, @Lazy LedgerEntryService ledgerEntryService) {
+    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, CoLedgerUserService coLedgerUserService, @Lazy LedgerEntryService ledgerEntryService) {
         super(mapper, LedgerCategoryDO.class, LedgerCategoryDTO.class, LedgerCategoryQuery.class);
-        this.ledgerService = ledgerService;
         this.coLedgerUserService = coLedgerUserService;
         this.ledgerEntryService = ledgerEntryService;
     }
@@ -42,9 +35,8 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     @Override
     public synchronized LedgerCategoryDTO save(LedgerCategoryDTO record) throws ServiceException {
         UUID userId = AccessTokenContext.getUserId();
-        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
-        if (existLedger == null) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "ledger不存在");
+        if (!coLedgerUserService.getLedgerPermission(record.getLedgerId(), userId, true)) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
 //        不可重复添加
         QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
@@ -52,23 +44,6 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         queryWrapper.eq("name", record.getName());
         if (mapper.exists(queryWrapper)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
-        }
-
-//        if (existLedger.getType().equals(LedgerTypeEnum.COMMON) || existLedger.getType().equals(LedgerTypeEnum.FINANCIAL)) {
-        if (existLedger.getType().equals(LedgerTypeEnum.COMMON)) {
-//        单人普通/理财账本：如果账本的拥有者不为当前用户
-            if (!existLedger.getOwnerId().equals(userId)) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-            }
-        } else if (existLedger.getType().equals(LedgerTypeEnum.CO_COMMON)) {
-//            如果是合作普通/理财账本 用coLedgerUserService
-//            查询co_ledger_user ledger_id +userId + is_writable = 1;
-//            如果查不到报错
-            if (!coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, true)) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-            }
-        } else {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型不对");
         }
         return super.save(record);
     }
@@ -80,29 +55,13 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         if (oldRecord == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定LedgerCategory不存在");
         }
-
         if (!record.getLedgerId().equals(oldRecord.getLedgerId())) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可修改ledgerId");
         }
-        LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
-
-//        查看账本是否是合作账本
-        if (existLedger.getType().equals(LedgerTypeEnum.COMMON)) {
-//        单人普通/理财账本：如果账本的拥有者不为当前用户
-            if (!existLedger.getOwnerId().equals(userId)) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-            }
-        } else if (existLedger.getType().equals(LedgerTypeEnum.CO_COMMON)) {
-//            如果是合作普通/理财账本 用coLedgerUserService
-//            查询co_ledger_user ledger_id +userId + is_writable = 1;
-//            如果查不到报错
-            if (!coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, true)) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-            }
-        } else {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型不对");
+        if (!coLedgerUserService.getLedgerPermission(record.getLedgerId(), userId, true)) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
-        //        不可重复添加
+//        不可重复添加
         QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
         queryWrapper.eq("name", record.getName());
@@ -120,29 +79,33 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         if (oldRecord == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定LedgerCategory不存在");
         }
-
-        LedgerDTO existLedger = ledgerService.get(oldRecord.getLedgerId());
-
-//        查看账本是否是合作账本
-        if (existLedger.getType().equals(LedgerTypeEnum.COMMON)) {
-//        单人普通/理财账本：如果账本的拥有者不为当前用户
-            if (!existLedger.getOwnerId().equals(userId)) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-            }
-        } else if (existLedger.getType().equals(LedgerTypeEnum.CO_COMMON)) {
-//            如果是合作普通/理财账本 用coLedgerUserService
-//            查询co_ledger_user ledger_id +userId + is_writable = 1;
-//            如果查不到报错
-            if (!coLedgerUserService.getLedgerPermission(existLedger.getId(), userId, true)) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
-            }
-        } else {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本类型不对");
+        if (!coLedgerUserService.getLedgerPermission(oldRecord.getLedgerId(), userId, true)) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
         if (ledgerEntryService.existCategoryId(uuid)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "请先删除账目中的此大类后再删除");
         }
         super.remove(uuid);
+    }
+
+    protected QueryWrapper<LedgerCategoryDO> buildQueryWrapper(LedgerCategoryQuery query) {
+        UUID userId = AccessTokenContext.getUserId();
+        if (!coLedgerUserService.getLedgerPermission(query.getLedgerId(), userId, true)) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+        }
+        return super.buildQueryWrapper(query);
+    }
+
+    @Override
+    public LedgerCategoryDTO get(UUID uuid) {
+        UUID userId = AccessTokenContext.getUserId();
+        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("uuid", uuid.toString());
+        LedgerCategoryDO record = mapper.selectOne(queryWrapper);
+        if (record == null ||  !coLedgerUserService.getLedgerPermission(UUID.fromString(record.getLedgerId()), userId, true)) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+        }
+        return doToDto(record);
     }
 
     @Override
