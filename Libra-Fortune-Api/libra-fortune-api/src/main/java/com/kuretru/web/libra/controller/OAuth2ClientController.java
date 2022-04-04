@@ -10,6 +10,8 @@ import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.web.libra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,7 +30,7 @@ public class OAuth2ClientController extends BaseOAuth2ClientController {
     }
 
     @Override
-    public ApiResponse<?> galaxyCallback(OAuth2AuthorizeDTO.Response response) throws ServiceException {
+    public ApiResponse<?> galaxyCallback(@Validated @RequestBody OAuth2AuthorizeDTO.Response response) throws ServiceException {
         GalaxyUserDTO galaxyUserDTO = galaxyManager.callback(response);
         UserLoginDTO result = userService.login(galaxyUserDTO);
         return ApiResponse.success(result);
