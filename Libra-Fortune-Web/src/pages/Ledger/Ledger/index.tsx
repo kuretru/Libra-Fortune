@@ -4,7 +4,7 @@ import { ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import LedgerService from '@/services/libra-fortune-web/ledger/ledger';
 import BasePage from '@/components/BasePage';
 
-class OAuthApplication extends React.Component {
+class Ledger extends React.Component {
   ledgerType = {
     COMMON: '个人账本',
     CO_COMMON: '合作账本',
@@ -65,11 +65,14 @@ class OAuthApplication extends React.Component {
           width="lg"
         />
         <ProFormText
-          label="备注"
+          disabled
+          hidden
+          initialValue={localStorage.getItem('userId')}
+          label="管理员"
           name="ownerId"
-          placeholder="请输入备注"
-          rules={[{ max: 64, required: true }]}
-          tooltip="最长64位"
+          placeholder="请输入管理员"
+          rules={[{ max: 36, required: true }]}
+          tooltip="最长36位"
           width="lg"
         />
       </>
@@ -88,4 +91,4 @@ class OAuthApplication extends React.Component {
   }
 }
 
-export default OAuthApplication;
+export default Ledger;
