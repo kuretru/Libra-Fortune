@@ -5,20 +5,20 @@ Access-Token-ID: {{access-token-id}}
 Access-Token: {{access-token-secret}}
 
 {
-  "ledgerId": "da573548-efe1-46a9-9b3a-c6a084668a73",
-  "name": "da571111"
+  "ledgerId": "a6b02840-d5cd-48cf-aa8c-95e90a65db4c",
+  "name": "A6B01111"
 }
 
 ### 更新
-PUT http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/81ba5d30-58bf-4fca-bf55-10869ac31c22
+PUT http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/fb5a01b2-e32e-4985-8dba-8f36afa6fc5b
 Content-Type: application/json
 Access-Token-ID: {{access-token-id}}
 Access-Token: {{access-token-secret}}
 
 {
-  "id": "81ba5d30-58bf-4fca-bf55-10869ac31c22",
+  "id": "fb5a01b2-e32e-4985-8dba-8f36afa6fc5b",
   "ledgerId": "a6b02840-d5cd-48cf-aa8c-95e90a65db4c",
-  "name": "ab6033333"
+  "name": "ab603544444444"
 }
 
 ### list by ledgerId
@@ -28,12 +28,12 @@ Access-Token-ID: {{access-token-id}}
 Access-Token: {{access-token-secret}}
 
 ### select by id
-GET http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/b22fe802-2d81-49e3-8450-58dc76699aea
+GET http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/c31a43f5-7678-4ea5-bb75-c6aa6aebbe0b
 Accept: application/json
 Access-Token-ID: {{access-token-id}}
 Access-Token: {{access-token-secret}}
 
 
 ### delete by id  还没测试
-DELETE http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/9219cf0d-ab07-4b1a-95c8-6db40638037a
+DELETE http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/1ee1cb9e-90f8-4484-a3ac-45dbbd8aec14
 Accept: application/json

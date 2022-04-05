@@ -36,14 +36,14 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     public synchronized LedgerCategoryDTO save(LedgerCategoryDTO record) throws ServiceException {
         UUID userId = AccessTokenContext.getUserId();
         if (!coLedgerUserService.getLedgerPermission(record.getLedgerId(), userId, true)) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "LedgerCategoryDTO.save.不可操做");
         }
 //        不可重复添加
         QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
         queryWrapper.eq("name", record.getName());
         if (mapper.exists(queryWrapper)) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "LedgerCategoryDTO.不可重复添加");
         }
         return super.save(record);
     }
@@ -91,19 +91,18 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     protected QueryWrapper<LedgerCategoryDO> buildQueryWrapper(LedgerCategoryQuery query) {
         UUID userId = AccessTokenContext.getUserId();
         if (!coLedgerUserService.getLedgerPermission(query.getLedgerId(), userId, true)) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "buildQueryWrapper.不可操做");
         }
         return super.buildQueryWrapper(query);
     }
 
-    @Override
-    public LedgerCategoryDTO get(UUID uuid) {
-        UUID userId = AccessTokenContext.getUserId();
+
+    public LedgerCategoryDTO get(UUID uuid,UUID userId) {
         QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uuid", uuid.toString());
         LedgerCategoryDO record = mapper.selectOne(queryWrapper);
         if (record == null ||  !coLedgerUserService.getLedgerPermission(UUID.fromString(record.getLedgerId()), userId, true)) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "LedgerCategoryService.get.不可操做");
         }
         return doToDto(record);
     }
