@@ -172,7 +172,7 @@ abstract class BasePage<T extends API.BaseDTO, Q> extends React.Component<
           headerTitle={`${this.props.pageName}管理`}
           loading={this.state.tableLoading}
           options={{ fullScreen: true, setting: true }}
-          pagination={{ defaultPageSize: 20 }}
+          pagination={{ defaultPageSize: 20, showSizeChanger: true }}
           request={this.fetchData}
           rowKey="id"
           tooltip={`${this.props.pageName}管理`}

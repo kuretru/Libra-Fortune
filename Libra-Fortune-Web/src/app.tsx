@@ -5,7 +5,7 @@ import { PageLoading, SettingDrawer } from '@ant-design/pro-layout';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import { LinkOutlined } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
 import { get as getUser } from '@/services/libra-fortune-web/user';
 
@@ -59,7 +59,7 @@ export async function getInitialState(): Promise<{
   };
 }
 
-/** Request的AccessToken拦截器 */
+// Request的AccessToken拦截器
 const accessTokenInterceptor = (url: string, options: RequestOptionsInit) => {
   const id = localStorage.getItem('accessTokenId');
   if (!id) {
@@ -79,7 +79,7 @@ const accessTokenInterceptor = (url: string, options: RequestOptionsInit) => {
   };
 };
 
-/** 全局Request配置 */
+// 全局Request配置
 export const request: RequestConfig = {
   errorConfig: {
     adaptor: (resData: any) => {
@@ -129,13 +129,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
     links: isDev
       ? [
-          <Link to="/umi/plugin/openapi" target="_blank">
+          <Link key="github" target="_blank" to="https://github.com/kuretru/Libra-Fortune/">
             <LinkOutlined />
-            <span>OpenAPI 文档</span>
-          </Link>,
-          <Link to="/~docs">
-            <BookOutlined />
-            <span>业务组件文档</span>
+            <span>GitBub</span>
           </Link>,
         ]
       : [],
@@ -153,7 +149,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               enableDarkTheme
               settings={initialState?.settings}
               onSettingChange={(settings) => {
-                setInitialState((preInitialState) => ({
+                setInitialState((preInitialState: any) => ({
                   ...preInitialState,
                   settings,
                 }));
