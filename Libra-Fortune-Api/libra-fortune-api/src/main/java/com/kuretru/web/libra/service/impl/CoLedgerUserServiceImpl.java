@@ -6,25 +6,20 @@ import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.CoLedgerUserDO;
-import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
-import com.kuretru.web.libra.entity.data.LedgerDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.CoLedgerUserQuery;
-import com.kuretru.web.libra.entity.query.LedgerCategoryQuery;
-import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.CoLedgerUserDTO;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
-import com.kuretru.web.libra.entity.transfer.SystemUserDTO;
+import com.kuretru.web.libra.entity.transfer.UserDTO;
 import com.kuretru.web.libra.mapper.CoLedgerUserMapper;
 import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerService;
-import com.kuretru.web.libra.service.SystemUserService;
+import com.kuretru.web.libra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,10 +27,10 @@ import java.util.UUID;
 public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper, CoLedgerUserDO, CoLedgerUserDTO, CoLedgerUserQuery> implements CoLedgerUserService {
 
     private final LedgerService ledgerService;
-    private final SystemUserService userService;
+    private final UserService userService;
 
     @Autowired
-    public CoLedgerUserServiceImpl(CoLedgerUserMapper mapper, @Lazy LedgerService ledgerService, SystemUserService userService) {
+    public CoLedgerUserServiceImpl(CoLedgerUserMapper mapper, @Lazy LedgerService ledgerService, UserService userService) {
         super(mapper, CoLedgerUserDO.class, CoLedgerUserDTO.class, CoLedgerUserQuery.class);
         this.ledgerService = ledgerService;
         this.userService = userService;
@@ -51,7 +46,7 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         if (existLedger == null || !existLedger.getOwnerId().equals(userId)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "ledger不存在/user无权添加");
         }
-        SystemUserDTO existUser = userService.get(record.getUserId());
+        UserDTO existUser = userService.get(record.getUserId());
         if (existUser == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无效用户");
         }
@@ -63,7 +58,7 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
             if (mapper.exists(queryWrapper)) {
                 throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可重复添加");
             }
-        }else{
+        } else {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "CoLedgerUserServiceImpl.save.账本类型不符");
         }
         return super.save(record);
@@ -122,7 +117,7 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         QueryWrapper<CoLedgerUserDO> accessWrapper = new QueryWrapper<>();
         accessWrapper.eq("ledger_id", query.getLedgerId().toString());
         accessWrapper.eq("user_id", userId.toString());
-        if (mapper.exists(accessWrapper)) {
+        if (!mapper.exists(accessWrapper)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "CoLedgerUserServiceImpl.buildQueryWrapper.无权查看");
         }
         QueryWrapper<CoLedgerUserDO> queryWrapper = new QueryWrapper<>();

@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface LedgerCategoryService extends BaseService<LedgerCategoryDTO, LedgerCategoryQuery> {
 
     LedgerCategoryDTO get(UUID id, UUID userId);
+
 }

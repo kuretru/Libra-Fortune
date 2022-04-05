@@ -22,6 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
+
     private final CoLedgerUserService coLedgerUserService;
     private final LedgerEntryService ledgerEntryService;
 
@@ -97,11 +98,11 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     }
 
 
-    public LedgerCategoryDTO get(UUID uuid,UUID userId) {
+    public LedgerCategoryDTO get(UUID uuid, UUID userId) {
         QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uuid", uuid.toString());
         LedgerCategoryDO record = mapper.selectOne(queryWrapper);
-        if (record == null ||  !coLedgerUserService.getLedgerPermission(UUID.fromString(record.getLedgerId()), userId, true)) {
+        if (record == null || !coLedgerUserService.getLedgerPermission(UUID.fromString(record.getLedgerId()), userId, true)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "LedgerCategoryService.get.不可操做");
         }
         return doToDto(record);

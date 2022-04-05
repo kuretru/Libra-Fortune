@@ -1,7 +1,6 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
