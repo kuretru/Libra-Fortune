@@ -1,7 +1,6 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
@@ -10,9 +9,12 @@ import com.kuretru.web.libra.entity.data.CoLedgerUserDO;
 import com.kuretru.web.libra.entity.query.CoLedgerUserQuery;
 import com.kuretru.web.libra.entity.transfer.CoLedgerUserDTO;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
+import com.kuretru.web.libra.entity.transfer.SystemUserDTO;
 import com.kuretru.web.libra.mapper.CoLedgerUserMapper;
 import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerService;
+import com.kuretru.web.libra.service.SystemUserService;
+import com.kuretru.web.libra.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -25,11 +27,12 @@ import java.util.UUID;
 public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper, CoLedgerUserDO, CoLedgerUserDTO, CoLedgerUserQuery> implements CoLedgerUserService {
 
     private final LedgerService ledgerService;
-
+    private final SystemUserService userService;
     @Autowired
-    public CoLedgerUserServiceImpl(CoLedgerUserMapper mapper, @Lazy LedgerService ledgerService) {
+    public CoLedgerUserServiceImpl(CoLedgerUserMapper mapper, @Lazy LedgerService ledgerService, SystemUserService userService) {
         super(mapper, CoLedgerUserDO.class, CoLedgerUserDTO.class, CoLedgerUserQuery.class);
         this.ledgerService = ledgerService;
+        this.userService = userService;
     }
 
     /**
@@ -41,6 +44,10 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         LedgerDTO existLedger = ledgerService.get(record.getLedgerId());
         if (existLedger == null || !existLedger.getOwnerId().equals(userId)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "ledger不存在/user无权添加");
+        }
+        SystemUserDTO existUser = userService.get(record.getUserId());
+        if (existUser == null ) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无效用户");
         }
         QueryWrapper<CoLedgerUserDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
@@ -66,7 +73,7 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权修改");
         }
 //        owner不要更改自己的权限
-        if (ledger.getOwnerId().equals(record.getUserId())) {
+        if (userId.equals(record.getUserId())) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "owner不要更改自己的权限");
         }
 //        更改了这条记录的ledgerId/userId
@@ -97,7 +104,6 @@ public class CoLedgerUserServiceImpl extends BaseServiceImpl<CoLedgerUserMapper,
         }
         throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无权删除");
     }
-
 
 
     @Override

@@ -1,4 +1,4 @@
-###
+### 新建
 POST http://{{hostname}}/api/ledgers/{{ledgerId}}/categories
 Content-Type: application/json
 Access-Token-ID: {{access-token-id}}
@@ -9,7 +9,7 @@ Access-Token: {{access-token-secret}}
   "name": "da571111"
 }
 
-###
+### 更新
 PUT http://{{hostname}}/api/ledgers/{{ledgerId}}/categories/81ba5d30-58bf-4fca-bf55-10869ac31c22
 Content-Type: application/json
 Access-Token-ID: {{access-token-id}}
