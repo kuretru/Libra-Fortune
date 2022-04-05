@@ -11,6 +11,7 @@ import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +28,7 @@ public class LedgerController extends BaseRestController<LedgerService, LedgerDT
     }
 
     @Override
-    public ApiResponse<LedgerDTO> get(UUID id) throws ServiceException {
+    public ApiResponse<LedgerDTO> get(@PathVariable("id") UUID id) throws ServiceException {
         UUID userId = AccessTokenContext.getUserId();
         if (id == null || EmptyConstants.EMPTY_UUID.equals(id)) {
             throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定ID或ID错误");
