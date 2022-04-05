@@ -12,6 +12,4 @@ public class CoLedgerUserQuery {
 
     private UUID userId;
 
-    private Boolean isWritable;
-
 }

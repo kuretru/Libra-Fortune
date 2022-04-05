@@ -30,7 +30,7 @@ public class OAuth2ClientController extends BaseOAuth2ClientController {
     }
 
     @Override
-    public ApiResponse<?> galaxyCallback(OAuth2AuthorizeDTO.Response response) throws ServiceException {
+    public ApiResponse<?> galaxyCallback(@Validated @RequestBody OAuth2AuthorizeDTO.Response response) throws ServiceException {
         GalaxyUserDTO galaxyUserDTO = galaxyManager.callback(response);
         UserLoginDTO result = userService.login(galaxyUserDTO);
         return ApiResponse.success(result);

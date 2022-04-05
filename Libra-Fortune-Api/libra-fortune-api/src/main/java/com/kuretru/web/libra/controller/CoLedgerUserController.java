@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.controller;
 
+import com.kuretru.microservices.authentication.annotaion.RequireAuthorization;
 import com.kuretru.microservices.web.controller.BaseRestController;
 import com.kuretru.web.libra.entity.query.CoLedgerUserQuery;
 import com.kuretru.web.libra.entity.transfer.CoLedgerUserDTO;
@@ -9,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/co-ledgers/{ledgerId}/users")
+@RequestMapping("/ledgers/{ledgerId}/users")
+@RequireAuthorization
 public class CoLedgerUserController extends BaseRestController<CoLedgerUserService, CoLedgerUserDTO, CoLedgerUserQuery> {
 
     @Autowired
