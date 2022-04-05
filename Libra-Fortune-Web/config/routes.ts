@@ -19,9 +19,15 @@ export default [
     icon: 'snippets',
     routes: [
       {
-        path: '/ledgers',
         component: './Ledger/Ledger',
         name: '账本管理',
+        path: '/ledgers',
+      },
+      {
+        component: './Ledger/Category',
+        hideInMenu: true,
+        name: '分类管理',
+        path: '/ledgers/:ledgerId/categories',
       },
     ],
   },

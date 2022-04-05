@@ -1,6 +1,9 @@
 import React from 'react';
+import { history } from 'umi';
+import { Button } from 'antd';
 import type { ProColumns } from '@ant-design/pro-table';
 import { ProFormSelect, ProFormText } from '@ant-design/pro-form';
+import { AppstoreOutlined } from '@ant-design/icons';
 import LedgerService from '@/services/libra-fortune-web/ledger/ledger';
 import BasePage from '@/components/BasePage';
 
@@ -34,6 +37,25 @@ class Ledger extends React.Component {
       dataIndex: 'remark',
       search: false,
       title: '描述',
+    },
+    {
+      align: 'center',
+      key: 'manager',
+      title: '管理',
+      valueType: 'option',
+      width: 240,
+      render: (_, record) => {
+        return [
+          <Button
+            icon={<AppstoreOutlined />}
+            key="category"
+            onClick={() => history.push(`/ledgers/${record.id}/categories`)}
+            type="primary"
+          >
+            分类管理
+          </Button>,
+        ];
+      },
     },
   ];
 

@@ -1,5 +1,5 @@
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
-import { ErrorShowType, history, Link } from 'umi';
+import { ErrorShowType, history } from 'umi';
 import type { RequestOptionsInit } from 'umi-request';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-layout';
 import type { Settings as LayoutSettings } from '@ant-design/pro-layout';
@@ -129,10 +129,15 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
     links: isDev
       ? [
-          <Link key="github" target="_blank" to="https://github.com/kuretru/Libra-Fortune/">
+          <a
+            key="github"
+            target="_blank"
+            href="https://github.com/kuretru/Libra-Fortune/"
+            rel="noreferrer"
+          >
             <LinkOutlined />
-            <span>GitBub</span>
-          </Link>,
+            <span>GitHub</span>
+          </a>,
         ]
       : [],
     menuHeaderRender: undefined,
