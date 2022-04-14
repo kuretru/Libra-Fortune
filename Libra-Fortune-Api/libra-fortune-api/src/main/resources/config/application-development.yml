@@ -12,7 +12,7 @@ logging:
 galaxy:
   oauth2:
     client:
-      gemini:
+      galaxy:
         server-url: http://127.0.0.1:7052
         application-id: 11ec9610244bfe55777c
         application-secret: c973e950-b0fa-11ec-9610-244bfe55777c

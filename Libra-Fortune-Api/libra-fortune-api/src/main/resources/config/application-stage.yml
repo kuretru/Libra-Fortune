@@ -12,7 +12,7 @@ logging:
 galaxy:
   oauth2:
     client:
-      gemini:
+      galaxy:
         server-url: https://oauth2.i5zhen.com
         application-id: ${GEMINI_APPLICATION_ID:}
         application-secret: ${GEMINI_APPLICATION_SECRET:}
