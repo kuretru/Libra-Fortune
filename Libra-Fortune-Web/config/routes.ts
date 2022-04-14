@@ -6,17 +6,17 @@ export default [
       {
         path: '/users',
         routes: [
-          { name: '登录', path: '/users/login', component: './user/Login' },
-          { name: '回调', path: '/users/login/callback', component: './user/Callback' },
+          { component: './User/Login', name: '登录', path: '/users/login' },
+          { component: './User/Callback', name: '回调', path: '/users/login/callback' },
         ],
       },
       { component: './404' },
     ],
   },
-  { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
+  { component: './Welcome', icon: 'smile', path: '/welcome', name: '欢迎' },
   {
-    name: '账本管理',
     icon: 'snippets',
+    name: '账本管理',
     routes: [
       {
         component: './Ledger/Ledger',
@@ -26,24 +26,17 @@ export default [
       {
         component: './Ledger/Category',
         hideInMenu: true,
-        name: '分类管理',
+        name: '账本分类管理',
         path: '/ledgers/:ledgerId/categories',
+      },
+      {
+        component: './Ledger/User',
+        hideInMenu: true,
+        name: '账本用户管理',
+        path: '/ledgers/:ledgerId/users',
       },
     ],
   },
-
-  {
-    path: '/admin',
-    name: '管理页',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
-    routes: [
-      { path: '/admin/sub-page', name: '二级管理页', icon: 'smile', component: './Welcome' },
-      { component: './404' },
-    ],
-  },
-  { name: '查询表格', icon: 'table', path: '/list', component: './TableList' },
   { path: '/', redirect: '/welcome' },
   { component: './404' },
 ];

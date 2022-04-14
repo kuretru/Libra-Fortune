@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Menu, Spin } from 'antd';
+import { Avatar, Menu, message, Spin } from 'antd';
 import { history, useModel } from 'umi';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-import { outLogin } from '@/services/ant-design-pro/api';
+import { logout } from '@/services/galaxy-oauth2-client/user';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 
 export type GlobalHeaderRightProps = {
@@ -16,13 +16,17 @@ export type GlobalHeaderRightProps = {
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = async () => {
-  await outLogin();
+  const response = await logout();
+  localStorage.removeItem('userId');
+  localStorage.removeItem('accessTokenId');
+  localStorage.removeItem('accessToken');
+  message.success(response.data);
   const { query = {}, search, pathname } = history.location;
   const { redirect } = query;
   // Note: There may be security issues, please note
-  if (window.location.pathname !== '/user/login' && !redirect) {
+  if (window.location.pathname !== '/users/login' && !redirect) {
     history.replace({
-      pathname: '/user/login',
+      pathname: '/users/login',
       search: stringify({
         redirect: pathname + search,
       }),
