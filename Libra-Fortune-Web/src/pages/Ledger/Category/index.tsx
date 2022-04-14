@@ -1,7 +1,7 @@
 import React from 'react';
 import type { IRouteComponentProps } from 'umi';
 import type { ProColumns } from '@ant-design/pro-table';
-import { ProFormSelect, ProFormText } from '@ant-design/pro-form';
+import { ProFormText } from '@ant-design/pro-form';
 import LedgerCategoryService from '@/services/libra-fortune-web/ledger/ledger-category';
 import LedgerService from '@/services/libra-fortune-web/ledger/ledger';
 import BasePage from '@/components/BasePage';
@@ -15,7 +15,7 @@ class LedgerCategory extends React.Component<IRouteComponentProps<{ ledgerId: st
   async fetchLedgerName() {
     const ledgerService = new LedgerService();
     const ledger = (await ledgerService.get(this.ledgerId)).data;
-    this.setState({ ledgerName: ledger.name + '分类' });
+    this.setState({ ledgerName: ledger.name });
   }
 
   constructor(props: IRouteComponentProps<{ ledgerId: string }>) {
@@ -66,7 +66,7 @@ class LedgerCategory extends React.Component<IRouteComponentProps<{ ledgerId: st
   render() {
     return (
       <BasePage<API.Ledger.LedgerCategoryDTO, API.Ledger.LedgerCategoryQuery>
-        pageName={this.state.ledgerName}
+        pageName={this.state.ledgerName + '-分类'}
         service={new LedgerCategoryService(this.ledgerId)}
         columns={this.columns}
         formItem={this.formItem()}
