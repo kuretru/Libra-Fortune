@@ -38,9 +38,7 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
     public synchronized LedgerDTO save(LedgerDTO record) throws ServiceException {
         // 判断当前userId存在
         UUID userId = AccessTokenContext.getUserId();
-        if (!userId.equals(record.getOwnerId())) {
-            throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "请勿操作别人的数据");
-        }
+        record.setOwnerId(userId);
         LedgerDTO ledgerDTO = super.save(record);
         // 去coLedgerUserService账本那边再加一条
         CoLedgerUserDTO coLedgerUserDTO = new CoLedgerUserDTO();
