@@ -3,7 +3,19 @@ server:
   servlet:
     context-path: /api
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  data:
+    redis:
+      repositories:
+        enabled: false
   datasource:
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 4
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${MYSQL_USERNAME:libra}
     password: ${MYSQL_PASSWORD:123456}
