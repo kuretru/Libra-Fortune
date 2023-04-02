@@ -7,7 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
+ * 账本表
  *
+ * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,12 +17,16 @@ import lombok.ToString;
 @TableName("ledger")
 public class LedgerDO extends BaseDO {
 
-    private String name;
-
-    private String remark;
-
+    /** 外键，账本主人ID */
     private String ownerId;
 
+    /** 账本名称 */
+    private String name;
+
+    /** 账本类型 */
     private Short type;
+
+    /** 账本备注 */
+    private String remark;
 
 }

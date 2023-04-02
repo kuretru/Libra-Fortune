@@ -7,16 +7,20 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
+ * 账本标签表
  *
+ * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("ledger_category")
-public class LedgerCategoryDO extends BaseDO {
+@TableName("ledger_tag")
+public class LedgerTagDO extends BaseDO {
 
-    private String ledgerId;
+    /** 外键，所属用户ID */
+    private String userId;
 
+    /** 标签名称 */
     private String name;
 
 }

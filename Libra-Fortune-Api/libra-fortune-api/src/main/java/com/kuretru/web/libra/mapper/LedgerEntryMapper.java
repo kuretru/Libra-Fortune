@@ -5,6 +5,9 @@ import com.kuretru.web.libra.entity.data.LedgerEntryDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+/**
+ * @author 呉真(kuretru) <kuretru@gmail.com>
+ */
 @Repository
 @Mapper
 public interface LedgerEntryMapper extends BaseMapper<LedgerEntryDO> {

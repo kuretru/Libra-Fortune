@@ -1,6 +1,5 @@
 package com.kuretru.web.libra.entity.data;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.kuretru.microservices.web.entity.data.BaseDO;
 import lombok.Data;
@@ -8,19 +7,20 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
+ * 账本成员关联表
  *
+ * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("co_ledger_user")
-public class CoLedgerUserDO extends BaseDO {
+@TableName("ledger_member")
+public class LedgerMemberDO extends BaseDO {
 
+    /** 外键，账本ID */
     private String ledgerId;
 
+    /** 外键，用户ID */
     private String userId;
-
-    @TableField("is_writable")
-    private Boolean isWritable;
 
 }

@@ -5,10 +5,10 @@ import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
-import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
+import com.kuretru.web.libra.entity.data.LedgerEntryCategoryDO;
 import com.kuretru.web.libra.entity.query.LedgerCategoryQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerCategoryDTO;
-import com.kuretru.web.libra.mapper.LedgerCategoryMapper;
+import com.kuretru.web.libra.mapper.LedgerEntryCategoryMapper;
 import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerCategoryService;
 import com.kuretru.web.libra.service.LedgerEntryService;
@@ -21,14 +21,14 @@ import java.util.UUID;
 
 @Service
 @Transactional
-public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMapper, LedgerCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
+public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerEntryCategoryMapper, LedgerEntryCategoryDO, LedgerCategoryDTO, LedgerCategoryQuery> implements LedgerCategoryService {
 
     private final CoLedgerUserService coLedgerUserService;
     private final LedgerEntryService ledgerEntryService;
 
     @Autowired
-    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, CoLedgerUserService coLedgerUserService, @Lazy LedgerEntryService ledgerEntryService) {
-        super(mapper, LedgerCategoryDO.class, LedgerCategoryDTO.class, LedgerCategoryQuery.class);
+    public LedgerCategoryServiceImpl(LedgerEntryCategoryMapper mapper, CoLedgerUserService coLedgerUserService, @Lazy LedgerEntryService ledgerEntryService) {
+        super(mapper, LedgerEntryCategoryDO.class, LedgerCategoryDTO.class, LedgerCategoryQuery.class);
         this.coLedgerUserService = coLedgerUserService;
         this.ledgerEntryService = ledgerEntryService;
     }
@@ -40,7 +40,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "LedgerCategoryDTO.save.不可操做");
         }
 //        不可重复添加
-        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<LedgerEntryCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
         queryWrapper.eq("name", record.getName());
         if (mapper.exists(queryWrapper)) {
@@ -63,7 +63,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不可操做");
         }
 //        不可重复添加
-        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<LedgerEntryCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
         queryWrapper.eq("name", record.getName());
         if (mapper.exists(queryWrapper)) {
@@ -89,7 +89,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
         super.remove(uuid);
     }
 
-    protected QueryWrapper<LedgerCategoryDO> buildQueryWrapper(LedgerCategoryQuery query) {
+    protected QueryWrapper<LedgerEntryCategoryDO> buildQueryWrapper(LedgerCategoryQuery query) {
         UUID userId = AccessTokenContext.getUserId();
         if (!coLedgerUserService.getLedgerPermission(query.getLedgerId(), userId, true)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "buildQueryWrapper.不可操做");
@@ -99,9 +99,9 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
 
 
     public LedgerCategoryDTO get(UUID uuid, UUID userId) {
-        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<LedgerEntryCategoryDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("uuid", uuid.toString());
-        LedgerCategoryDO record = mapper.selectOne(queryWrapper);
+        LedgerEntryCategoryDO record = mapper.selectOne(queryWrapper);
         if (record == null || !coLedgerUserService.getLedgerPermission(UUID.fromString(record.getLedgerId()), userId, true)) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "LedgerCategoryService.get.不可操做");
         }
@@ -109,7 +109,7 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     }
 
     @Override
-    protected LedgerCategoryDTO doToDto(LedgerCategoryDO record) {
+    protected LedgerCategoryDTO doToDto(LedgerEntryCategoryDO record) {
         LedgerCategoryDTO result = super.doToDto(record);
         if (record != null) {
             result.setLedgerId(UUID.fromString(record.getLedgerId()));
@@ -118,8 +118,8 @@ public class LedgerCategoryServiceImpl extends BaseServiceImpl<LedgerCategoryMap
     }
 
     @Override
-    protected LedgerCategoryDO dtoToDo(LedgerCategoryDTO record) {
-        LedgerCategoryDO result = super.dtoToDo(record);
+    protected LedgerEntryCategoryDO dtoToDo(LedgerCategoryDTO record) {
+        LedgerEntryCategoryDO result = super.dtoToDo(record);
         if (result != null) {
             result.setLedgerId(record.getLedgerId().toString());
         }

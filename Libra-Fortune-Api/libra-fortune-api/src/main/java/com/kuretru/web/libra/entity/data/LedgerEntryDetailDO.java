@@ -7,18 +7,29 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
+ * 账本条目详细表
  *
+ * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("co_ledger_entry")
-public class CoLedgerEntryDO extends BaseDO {
+@TableName("ledger_entry_detail")
+public class LedgerEntryDetailDO extends BaseDO {
 
+    /** 外键，条目ID */
     private String entryId;
 
+    /** 外键，归属用户ID */
     private String userId;
 
+    /** 外键，支出渠道ID */
+    private String paymentChannelId;
+
+    /** 承担比例 */
+    private Short fundedRation;
+
+    /** 承担金额 */
     private Long amount;
 
 }

@@ -9,7 +9,9 @@ import lombok.ToString;
 import java.time.LocalDate;
 
 /**
+ * 账本条目表
  *
+ * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -17,14 +19,22 @@ import java.time.LocalDate;
 @TableName("ledger_entry")
 public class LedgerEntryDO extends BaseDO {
 
+    /** 外键，账本ID */
     private String ledgerId;
 
+    /** 外键，条目分类ID */
     private String categoryId;
 
+    /** 条目日期 */
     private LocalDate date;
 
-    private Long amount;
+    /** 条目金额总计 */
+    private Long total;
 
+    /** 货币类型 */
+    private String currencyType;
+
+    /** 备注 */
     private String remark;
 
 }

@@ -6,24 +6,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.time.LocalDate;
-
 /**
+ * 账本条目分类表
  *
+ * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("financial_entry")
-public class FinancialEntryDO extends BaseDO {
+@TableName("ledger_entry_category")
+public class LedgerEntryCategoryDO extends BaseDO {
 
-    private String ledgerId;
-
-    private LocalDate date;
-
-    private Long amount;
-
-    private String remark;
-
+    /** 分类名称 */
+    private String name;
 
 }

@@ -5,7 +5,7 @@ import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
-import com.kuretru.web.libra.entity.data.EntryTagDO;
+import com.kuretru.web.libra.entity.data.LedgerEntryTagDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.EntryTagQuery;
 import com.kuretru.web.libra.entity.transfer.*;
@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
-public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTagDO, EntryTagDTO, EntryTagQuery> implements EntryTagService {
+public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, LedgerEntryTagDO, EntryTagDTO, EntryTagQuery> implements EntryTagService {
 
     private final UserTagService userTagService;
     private final FinancialEntryService financialEntryService;
@@ -29,7 +29,7 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
 
     @Autowired
     public EntryTagServiceImpl(EntryTagMapper mapper, UserTagService userTagService, FinancialEntryService financialEntryService, LedgerEntryService ledgerEntryService, LedgerService ledgerService, CoLedgerEntryService coLedgerEntryService) {
-        super(mapper, EntryTagDO.class, EntryTagDTO.class, EntryTagQuery.class);
+        super(mapper, LedgerEntryTagDO.class, EntryTagDTO.class, EntryTagQuery.class);
         this.userTagService = userTagService;
         this.financialEntryService = financialEntryService;
         this.ledgerEntryService = ledgerEntryService;
@@ -50,7 +50,7 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该用户没有该Tag");
         }
 //        是否重复
-        QueryWrapper<EntryTagDO> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<LedgerEntryTagDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("entry_id", record.getEntryId().toString());
         queryWrapper.eq("tag_id", record.getTagId().toString());
         if (mapper.exists(queryWrapper)) {
@@ -109,13 +109,13 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
 
     @Override
     public void deleteByTagId(UUID tagId) {
-        QueryWrapper<EntryTagDO> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<LedgerEntryTagDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("tag_id", tagId.toString());
         mapper.delete(queryWrapper);
     }
 
     @Override
-    protected EntryTagDTO doToDto(EntryTagDO record) {
+    protected EntryTagDTO doToDto(LedgerEntryTagDO record) {
         EntryTagDTO result = super.doToDto(record);
         if (record != null) {
             result.setEntryId(UUID.fromString(record.getEntryId()));
@@ -125,8 +125,8 @@ public class EntryTagServiceImpl extends BaseServiceImpl<EntryTagMapper, EntryTa
     }
 
     @Override
-    protected EntryTagDO dtoToDo(EntryTagDTO record) {
-        EntryTagDO result = super.dtoToDo(record);
+    protected LedgerEntryTagDO dtoToDo(EntryTagDTO record) {
+        LedgerEntryTagDO result = super.dtoToDo(record);
         if (result != null) {
             result.setEntryId(record.getEntryId().toString());
             result.setTagId(record.getTagId().toString());

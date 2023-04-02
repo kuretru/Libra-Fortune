@@ -7,16 +7,20 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
+ * 支付渠道表
  *
+ * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("user_tag")
-public class UserTagDO extends BaseDO {
+@TableName("payment_channel")
+public class PaymentChannelDO extends BaseDO {
 
+    /** 外键，归属用户ID */
     private String userId;
 
+    /** 支付渠道名称 */
     private String name;
 
 }
