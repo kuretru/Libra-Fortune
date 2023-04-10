@@ -12,9 +12,9 @@ import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.CoLedgerUserDTO;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.mapper.LedgerMapper;
-import com.kuretru.web.libra.service.CoLedgerUserService;
 import com.kuretru.web.libra.service.LedgerService;
 import org.apache.commons.lang3.NotImplementedException;
+import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -22,15 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+/**
+ * @author 呉真(kuretru) <kuretru@gmail.com>
+ */
 @Service
 public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery> implements LedgerService {
 
-    private final CoLedgerUserService coLedgerUserService;
-
     @Autowired
-    public LedgerServiceImpl(LedgerMapper mapper, CoLedgerUserService coLedgerUserService) {
-        super(mapper, LedgerDO.class, LedgerDTO.class, LedgerQuery.class);
-        this.coLedgerUserService = coLedgerUserService;
+    public LedgerServiceImpl(LedgerMapper mapper, LedgerEntityMapper entityMapper) {
+        super(mapper, entityMapper);
     }
 
     @Override
@@ -122,6 +122,23 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
             result.setType(record.getType().getCode());
         }
         return result;
+    }
+
+    @Override
+    public void verifyIamLedgerOwner(UUID ledgerId) throws ServiceException {
+        LedgerDTO ledgerDTO = get(ledgerId);
+        if (ledgerDTO == null) {
+            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本不存在");
+        }
+        UUID myUserId = AccessTokenContext.getUserId();
+        if (!ledgerDTO.getOwnerId().equals(myUserId)) {
+            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "账本拥有者才可以修改账本成员");
+        }
+    }
+
+    @Mapper(componentModel = "spring")
+    interface LedgerEntityMapper extends BaseServiceImpl.BaseEntityMapper<LedgerDO, LedgerDTO> {
+
     }
 
 }

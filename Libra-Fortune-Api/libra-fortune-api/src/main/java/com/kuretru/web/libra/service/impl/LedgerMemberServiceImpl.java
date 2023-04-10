@@ -9,7 +9,6 @@ import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerMemberDO;
 import com.kuretru.web.libra.entity.query.LedgerMemberQuery;
-import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.entity.transfer.LedgerMemberDTO;
 import com.kuretru.web.libra.mapper.LedgerMemberMapper;
 import com.kuretru.web.libra.service.LedgerMemberService;
@@ -96,14 +95,7 @@ public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper,
 
     @Override
     protected void verifyDTO(LedgerMemberDTO record) throws ServiceException {
-        LedgerDTO ledgerDTO = ledgerService.get(record.getLedgerId());
-        if (ledgerDTO == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本不存在");
-        }
-        UUID myUserId = AccessTokenContext.getUserId();
-        if (!ledgerDTO.getOwnerId().equals(myUserId)) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "账本拥有者才可以修改账本成员");
-        }
+        ledgerService.verifyIamLedgerOwner(record.getLedgerId());
     }
 
     @Mapper(componentModel = "spring")
