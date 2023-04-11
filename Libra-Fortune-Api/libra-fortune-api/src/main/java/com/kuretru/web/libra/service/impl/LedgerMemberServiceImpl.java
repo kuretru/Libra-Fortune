@@ -47,7 +47,7 @@ public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper,
         if (result != null) {
             UUID myUserId = AccessTokenContext.getUserId();
             if (!myUserId.equals(result.getUserId())) {
-                throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能查看自己信息");
+                throw new ServiceException(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能查看自己信息");
             }
         }
         return result;
@@ -74,14 +74,14 @@ public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper,
                 return;
             }
         }
-        throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能查看自己所在账本的账本成员");
+        throw new ServiceException(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能查看自己所在账本的账本成员");
     }
 
     @Override
     public void remove(UUID uuid) throws ServiceException {
         LedgerMemberDTO ledgerMemberDTO = this.get(uuid);
         if (ledgerMemberDTO == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本成员不存在");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本成员不存在");
         }
 
         UUID myUserId = AccessTokenContext.getUserId();

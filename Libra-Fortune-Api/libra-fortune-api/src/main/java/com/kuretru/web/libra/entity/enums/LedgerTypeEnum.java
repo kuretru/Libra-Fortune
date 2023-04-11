@@ -3,6 +3,9 @@ package com.kuretru.web.libra.entity.enums;
 import com.kuretru.microservices.common.entity.enums.BaseEnum;
 import lombok.Getter;
 
+/**
+ * @author 呉真(kuretru) <kuretru@gmail.com>
+ */
 @Getter
 public enum LedgerTypeEnum implements BaseEnum<LedgerTypeEnum> {
 

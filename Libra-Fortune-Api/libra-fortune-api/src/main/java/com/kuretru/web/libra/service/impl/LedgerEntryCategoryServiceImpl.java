@@ -38,7 +38,7 @@ public class LedgerEntryCategoryServiceImpl extends BaseServiceImpl<LedgerEntryC
         queryWrapper.eq("ledger_id", record.getLedgerId().toString());
         queryWrapper.eq("name", record.getName());
         if (!list(queryWrapper).isEmpty()) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本下已存在同名分类");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本下已存在同名分类");
         }
         return super.save(record);
     }
@@ -47,14 +47,14 @@ public class LedgerEntryCategoryServiceImpl extends BaseServiceImpl<LedgerEntryC
     public LedgerEntryCategoryDTO update(LedgerEntryCategoryDTO record) throws ServiceException {
         LedgerEntryCategoryDTO old = get(record.getId());
         if (!old.getLedgerId().equals(record.getLedgerId())) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无法修改账本ID");
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无法修改账本ID");
         }
         return super.update(record);
     }
 
     @Override
     public void remove(UUID uuid) throws ServiceException {
-        throw ServiceException.build(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "尚未实现");
+        throw new ServiceException(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "尚未实现");
         // TODO: 验证该分类下是否已不存在条目
         // super.remove(uuid);
     }
