@@ -21,7 +21,9 @@ import java.util.UUID;
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Service
-public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery> implements LedgerService {
+public class LedgerServiceImpl
+        extends BaseServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery>
+        implements LedgerService {
 
     @Autowired
     public LedgerServiceImpl(LedgerMapper mapper, LedgerEntityMapper entityMapper) {
@@ -64,12 +66,13 @@ public class LedgerServiceImpl extends BaseServiceImpl<LedgerMapper, LedgerDO, L
         }
         UUID myUserId = AccessTokenContext.getUserId();
         if (!ledgerDTO.getOwnerId().equals(myUserId)) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "账本拥有者才可以修改账本成员");
+            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "非账本拥有者");
         }
     }
 
     @Mapper(componentModel = "spring")
-    interface LedgerEntityMapper extends BaseServiceImpl.BaseEntityMapper<LedgerDO, LedgerDTO> {
+    interface LedgerEntityMapper
+            extends BaseServiceImpl.BaseEntityMapper<LedgerDO, LedgerDTO> {
 
         /**
          * 将数据实体转换为数据传输实体

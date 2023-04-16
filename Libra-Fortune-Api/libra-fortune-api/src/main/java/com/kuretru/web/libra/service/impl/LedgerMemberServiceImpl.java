@@ -30,7 +30,9 @@ import java.util.UUID;
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Service
-public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO, LedgerMemberQuery> implements LedgerMemberService {
+public class LedgerMemberServiceImpl
+        extends BaseServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO, LedgerMemberQuery>
+        implements LedgerMemberService {
 
     private final LedgerService ledgerService;
 
@@ -99,7 +101,8 @@ public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper,
     }
 
     @Mapper(componentModel = "spring")
-    interface LedgerMemberEntityMapper extends BaseServiceImpl.BaseEntityMapper<LedgerMemberDO, LedgerMemberDTO> {
+    interface LedgerMemberEntityMapper
+            extends BaseServiceImpl.BaseEntityMapper<LedgerMemberDO, LedgerMemberDTO> {
 
     }
 
