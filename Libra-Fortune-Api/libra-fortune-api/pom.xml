@@ -19,7 +19,7 @@
     <groupId>com.kuretru.web</groupId>
     <artifactId>libra-fortune-api</artifactId>
     <version>0.4.0</version>
-    <name>libra-fortune-api</name>n
+    <name>libra-fortune-api</name>
     <description>天秤财富-后端API</description>
 
     <dependencies>

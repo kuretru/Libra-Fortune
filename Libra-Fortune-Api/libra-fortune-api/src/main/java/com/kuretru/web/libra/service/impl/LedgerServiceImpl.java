@@ -1,17 +1,18 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.common.utils.EnumUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerDO;
+import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.mapper.LedgerMapper;
 import com.kuretru.web.libra.service.LedgerService;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,31 +72,16 @@ public class LedgerServiceImpl
     }
 
     @Mapper(componentModel = "spring")
-    interface LedgerEntityMapper
+    public interface LedgerEntityMapper
             extends BaseServiceImpl.BaseEntityMapper<LedgerDO, LedgerDTO> {
 
-        /**
-         * 将数据实体转换为数据传输实体
-         *
-         * @param record 数据实体
-         * @return 数据传输实体
-         */
-        @Mapping(source = "uuid", target = "id")
-        @Mapping(source = "com.kuretru.microservices.common.utils.EnumUtils.valueOf(com.kuretru.web.libra.entity.enums.LedgerTypeEnum.class, type)", target = "type")
-        LedgerDTO doToDto(LedgerDO record);
+        default LedgerTypeEnum toLedgerTypeEnum(Short code) {
+            return EnumUtils.valueOf(LedgerTypeEnum.class, code);
+        }
 
-        /**
-         * 将数据传输实体转换为数据实体
-         *
-         * @param record 数据传输实体
-         * @return 数据实体
-         */
-        @Mapping(source = "id", target = "uuid")
-        @Mapping(target = "id", ignore = true)
-        @Mapping(target = "createTime", ignore = true)
-        @Mapping(target = "updateTime", ignore = true)
-        @Mapping(source = "type.getCode()", target = "type")
-        LedgerDO dtoToDo(LedgerDTO record);
+        default Short fromLedgerTypeEnum(LedgerTypeEnum type) {
+            return type.getCode();
+        }
 
     }
 

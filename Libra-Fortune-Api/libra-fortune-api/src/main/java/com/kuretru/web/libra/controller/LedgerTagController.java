@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/ledgers/tags")
 @RequireAuthorization
-public class LedgerTagController extends BaseRestController<LedgerTagService, LedgerTagDTO, LedgerTagQuery> {
+public class LedgerTagController
+        extends BaseRestController<LedgerTagService, LedgerTagDTO, LedgerTagQuery> {
 
     @Autowired
     public LedgerTagController(LedgerTagService service) {
