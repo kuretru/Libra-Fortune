@@ -14,8 +14,8 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("ledger_entry_category")
-public class LedgerEntryCategoryDO extends BaseDO {
+@TableName("ledger_category")
+public class LedgerCategoryDO extends BaseDO {
 
     /** 外键，账本ID */
     private String ledgerId;

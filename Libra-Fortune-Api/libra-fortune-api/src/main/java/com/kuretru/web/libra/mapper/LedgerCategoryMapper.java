@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.kuretru.web.libra.entity.data.LedgerEntryCategoryDO;
+import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Mapper
-public interface LedgerEntryCategoryMapper extends BaseMapper<LedgerEntryCategoryDO> {
+public interface LedgerCategoryMapper extends BaseMapper<LedgerCategoryDO> {
 
 }
