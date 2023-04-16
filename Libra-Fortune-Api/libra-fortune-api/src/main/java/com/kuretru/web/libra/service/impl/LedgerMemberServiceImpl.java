@@ -8,12 +8,12 @@ import com.kuretru.microservices.web.entity.PaginationResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerMemberDO;
+import com.kuretru.web.libra.entity.mapper.LedgerMemberEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerMemberQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerMemberDTO;
 import com.kuretru.web.libra.mapper.LedgerMemberMapper;
 import com.kuretru.web.libra.service.LedgerMemberService;
 import com.kuretru.web.libra.service.LedgerService;
-import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -98,12 +98,6 @@ public class LedgerMemberServiceImpl
     @Override
     protected void verifyDTO(LedgerMemberDTO record) throws ServiceException {
         ledgerService.verifyIamLedgerOwner(record.getLedgerId());
-    }
-
-    @Mapper(componentModel = "spring")
-    interface LedgerMemberEntityMapper
-            extends BaseServiceImpl.BaseEntityMapper<LedgerMemberDO, LedgerMemberDTO> {
-
     }
 
 }

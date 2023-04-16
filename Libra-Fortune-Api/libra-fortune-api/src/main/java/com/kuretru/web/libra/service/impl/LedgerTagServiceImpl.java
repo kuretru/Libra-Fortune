@@ -7,11 +7,11 @@ import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerTagDO;
+import com.kuretru.web.libra.entity.mapper.LedgerTagEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerTagQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerTagDTO;
 import com.kuretru.web.libra.mapper.LedgerTagMapper;
 import com.kuretru.web.libra.service.LedgerTagService;
-import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,11 +61,6 @@ public class LedgerTagServiceImpl
         queryWrapper.eq("name", record.getName());
         LedgerTagDO result = mapper.selectOne(queryWrapper);
         return entityMapper.doToDto(result);
-    }
-
-    @Mapper(componentModel = "spring")
-    interface LedgerTagEntityMapper extends BaseServiceImpl.BaseEntityMapper<LedgerTagDO, LedgerTagDTO> {
-
     }
 
 }

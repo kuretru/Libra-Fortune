@@ -1,18 +1,16 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
-import com.kuretru.microservices.common.utils.EnumUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerDO;
-import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
+import com.kuretru.web.libra.entity.mapper.LedgerEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.mapper.LedgerMapper;
 import com.kuretru.web.libra.service.LedgerService;
-import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,20 +67,6 @@ public class LedgerServiceImpl
         if (!ledgerDTO.getOwnerId().equals(myUserId)) {
             throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "非账本拥有者");
         }
-    }
-
-    @Mapper(componentModel = "spring")
-    public interface LedgerEntityMapper
-            extends BaseServiceImpl.BaseEntityMapper<LedgerDO, LedgerDTO> {
-
-        default LedgerTypeEnum toLedgerTypeEnum(Short code) {
-            return EnumUtils.valueOf(LedgerTypeEnum.class, code);
-        }
-
-        default Short fromLedgerTypeEnum(LedgerTypeEnum type) {
-            return type.getCode();
-        }
-
     }
 
 }

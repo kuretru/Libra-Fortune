@@ -6,12 +6,12 @@ import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
+import com.kuretru.web.libra.entity.mapper.LedgerCategoryEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerCategoryQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerCategoryDTO;
 import com.kuretru.web.libra.mapper.LedgerCategoryMapper;
 import com.kuretru.web.libra.service.LedgerCategoryService;
 import com.kuretru.web.libra.service.LedgerService;
-import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class LedgerCategoryServiceImpl
     private final LedgerService ledgerService;
 
     @Autowired
-    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, LedgerEntryCategoryEntityMapper entityMapper,
+    public LedgerCategoryServiceImpl(LedgerCategoryMapper mapper, LedgerCategoryEntityMapper entityMapper,
                                      @Lazy LedgerService ledgerService) {
         super(mapper, entityMapper);
         this.ledgerService = ledgerService;
@@ -63,11 +63,6 @@ public class LedgerCategoryServiceImpl
         queryWrapper.eq("name", record.getName());
         LedgerCategoryDO result = mapper.selectOne(queryWrapper);
         return entityMapper.doToDto(result);
-    }
-
-    @Mapper(componentModel = "spring")
-    interface LedgerEntryCategoryEntityMapper extends BaseServiceImpl.BaseEntityMapper<LedgerCategoryDO, LedgerCategoryDTO> {
-
     }
 
 }
