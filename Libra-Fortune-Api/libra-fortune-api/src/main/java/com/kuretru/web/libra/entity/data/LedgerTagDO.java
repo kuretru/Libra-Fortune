@@ -8,6 +8,9 @@ import lombok.ToString;
 
 /**
  * 账本标签表
+ * 标签归属于用户
+ * 每个用户只能看到自己的标签
+ * 每个条目都可以单独设置标签
  *
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public class LedgerCategoryDTO extends BaseDTO {
     @NotNull
     private UUID ledgerId;
 
-    @NotNull
+    @NotEmpty
     private String name;
 
 }

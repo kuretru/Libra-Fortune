@@ -5,21 +5,24 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
-
+/**
+ * @author 呉真(kuretru) <kuretru@gmail.com>
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class UserTagDTO extends BaseDTO {
-
-    @NotNull
-    @Size(max = 16)
-    private String name;
+public class LedgerTagDTO extends BaseDTO {
 
     @NotNull
     private UUID userId;
+
+    @NotEmpty
+    @Size(max = 32)
+    private String name;
 
 }
