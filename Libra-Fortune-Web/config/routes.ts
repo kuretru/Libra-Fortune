@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @name umi 的路由配置
  * @description 只支持 path,component,routes,redirect,wrappers,name,icon 的配置
  * @param path  path 只支持两种占位符配置，第一种是动态参数 :id 的形式，第二种是 * 通配符，通配符只能出现路由字符串的最后。
@@ -11,53 +11,19 @@
  * @doc https://umijs.org/docs/guides/routes
  */
 export default [
-  {
-    path: '/user',
-    layout: false,
-    routes: [
-      {
-        name: 'login',
-        path: '/user/login',
-        component: './User/Login',
-      },
-    ],
-  },
-  {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
-  },
+  { path: '/user', layout: false, routes: [{ name: 'login', path: '/user/login', component: './User/Login' }] },
+  { path: '/welcome', name: 'welcome', icon: 'smile', component: './Welcome' },
   {
     path: '/admin',
     name: 'admin',
     icon: 'crown',
     access: 'canAdmin',
     routes: [
-      {
-        path: '/admin',
-        redirect: '/admin/sub-page',
-      },
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        component: './Admin',
-      },
+      { path: '/admin', redirect: '/admin/sub-page' },
+      { path: '/admin/sub-page', name: 'sub-page', component: './Admin' },
     ],
   },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
-  {
-    path: '/',
-    redirect: '/welcome',
-  },
-  {
-    path: '*',
-    layout: false,
-    component: './404',
-  },
+  { name: 'list.table-list', icon: 'table', path: '/list', component: './TableList' },
+  { path: '/', redirect: '/welcome' },
+  { path: '*', layout: false, component: './404' },
 ];
