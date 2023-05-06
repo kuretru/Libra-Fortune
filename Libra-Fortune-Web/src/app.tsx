@@ -1,50 +1,43 @@
-import Footer from '@/components/Footer';
-import { Question } from '@/components/RightContent';
-import { LinkOutlined } from '@ant-design/icons';
-import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
-import defaultSettings from '../config/defaultSettings';
+import type { Settings as LayoutSettings } from '@ant-design/pro-components';
+import { SettingDrawer } from '@ant-design/pro-components';
+import { LinkOutlined } from '@ant-design/icons';
+import Footer from '@/components/Footer';
+import { Question } from '@/components/RightContent';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
-import { errorConfig } from './requestErrorConfig';
+import defaultSettings from '../config/defaultSettings';
+import { requestConfig } from './utils/request-config';
+import { getUserInfo } from './utils/app-utils';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import type { RequestConfig } from '@umijs/max';
+
 const isDev = process.env.NODE_ENV === 'development';
-const loginPath = '/user/login';
+const loginPath = '/users/login';
+const callbackPath = '/users/login/callback';
+const nonLoginPaths = [loginPath, callbackPath];
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
- * */
+ */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.CurrentUser;
+  currentUser?: Galaxy.OAuth2.System.UserDTO;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<Galaxy.OAuth2.System.UserDTO | undefined>;
 }> {
-  const fetchUserInfo = async () => {
-    try {
-      const msg = await queryCurrentUser({
-        skipErrorHandler: true,
-      });
-      return msg.data;
-    } catch (error) {
-      history.push(loginPath);
-    }
-    return undefined;
-  };
   // 如果不是登录页面，执行
-  const { location } = history;
-  if (location.pathname !== loginPath) {
-    const currentUser = await fetchUserInfo();
+  if (!nonLoginPaths.includes(history.location.pathname)) {
+    const currentUser = await getUserInfo();
     return {
-      fetchUserInfo,
-      currentUser,
       settings: defaultSettings as Partial<LayoutSettings>,
+      currentUser: currentUser,
+      fetchUserInfo: getUserInfo,
     };
   }
   return {
-    fetchUserInfo,
     settings: defaultSettings as Partial<LayoutSettings>,
+    fetchUserInfo: getUserInfo,
   };
 }
 
@@ -92,11 +85,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     ],
     links: isDev
       ? [
-          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-            <LinkOutlined />
-            <span>OpenAPI 文档</span>
-          </Link>,
-        ]
+        <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+          <LinkOutlined />
+          <span>OpenAPI 文档</span>
+        </Link>,
+      ]
       : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
@@ -130,6 +123,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
  * 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
  * @doc https://umijs.org/docs/max/request#配置
  */
-export const request = {
-  ...errorConfig,
+export const request: RequestConfig = {
+  ...requestConfig,
 };
