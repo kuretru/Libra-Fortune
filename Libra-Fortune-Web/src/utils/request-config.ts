@@ -10,8 +10,8 @@ import { message } from 'antd';
 const accessTokenRequestInterceptor = (options: RequestOptions) => {
   const id = localStorage.getItem('accessTokenId');
   if (id) {
-    options.headers['Access-Token-ID'] = id;
-    options.headers['Access-Token'] = localStorage.getItem('accessToken') ?? '';
+    options.headers!['Access-Token-ID'] = id;
+    options.headers!['Access-Token'] = localStorage.getItem('accessToken') ?? '';
   }
   return options;
 };
@@ -54,13 +54,13 @@ export const requestConfig: RequestConfig = {
         message.error(error.message);
       } else if (error.response) {
         // Axios的错误
-        if (error.response.data) {
+        if (error.response.status === 404) {
+          // 请求到了服务器，但是路径错误
+          message.error('404 - 请求路径错误');
+        } else if (error.response.data) {
           // 请求成功发出且服务器也做出了响应，但状态代码超出了 2xx 的范围 -> 业务异常
           const response: API.ApiResponse<string> = error.response.data;
           message.error(`[${response.code}]${response.message} - ${response.data}`);
-        } else if (error.response.status === 404) {
-          // 请求到了服务器，但是路径错误
-          message.error('404 - 请求路径错误');
         } else {
           // 请求未到服务器，或产生未被服务端全局捕获的其他异常
           message.error(`请求失败：${error.response.status} - ${error.response.statusText}`);

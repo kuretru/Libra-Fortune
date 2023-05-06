@@ -12,9 +12,12 @@
  */
 export default [
   {
-    path: '/users', layout: false, routes: [
-      { name: 'login', path: '/users/login', component: './User/Login' }
-    ]
+    path: '/users',
+    layout: false,
+    routes: [
+      { name: '登录', path: '/users/login', component: './User/Login' },
+      { name: '登录回调', path: '/users/login/callback', component: './User/Callback' },
+    ],
   },
   { path: '/welcome', name: 'welcome', icon: 'smile', component: './Welcome' },
   {

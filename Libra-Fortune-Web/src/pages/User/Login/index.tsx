@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from '@umijs/max';
+import { Helmet, useSearchParams } from '@umijs/max';
 import { Skeleton } from 'antd';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { LoginForm } from '@ant-design/pro-components';
@@ -9,6 +9,8 @@ import { galaxyAuthorize } from '@/services/galaxy-oauth2-client/service';
 
 
 const Login: React.FC = () => {
+  let [searchParams] = useSearchParams();
+
   const containerCss = useEmotionCss(() => {
     return {
       display: 'flex',
@@ -22,6 +24,11 @@ const Login: React.FC = () => {
   });
 
   const handleSubmit = async () => {
+    // 保存传递过来的redirect参数，回调完成后跳转回原来的页面
+    if (searchParams.has("redirect")) {
+      localStorage.setItem("redirect", searchParams.toString());
+    }
+
     const record: Galaxy.OAuth2.Client.OAuth2AuthorizeRequestDTO = {
       scopes: ['email'],
     };

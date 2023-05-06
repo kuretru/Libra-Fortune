@@ -20,7 +20,7 @@ export default {
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
-    'oauth2': {
+    '/oauth2/': {
       target: 'http://127.0.0.1:7041/api',
       changeOrigin: true,
     },

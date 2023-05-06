@@ -1,16 +1,17 @@
-import type { RunTimeLayoutConfig } from '@umijs/max';
+
+import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
-import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import { SettingDrawer } from '@ant-design/pro-components';
+import { message } from 'antd';
+import { ProSettings, SettingDrawer } from '@ant-design/pro-components';
+import defaultSettings from '../config/defaultSettings';
+import { requestConfig } from './utils/request-config';
+import { getUserInfo } from './utils/user-utils';
+
 import { LinkOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
 import { Question } from '@/components/RightContent';
 import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
-import defaultSettings from '../config/defaultSettings';
-import { requestConfig } from './utils/request-config';
-import { getUserInfo } from './utils/app-utils';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-import type { RequestConfig } from '@umijs/max';
+import { appendSearchParams } from './utils/request-utils';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/users/login';
@@ -21,22 +22,23 @@ const nonLoginPaths = [loginPath, callbackPath];
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  */
 export async function getInitialState(): Promise<{
-  settings?: Partial<LayoutSettings>;
+  settings?: Partial<ProSettings>;
   currentUser?: Galaxy.OAuth2.System.UserDTO;
   loading?: boolean;
   fetchUserInfo?: () => Promise<Galaxy.OAuth2.System.UserDTO | undefined>;
 }> {
   // 如果不是登录页面，执行
-  if (!nonLoginPaths.includes(history.location.pathname)) {
+  const { location } = history
+  if (!nonLoginPaths.includes(location.pathname)) {
     const currentUser = await getUserInfo();
     return {
-      settings: defaultSettings as Partial<LayoutSettings>,
+      settings: defaultSettings as Partial<ProSettings>,
       currentUser: currentUser,
       fetchUserInfo: getUserInfo,
     };
   }
   return {
-    settings: defaultSettings as Partial<LayoutSettings>,
+    settings: defaultSettings as Partial<ProSettings>,
     fetchUserInfo: getUserInfo,
   };
 }
@@ -53,14 +55,18 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       },
     },
     waterMarkProps: {
-      content: initialState?.currentUser?.name,
+      content: initialState?.currentUser?.nickname,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
-        history.push(loginPath);
+      if (!initialState?.currentUser && !nonLoginPaths.includes(location.pathname)) {
+        message.error('没有用户信息，请登录');
+        history.push({
+          pathname: loginPath,
+          search: appendSearchParams({ redirect: location.pathname })
+        });
       }
     },
     layoutBgImgList: [
