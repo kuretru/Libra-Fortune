@@ -1,16 +1,15 @@
-
+import React from 'react';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
-import { message } from 'antd';
+import { AvatarProps, message } from 'antd';
 import { ProSettings, SettingDrawer } from '@ant-design/pro-components';
-import defaultSettings from '../config/defaultSettings';
-import { requestConfig } from './utils/request-config';
-import { getUserInfo } from './utils/user-utils';
-
 import { LinkOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
 import { Question } from '@/components/RightContent';
-import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
+import { AvatarDropdown, AvatarName } from '@/components/RightContent/AvatarDropdown';
+import defaultSettings from '../config/defaultSettings';
+import { requestConfig } from './utils/request-config';
+import { getUserInfo } from './utils/user-utils';
 import { appendSearchParams } from './utils/request-utils';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -50,7 +49,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
-      render: (_, avatarChildren) => {
+      render: (_: AvatarProps, avatarChildren: React.ReactNode) => {
         return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
       },
     },
