@@ -48,6 +48,7 @@ abstract class BasePage<
     {
       align: 'center',
       key: 'action',
+      search: false,
       title: '操作',
       width: 240,
       render: (_, record) => {
@@ -183,7 +184,7 @@ abstract class BasePage<
           onSubmit={this.onSubmit}
           onReset={this.onReset}
           options={{ fullScreen: true, setting: true }}
-          pagination={{ defaultPageSize: 20 }}
+          pagination={{ defaultPageSize: 20, showSizeChanger: true }}
           request={this.fetchData}
           rowKey="id"
           tooltip={`${this.props.pageName}管理`}

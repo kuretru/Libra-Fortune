@@ -34,4 +34,9 @@ declare namespace API {
     pageSize: number;
     total: number;
   };
+
+  type EnumDTO = {
+    label: string;
+    value: string;
+  };
 }

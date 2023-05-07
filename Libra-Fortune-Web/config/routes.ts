@@ -24,7 +24,10 @@ export default [
     path: '/ledgers',
     name: '账本管理',
     icon: 'accountBook',
-    routes: [{ name: '账本标签管理', path: '/ledgers/tags', component: './Ledger/Tag' }],
+    routes: [
+      { name: '账本管理', path: '/ledgers', component: './Ledger/Ledger' },
+      { name: '账本标签管理', path: '/ledgers/tags', component: './Ledger/Tag' },
+    ],
   },
   {
     path: '/admin',
