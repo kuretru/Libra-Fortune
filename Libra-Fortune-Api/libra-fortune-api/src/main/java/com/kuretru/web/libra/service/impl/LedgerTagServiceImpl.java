@@ -48,6 +48,20 @@ public class LedgerTagServiceImpl
     }
 
     @Override
+    protected void verifyQuery(LedgerTagQuery query) throws ServiceException {
+        if (!query.getUserId().equals(AccessTokenContext.getUserId())) {
+            throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只能查询自己的账本标签");
+        }
+    }
+
+    @Override
+    protected void verifyDO(LedgerTagDO record) throws ServiceException {
+        if (!UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId())) {
+            throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只能查询自己的账本标签");
+        }
+    }
+
+    @Override
     protected void verifyDTO(LedgerTagDTO record) throws ServiceException {
         if (!record.getUserId().equals(AccessTokenContext.getUserId())) {
             throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只能修改自己的账本标签");
