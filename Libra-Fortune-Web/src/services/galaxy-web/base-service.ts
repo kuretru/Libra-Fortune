@@ -29,7 +29,7 @@ abstract class BaseService<T extends API.BaseDTO, Q extends API.PaginationQuery>
     });
   }
 
-  async listByPage(params: API.PaginationQuery): Promise<API.ProTableData<T>> {
+  async listByPage(params: Q & API.PaginationQuery): Promise<API.ProTableData<T>> {
     this.camelToUnderscore(params);
     return request<API.ApiResponse<API.PaginationResponse<T>>>(`/api${this.url}`, {
       method: 'get',
