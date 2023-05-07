@@ -63,6 +63,7 @@ public class LedgerServiceImpl
     }
 
     @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = ServiceException.class)
     public LedgerDTO update(LedgerDTO record) throws ServiceException {
         LedgerDTO old = get(record.getId());
         if (old == null) {
