@@ -3,7 +3,6 @@ package com.kuretru.web.libra.entity.mapper;
 import com.kuretru.web.libra.entity.data.LedgerDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.transfer.LedgerDTO;
-import com.kuretru.web.libra.service.impl.LedgerServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,10 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 class LedgerEntityMapperTest {
 
-    private final LedgerServiceImpl.LedgerEntityMapper entityMapper;
+    private final LedgerEntityMapper entityMapper;
 
     @Autowired
-    public LedgerEntityMapperTest(LedgerServiceImpl.LedgerEntityMapper entityMapper) {
+    public LedgerEntityMapperTest(LedgerEntityMapper entityMapper) {
         this.entityMapper = entityMapper;
     }
 
