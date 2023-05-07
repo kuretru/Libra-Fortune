@@ -8,7 +8,7 @@ import {
 import type { ActionType, ProColumns, ProFormInstance } from '@ant-design/pro-components';
 import { ModalForm, PageContainer, ProFormText, ProTable } from '@ant-design/pro-components';
 import type { FormInstance } from 'antd';
-import { Button, message, Modal } from 'antd';
+import { Button, message, Modal, Space } from 'antd';
 import React from 'react';
 
 const { confirm } = Modal;
@@ -49,28 +49,29 @@ abstract class BasePage<
       align: 'center',
       key: 'action',
       title: '操作',
-      valueType: 'option',
       width: 240,
       render: (_, record) => {
-        return [
-          <Button
-            icon={<EditOutlined />}
-            key="edit"
-            onClick={() => this.onEditButtonClick(record)}
-            type="primary"
-          >
-            编辑
-          </Button>,
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            key="delete"
-            onClick={() => this.onDeleteButtonClick(record.id!)}
-            type="primary"
-          >
-            删除
-          </Button>,
-        ];
+        return (
+          <Space>
+            <Button
+              icon={<EditOutlined />}
+              key="edit"
+              onClick={() => this.onEditButtonClick(record)}
+              type="primary"
+            >
+              编辑
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              key="delete"
+              onClick={() => this.onDeleteButtonClick(record.id!)}
+              type="primary"
+            >
+              删除
+            </Button>
+          </Space>
+        );
       },
     },
   ];
