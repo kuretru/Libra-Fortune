@@ -1,7 +1,6 @@
-import { request } from 'umi';
+import { request } from '@umijs/max';
 
 abstract class BaseService<T extends API.BaseDTO, Q extends API.PaginationQuery> {
-
   protected url: string;
 
   constructor(url: string) {
@@ -65,7 +64,6 @@ abstract class BaseService<T extends API.BaseDTO, Q extends API.PaginationQuery>
       method: 'delete',
     });
   }
-
 }
 
 export default BaseService;
