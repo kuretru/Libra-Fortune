@@ -31,13 +31,21 @@ public class LedgerTagServiceImpl
     }
 
     @Override
+    public LedgerTagDTO save(LedgerTagDTO record) throws ServiceException {
+        record.setUserId(AccessTokenContext.getUserId());
+        return super.save(record);
+    }
+
+    @Override
     public LedgerTagDTO update(LedgerTagDTO record) throws ServiceException {
-        // 不能把别人的记录修改为自己的
+        record.setUserId(AccessTokenContext.getUserId());
         LedgerTagDTO old = get(record.getId());
         if (old == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定记录不存在");
+        } else if (!old.getUserId().equals(record.getUserId())) {
+            // 不能把别人的记录修改为自己的
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "无法修改非自己的账本标签");
         }
-        verifyDTO(old);
 
         return super.update(record);
     }
@@ -48,23 +56,16 @@ public class LedgerTagServiceImpl
     }
 
     @Override
-    protected void verifyQuery(LedgerTagQuery query) throws ServiceException {
-        if (!query.getUserId().equals(AccessTokenContext.getUserId())) {
-            throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只能查询自己的账本标签");
-        }
+    protected QueryWrapper<LedgerTagDO> buildQueryWrapper(LedgerTagQuery query) {
+        QueryWrapper<LedgerTagDO> queryWrapper = super.buildQueryWrapper(query);
+        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        return queryWrapper;
     }
 
     @Override
     protected void verifyDO(LedgerTagDO record) throws ServiceException {
         if (!UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId())) {
             throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只能查询自己的账本标签");
-        }
-    }
-
-    @Override
-    protected void verifyDTO(LedgerTagDTO record) throws ServiceException {
-        if (!record.getUserId().equals(AccessTokenContext.getUserId())) {
-            throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只能修改自己的账本标签");
         }
     }
 

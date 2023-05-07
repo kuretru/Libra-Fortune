@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.entity.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kuretru.microservices.web.entity.transfer.BaseDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @ToString(callSuper = true)
 public class LedgerTagDTO extends BaseDTO {
 
-    @NotNull
+    @JsonIgnore
     private UUID userId;
 
     @NotEmpty

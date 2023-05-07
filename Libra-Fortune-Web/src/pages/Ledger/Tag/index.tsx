@@ -23,14 +23,6 @@ const LedgerTag: React.FC = () => {
     return (
       <>
         <ProFormText
-          disabled
-          hidden
-          label="用户ID"
-          name="userId"
-          initialValue={localStorage.getItem("userId")}
-          width="lg"
-        />
-        <ProFormText
           label="标签名称"
           name="name"
           placeholder="请输入名称"

@@ -12,9 +12,6 @@ import java.util.UUID;
 @Data
 public class LedgerTagQuery {
 
-    @NotNull
-    private UUID userId;
-
     @Size(max = 32)
     private String name;
 
