@@ -1,6 +1,6 @@
-import { ProColumns, ProFormText } from "@ant-design/pro-components";
-import BasePage from "@/components/BasePage";
-import LedgerTagService from "@/services/libra-fortune/ledger/ledger-tag";
+import BasePage from '@/components/BasePage';
+import LedgerTagService from '@/services/libra-fortune/ledger/ledger-tag';
+import { ProColumns, ProFormText } from '@ant-design/pro-components';
 
 const LedgerTag: React.FC = () => {
   const columns: ProColumns<API.Ledger.LedgerTagDTO>[] = [
@@ -42,6 +42,6 @@ const LedgerTag: React.FC = () => {
       formItem={formItem()}
     />
   );
-}
+};
 
 export default LedgerTag;

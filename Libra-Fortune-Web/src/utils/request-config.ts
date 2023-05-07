@@ -1,4 +1,4 @@
-﻿import type { RequestError, RequestOptions } from '@@/plugin-request/request';
+﻿import { type RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message } from 'antd';
 
@@ -45,7 +45,7 @@ export const requestConfig: RequestConfig = {
       }
     },
     // 错误接收及处理
-    errorHandler: (error: RequestError, opts: RequestOptions) => {
+    errorHandler: (error: any, opts: RequestOptions) => {
       if (opts?.skipErrorHandler) {
         throw error;
       }

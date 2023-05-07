@@ -1,9 +1,9 @@
-import React from 'react';
-import { flushSync } from 'react-dom';
+import { galaxyCallback } from '@/services/galaxy-oauth2-client/service';
+import { ProSkeleton } from '@ant-design/pro-components';
 import { history, useModel, useSearchParams } from '@umijs/max';
 import { message } from 'antd';
-import { ProSkeleton } from '@ant-design/pro-components';
-import { galaxyCallback } from '@/services/galaxy-oauth2-client/service';
+import React from 'react';
+import { flushSync } from 'react-dom';
 
 const LoginCallback: React.FC = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -15,14 +15,14 @@ const LoginCallback: React.FC = () => {
     if (userInfo) {
       flushSync(() => {
         setInitialState((state: any) => ({ ...state, currentUser: userInfo }));
-      })
+      });
     }
   };
 
   const login = async () => {
     const record: Galaxy.OAuth2.Client.OAuth2AuthorizeResponseDTO = {
-      code: searchParams.get("code")!,
-      state: searchParams.get("state")!,
+      code: searchParams.get('code')!,
+      state: searchParams.get('state')!,
     };
     const response = await galaxyCallback(record);
     console.log(`登录成功，userId=${response.data.userId}`);
@@ -37,13 +37,13 @@ const LoginCallback: React.FC = () => {
       await fetchUserInfo();
 
       // 向redirect跳转并传递其余search参数
-      const redirect = localStorage.getItem("redirect");
+      const redirect = localStorage.getItem('redirect');
 
       if (redirect) {
-        localStorage.removeItem("redirect");
+        localStorage.removeItem('redirect');
         const urlSearchParams = new URLSearchParams(redirect);
-        const pathname = urlSearchParams.get("redirect") ?? "/welcome";
-        urlSearchParams.delete("redirect");
+        const pathname = urlSearchParams.get('redirect') ?? '/welcome';
+        urlSearchParams.delete('redirect');
         history.push({
           pathname: pathname,
           search: urlSearchParams.toString(),

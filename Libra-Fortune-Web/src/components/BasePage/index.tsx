@@ -1,15 +1,15 @@
-import React from 'react';
-import type { FormInstance } from 'antd';
-import { Button, message, Modal } from 'antd';
-import type { ActionType, ProColumns, ProFormInstance } from '@ant-design/pro-components';
-import { PageContainer, ProTable, ModalForm, ProFormText } from '@ant-design/pro-components';
+import type BaseService from '@/services/galaxy-web/base-service';
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons';
-import type BaseService from '@/services/galaxy-web/base-service';
+import type { ActionType, ProColumns, ProFormInstance } from '@ant-design/pro-components';
+import { ModalForm, PageContainer, ProFormText, ProTable } from '@ant-design/pro-components';
+import type { FormInstance } from 'antd';
+import { Button, message, Modal } from 'antd';
+import React from 'react';
 
 const { confirm } = Modal;
 

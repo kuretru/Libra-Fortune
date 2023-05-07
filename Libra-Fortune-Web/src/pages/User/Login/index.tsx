@@ -1,12 +1,11 @@
-import React from 'react';
+import Settings from '@/../config/defaultSettings';
+import Footer from '@/components/Footer';
+import { galaxyAuthorize } from '@/services/galaxy-oauth2-client/service';
+import { LoginForm } from '@ant-design/pro-components';
+import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { Helmet, useSearchParams } from '@umijs/max';
 import { Skeleton } from 'antd';
-import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { LoginForm } from '@ant-design/pro-components';
-import Footer from '@/components/Footer';
-import Settings from '@/../config/defaultSettings';
-import { galaxyAuthorize } from '@/services/galaxy-oauth2-client/service';
-
+import React from 'react';
 
 const Login: React.FC = () => {
   let [searchParams] = useSearchParams();
@@ -25,8 +24,8 @@ const Login: React.FC = () => {
 
   const handleSubmit = async () => {
     // 保存传递过来的redirect参数，回调完成后跳转回原来的页面
-    if (searchParams.has("redirect")) {
-      localStorage.setItem("redirect", searchParams.toString());
+    if (searchParams.has('redirect')) {
+      localStorage.setItem('redirect', searchParams.toString());
     }
 
     const record: Galaxy.OAuth2.Client.OAuth2AuthorizeRequestDTO = {
@@ -60,7 +59,9 @@ const Login: React.FC = () => {
           initialValues={{
             autoLogin: true,
           }}
-          onFinish={async () => { await handleSubmit(); }}
+          onFinish={async () => {
+            await handleSubmit();
+          }}
         >
           <div
             style={{

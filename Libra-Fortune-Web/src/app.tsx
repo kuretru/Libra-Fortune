@@ -1,16 +1,16 @@
-import React from 'react';
-import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
-import { history, Link } from '@umijs/max';
-import { AvatarProps, message } from 'antd';
-import { ProSettings, SettingDrawer } from '@ant-design/pro-components';
-import { LinkOutlined } from '@ant-design/icons';
 import Footer from '@/components/Footer';
 import { Question } from '@/components/RightContent';
 import { AvatarDropdown, AvatarName } from '@/components/RightContent/AvatarDropdown';
+import { LinkOutlined } from '@ant-design/icons';
+import { ProSettings, SettingDrawer } from '@ant-design/pro-components';
+import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
+import { history, Link } from '@umijs/max';
+import { AvatarProps, message } from 'antd';
+import React from 'react';
 import defaultSettings from '../config/defaultSettings';
 import { requestConfig } from './utils/request-config';
-import { getUserInfo } from './utils/user-utils';
 import { appendSearchParams } from './utils/request-utils';
+import { getUserInfo } from './utils/user-utils';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/users/login';
@@ -27,7 +27,7 @@ export async function getInitialState(): Promise<{
   fetchUserInfo?: () => Promise<Galaxy.OAuth2.System.UserDTO | undefined>;
 }> {
   // 如果不是登录页面，执行
-  const { location } = history
+  const { location } = history;
   if (!nonLoginPaths.includes(location.pathname)) {
     const currentUser = await getUserInfo();
     return {
@@ -64,7 +64,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         message.error('没有用户信息，请登录');
         history.push({
           pathname: loginPath,
-          search: appendSearchParams({ redirect: location.pathname })
+          search: appendSearchParams({ redirect: location.pathname }),
         });
       }
     },
@@ -90,11 +90,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     ],
     links: isDev
       ? [
-        <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-          <LinkOutlined />
-          <span>OpenAPI 文档</span>
-        </Link>,
-      ]
+          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
+            <LinkOutlined />
+            <span>OpenAPI 文档</span>
+          </Link>,
+        ]
       : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
