@@ -90,9 +90,7 @@ abstract class BasePage<
   }
 
   fetchData = async (params: Q & API.PaginationQuery) => {
-    return this.props.service
-      .listByPage(params)
-      .catch((error: any) => message.error(error.message));
+    return this.props.service.listByPage(params);
   };
 
   onAddButtonClick = () => {
@@ -121,9 +119,8 @@ abstract class BasePage<
             tableRef.current?.reload();
             message.success({ content: '删除成功！', key: messageKey });
           })
-          .catch((error: any) => {
+          .catch(() => {
             message.destroy(messageKey);
-            message.error(error.message);
           });
       },
     });
@@ -141,9 +138,8 @@ abstract class BasePage<
           message.success({ content: '修改成功！', key: messageKey });
           result = true;
         })
-        .catch((error: any) => {
+        .catch(() => {
           message.destroy(messageKey);
-          message.error(error.message);
         });
     } else {
       await this.props.service
@@ -153,9 +149,8 @@ abstract class BasePage<
           message.success({ content: '新增成功！', key: messageKey });
           result = true;
         })
-        .catch((error: any) => {
+        .catch(() => {
           message.destroy(messageKey);
-          message.error(error.message);
         });
     }
     return result;
