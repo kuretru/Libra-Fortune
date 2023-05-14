@@ -1,6 +1,6 @@
 import BasePage from '@/components/BasePage';
 import LedgerTagService from '@/services/libra-fortune/ledger/ledger-tag';
-import { ProColumns, ProFormText } from '@ant-design/pro-components';
+import { PageContainer, ProColumns, ProFormText } from '@ant-design/pro-components';
 
 const LedgerTag: React.FC = () => {
   const columns: ProColumns<API.Ledger.LedgerTagDTO>[] = [
@@ -35,12 +35,14 @@ const LedgerTag: React.FC = () => {
   };
 
   return (
-    <BasePage<API.Ledger.LedgerTagDTO, API.Ledger.LedgerTagQuery>
-      pageName="账本标签"
-      service={new LedgerTagService()}
-      columns={columns}
-      formItem={formItem()}
-    />
+    <PageContainer>
+      <BasePage<API.Ledger.LedgerTagDTO, API.Ledger.LedgerTagQuery>
+        pageName="账本标签"
+        service={new LedgerTagService()}
+        columns={columns}
+        formItem={formItem()}
+      />
+    </PageContainer>
   );
 };
 

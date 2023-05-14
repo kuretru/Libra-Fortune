@@ -6,7 +6,7 @@ import {
   QuestionCircleOutlined,
 } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProFormInstance } from '@ant-design/pro-components';
-import { ModalForm, PageContainer, ProFormText, ProTable } from '@ant-design/pro-components';
+import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
 import type { FormInstance } from 'antd';
 import { Button, message, Modal, Space } from 'antd';
 import React from 'react';
@@ -174,7 +174,7 @@ abstract class BasePage<
 
   render() {
     return (
-      <PageContainer>
+      <>
         <ProTable<T, Q>
           actionRef={this.tableRef}
           bordered
@@ -227,7 +227,7 @@ abstract class BasePage<
           <ProFormText disabled hidden label="ID" name="id" width="lg" />
           {this.props.formItem}
         </ModalForm>
-      </PageContainer>
+      </>
     );
   }
 }
