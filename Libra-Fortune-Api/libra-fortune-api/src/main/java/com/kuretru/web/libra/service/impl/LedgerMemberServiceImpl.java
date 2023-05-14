@@ -1,16 +1,20 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.PaginationQuery;
 import com.kuretru.microservices.web.entity.PaginationResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
+import com.kuretru.web.libra.entity.business.LedgerMemberBO;
 import com.kuretru.web.libra.entity.data.LedgerMemberDO;
 import com.kuretru.web.libra.entity.mapper.LedgerMemberEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerMemberQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerMemberDTO;
+import com.kuretru.web.libra.entity.view.LedgerMemberVO;
 import com.kuretru.web.libra.mapper.LedgerMemberMapper;
 import com.kuretru.web.libra.service.LedgerMemberService;
 import com.kuretru.web.libra.service.LedgerService;
@@ -41,6 +45,20 @@ public class LedgerMemberServiceImpl
                                    @Lazy LedgerService ledgerService) {
         super(mapper, entityMapper);
         this.ledgerService = ledgerService;
+    }
+
+    @Override
+    public PaginationResponse<LedgerMemberVO> listVo(PaginationQuery pagination, LedgerMemberQuery query) {
+        QueryWrapper<LedgerMemberBO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger_member.ledger_id", query.getLedgerId());
+        queryWrapper.orderByAsc("id");
+
+        IPage<LedgerMemberBO> page = new Page<>(pagination.getCurrent(), pagination.getPageSize());
+        page = mapper.listPageBo(page, queryWrapper);
+        List<LedgerMemberVO> records = ((LedgerMemberEntityMapper)entityMapper).boToVo(page.getRecords());
+
+        // TODO: 排序，Owner应该在最前
+        return new PaginationResponse<>(records, page.getCurrent(), page.getSize(), page.getTotal());
     }
 
     @Override

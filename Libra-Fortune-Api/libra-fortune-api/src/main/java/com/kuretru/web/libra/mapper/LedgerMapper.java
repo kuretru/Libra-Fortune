@@ -18,11 +18,12 @@ import org.springframework.stereotype.Repository;
 public interface LedgerMapper extends BaseMapper<LedgerDO> {
 
     /**
+     * 分页查询BO
      *
-     * @param page
-     * @param queryWrapper
-     * @return
+     * @param page         分页参数
+     * @param queryWrapper 查询条件
+     * @return BO
      */
-    IPage<LedgerBO> listPageBo(IPage<LedgerBO> page, @Param(Constants.WRAPPER) QueryWrapper queryWrapper);
+    IPage<LedgerBO> listPageBo(IPage<LedgerBO> page, @Param(Constants.WRAPPER) QueryWrapper<LedgerBO> queryWrapper);
 
 }

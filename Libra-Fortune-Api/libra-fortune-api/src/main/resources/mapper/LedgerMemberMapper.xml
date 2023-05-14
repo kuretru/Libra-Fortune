@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuretru.web.libra.mapper.LedgerMemberMapper">
+
+    <select id="listPageBo" resultType="com.kuretru.web.libra.entity.business.LedgerMemberBO">
+        SELECT ledger_member.id,
+               ledger_member.uuid,
+               ledger_member.create_time,
+               ledger_member.update_time,
+               ledger_member.ledger_id,
+               ledger_member.user_id,
+               `user`.nickname AS user_nickname,
+               `user`.avatar   AS user_avatar
+        FROM ledger_member
+                 LEFT JOIN `user` ON ledger_member.user_id = `user`.uuid
+            ${ew.customSqlSegment}
+    </select>
+
+</mapper>
