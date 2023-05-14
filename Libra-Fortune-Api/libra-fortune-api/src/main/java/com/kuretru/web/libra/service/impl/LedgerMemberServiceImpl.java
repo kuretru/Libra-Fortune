@@ -50,7 +50,7 @@ public class LedgerMemberServiceImpl
     @Override
     public PaginationResponse<LedgerMemberVO> listVo(PaginationQuery pagination, LedgerMemberQuery query) {
         QueryWrapper<LedgerMemberBO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("ledger_member.ledger_id", query.getLedgerId());
+        queryWrapper.eq("ledger_member.ledger_id", query.getLedgerId().toString());
         queryWrapper.orderByAsc("id");
 
         IPage<LedgerMemberBO> page = new Page<>(pagination.getCurrent(), pagination.getPageSize());

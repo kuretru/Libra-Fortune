@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @RestController
-@RequestMapping("/ledgers/members")
+@RequestMapping("/ledgers/{ledgerId}/members")
 @RequireAuthorization
 public class LedgerMemberController
         extends BaseRestController<LedgerMemberService, LedgerMemberDTO, LedgerMemberQuery> {
