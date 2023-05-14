@@ -15,6 +15,7 @@ import type {
 import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
 import type { FormInstance } from 'antd';
 import { Button, message, Modal, Space } from 'antd';
+import { isEqual } from 'lodash';
 import React from 'react';
 
 const { confirm } = Modal;
@@ -97,6 +98,12 @@ abstract class BasePage<
     this.formRef = React.createRef<ProFormInstance>() as React.MutableRefObject<ProFormInstance>;
     this.tableRef = React.createRef<ActionType>();
     this.defaultFormValue = {};
+  }
+
+  componentDidUpdate(prevProps: IBasePageProps<T, Q>) {
+    if (!isEqual(this.props.service, prevProps.service)) {
+      this.tableRef.current?.reloadAndRest?.();
+    }
   }
 
   fetchData = async (params: Q & API.PaginationQuery) => {

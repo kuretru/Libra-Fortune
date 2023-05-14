@@ -3,17 +3,29 @@ import { getLedgerType } from '@/services/libra-fortune/enum';
 import LedgerService from '@/services/libra-fortune/ledger/ledger';
 import { UserOutlined } from '@ant-design/icons';
 import {
+  ModalForm,
+  PageContainer,
   ProColumns,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { Avatar, Button, Space } from 'antd';
+import { useState } from 'react';
+import LedgerMember from './ledger-member';
 
 const Ledger: React.FC = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [ledgerId, setLedgerId] = useState('');
+
   const fetchLedgerType = async () => {
     const response = await getLedgerType();
     return response.data;
+  };
+
+  const onUserManagerButtonClick = (record: API.Ledger.LedgerDTO) => {
+    setLedgerId(record.id!);
+    setModalOpen(true);
   };
 
   const columns: ProColumns<API.Ledger.LedgerDTO>[] = [
@@ -69,7 +81,7 @@ const Ledger: React.FC = () => {
           <Button
             icon={<UserOutlined />}
             key="userManager"
-            // onClick={() => this.onEditButtonClick(record)}
+            onClick={() => onUserManagerButtonClick(record)}
             type="primary"
           >
             成员管理
@@ -128,12 +140,30 @@ const Ledger: React.FC = () => {
   };
 
   return (
-    <BasePage<API.Ledger.LedgerDTO, API.Ledger.LedgerQuery>
-      pageName="账本"
-      service={new LedgerService()}
-      columns={columns}
-      formItem={formItem()}
-    />
+    <PageContainer>
+      <BasePage<API.Ledger.LedgerDTO, API.Ledger.LedgerQuery>
+        pageName="账本"
+        service={new LedgerService()}
+        columns={columns}
+        formItem={formItem()}
+      />
+      <ModalForm
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        submitter={{
+          searchConfig: {
+            resetText: '关闭',
+          },
+          submitButtonProps: {
+            style: {
+              display: 'none',
+            },
+          },
+        }}
+      >
+        <LedgerMember ledgerId={ledgerId} />
+      </ModalForm>
+    </PageContainer>
   );
 };
 

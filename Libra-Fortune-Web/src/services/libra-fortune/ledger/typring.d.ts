@@ -31,4 +31,19 @@ declare namespace API.Ledger {
   type LedgerTagQuery = API.PaginationQuery & {
     name?: string;
   };
+
+  type LedgerMemberDTO = API.BaseDTO & {
+    ledgerId: string;
+    userId: string;
+  };
+
+  type LedgerMemberQuery = API.PaginationQuery & {
+    ledgerId?: string;
+  };
+
+  type LedgerMemberVO = API.BaseDTO & {
+    userId: string;
+    userNickname: string;
+    userAvatar: string;
+  };
 }
