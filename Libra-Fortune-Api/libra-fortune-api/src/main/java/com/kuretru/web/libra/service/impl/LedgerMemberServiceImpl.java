@@ -99,7 +99,7 @@ public class LedgerMemberServiceImpl
 
     @Override
     public void remove(UUID uuid) throws ServiceException {
-        LedgerMemberDTO ledgerMemberDTO = this.get(uuid);
+        LedgerMemberDTO ledgerMemberDTO = super.get(uuid);
         if (ledgerMemberDTO == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本成员不存在");
         }
