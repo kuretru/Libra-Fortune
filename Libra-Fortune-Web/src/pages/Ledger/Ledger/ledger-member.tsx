@@ -44,11 +44,18 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
     return (
       <>
         <ProFormText
-          label="账本所有者"
+          label="账本ID"
           disabled
           hidden
-          name="ownerId"
-          initialValue={localStorage.getItem('userId')}
+          initialValue={props.ledgerId}
+          name="ledgerId"
+          rules={[{ max: 36, required: true }]}
+          tooltip="最长36位"
+          width="lg"
+        />
+        <ProFormText
+          label="用户ID"
+          name="userId"
           rules={[{ max: 36, required: true }]}
           tooltip="最长36位"
           width="lg"

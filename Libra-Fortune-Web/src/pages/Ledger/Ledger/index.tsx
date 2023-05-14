@@ -148,6 +148,7 @@ const Ledger: React.FC = () => {
         formItem={formItem()}
       />
       <ModalForm
+        modalProps={{ maskClosable: false }}
         open={modalOpen}
         onOpenChange={setModalOpen}
         submitter={{
