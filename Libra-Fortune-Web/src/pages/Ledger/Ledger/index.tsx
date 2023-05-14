@@ -1,7 +1,7 @@
 import BasePage from '@/components/BasePage';
 import { getLedgerType } from '@/services/libra-fortune/enum';
 import LedgerService from '@/services/libra-fortune/ledger/ledger';
-import { UserOutlined } from '@ant-design/icons';
+import { AppstoreAddOutlined, RightCircleOutlined, UserOutlined } from '@ant-design/icons';
 import {
   ModalForm,
   PageContainer,
@@ -12,19 +12,28 @@ import {
 } from '@ant-design/pro-components';
 import { Avatar, Button, Space } from 'antd';
 import { useState } from 'react';
+import LedgerCategory from './ledger-category';
 import LedgerMember from './ledger-member';
 
 const Ledger: React.FC = () => {
-  const [modalOpen, setModalOpen] = useState(false);
   const [ledgerId, setLedgerId] = useState('');
+  const [managerType, setManagerType] = useState('member');
+  const [modalOpen, setModalOpen] = useState(false);
 
   const fetchLedgerType = async () => {
     const response = await getLedgerType();
     return response.data;
   };
 
-  const onUserManagerButtonClick = (record: API.Ledger.LedgerDTO) => {
+  const onMemberManagerButtonClick = (record: API.Ledger.LedgerDTO) => {
     setLedgerId(record.id!);
+    setManagerType('member');
+    setModalOpen(true);
+  };
+
+  const onCategoryManagerButtonClick = (record: API.Ledger.LedgerDTO) => {
+    setLedgerId(record.id!);
+    setManagerType('category');
     setModalOpen(true);
   };
 
@@ -65,27 +74,52 @@ const Ledger: React.FC = () => {
       dataIndex: 'remark',
       search: false,
       title: '备注',
-      width: 240,
+    },
+    {
+      align: 'center',
+      dataIndex: 'go',
+      search: false,
+      title: 'Go',
+      width: 160,
+      render: (_, record) => {
+        return (
+          <Button
+            icon={<RightCircleOutlined />}
+            key="go"
+            onClick={() => onCategoryManagerButtonClick(record)}
+            type="primary"
+          >
+            开始记账
+          </Button>
+        );
+      },
     },
     {
       align: 'center',
       key: 'manager',
       search: false,
       title: '管理',
-      width: 120,
+      width: 280,
       render: (_, record) => {
-        if (!record.type.startsWith('CO_')) {
-          return;
-        }
         return (
-          <Button
-            icon={<UserOutlined />}
-            key="userManager"
-            onClick={() => onUserManagerButtonClick(record)}
-            type="primary"
-          >
-            成员管理
-          </Button>
+          <Space>
+            {record.type.startsWith('CO_') && (
+              <Button
+                icon={<UserOutlined />}
+                key="memberManager"
+                onClick={() => onMemberManagerButtonClick(record)}
+              >
+                成员管理
+              </Button>
+            )}
+            <Button
+              icon={<AppstoreAddOutlined />}
+              key="categoryManager"
+              onClick={() => onCategoryManagerButtonClick(record)}
+            >
+              分类管理
+            </Button>
+          </Space>
         );
       },
     },
@@ -162,7 +196,8 @@ const Ledger: React.FC = () => {
           },
         }}
       >
-        <LedgerMember ledgerId={ledgerId} />
+        {managerType === 'member' && <LedgerMember ledgerId={ledgerId} />}
+        {managerType === 'category' && <LedgerCategory ledgerId={ledgerId} />}
       </ModalForm>
     </PageContainer>
   );
