@@ -5,7 +5,13 @@ import {
   PlusOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons';
-import type { ActionType, ProColumns, ProFormInstance } from '@ant-design/pro-components';
+import type {
+  ActionType,
+  ModalFormProps,
+  ProColumns,
+  ProFormInstance,
+  ProTableProps,
+} from '@ant-design/pro-components';
 import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
 import type { FormInstance } from 'antd';
 import { Button, message, Modal, Space } from 'antd';
@@ -24,6 +30,8 @@ interface IBasePageProps<T extends API.BaseDTO, Q extends API.PaginationQuery> {
     formRef: React.MutableRefObject<FormInstance>,
   ) => void;
   onSubmit?: (params: Q) => Q;
+  tableProps?: ProTableProps<T, Q>;
+  modalProps?: ModalFormProps<T>;
 }
 
 interface IBasePageState {
@@ -198,6 +206,7 @@ abstract class BasePage<
               新增{this.props.pageName}
             </Button>,
           ]}
+          {...this.props.tableProps}
         />
         <ModalForm<T>
           formRef={this.formRef}
@@ -223,6 +232,7 @@ abstract class BasePage<
             },
             searchConfig: { resetText: '取消', submitText: '提交' },
           }}
+          {...this.props.modalProps}
         >
           <ProFormText disabled hidden label="ID" name="id" width="lg" />
           {this.props.formItem}
