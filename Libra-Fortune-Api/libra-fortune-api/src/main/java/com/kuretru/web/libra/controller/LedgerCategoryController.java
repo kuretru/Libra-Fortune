@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @RestController
-@RequestMapping("/ledgers/{ledger_id}/categories")
+@RequestMapping("/ledgers/{ledgerId}/categories")
 @RequireAuthorization
 public class LedgerCategoryController
         extends BaseRestController<LedgerCategoryService, LedgerCategoryDTO, LedgerCategoryQuery> {
