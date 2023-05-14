@@ -47,6 +47,39 @@ public class LedgerServiceImpl
     }
 
     @Override
+    public PaginationResponse<LedgerVO> listVo(PaginationQuery pagination, LedgerQuery query) {
+        QueryWrapper<LedgerBO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger_member.user_id", AccessTokenContext.getUserId().toString());
+        if (query.getOwnerId() != null) {
+            queryWrapper.eq("ledger.owner_id", query.getOwnerId().toString());
+        }
+        if (query.getName() != null) {
+            queryWrapper.like("ledger.name", query.getName());
+        }
+        if (query.getType() != null) {
+            queryWrapper.eq("ledger.type", query.getType().getCode());
+        }
+        queryWrapper.orderByAsc("id");
+
+        IPage<LedgerBO> page = new Page<>(pagination.getCurrent(), pagination.getPageSize());
+        page = mapper.listPageBo(page, queryWrapper);
+        List<LedgerVO> records = ((LedgerEntityMapper)entityMapper).boToVo(page.getRecords());
+        return new PaginationResponse<>(records, page.getCurrent(), page.getSize(), page.getTotal());
+    }
+
+    @Override
+    public void verifyIamLedgerOwner(UUID ledgerId) throws ServiceException {
+        LedgerDTO ledgerDTO = get(ledgerId);
+        if (ledgerDTO == null) {
+            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本不存在");
+        }
+        UUID myUserId = AccessTokenContext.getUserId();
+        if (!ledgerDTO.getOwnerId().equals(myUserId)) {
+            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "非账本拥有者");
+        }
+    }
+
+    @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = ServiceException.class)
     public LedgerDTO save(LedgerDTO record) throws ServiceException {
         if (!record.getOwnerId().equals(AccessTokenContext.getUserId())) {
@@ -97,39 +130,6 @@ public class LedgerServiceImpl
         queryWrapper.eq("name", record.getName());
         LedgerDO result = mapper.selectOne(queryWrapper);
         return entityMapper.doToDto(result);
-    }
-
-    @Override
-    public PaginationResponse<LedgerVO> listVo(PaginationQuery pagination, LedgerQuery query) {
-        QueryWrapper<LedgerBO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("ledger_member.user_id", AccessTokenContext.getUserId().toString());
-        if (query.getOwnerId() != null) {
-            queryWrapper.eq("ledger.owner_id", query.getOwnerId().toString());
-        }
-        if (query.getName() != null) {
-            queryWrapper.like("ledger.name", query.getName());
-        }
-        if (query.getType() != null) {
-            queryWrapper.eq("ledger.type", query.getType().getCode());
-        }
-        queryWrapper.orderByAsc("id");
-
-        IPage<LedgerBO> page = new Page<>(pagination.getCurrent(), pagination.getPageSize());
-        page = mapper.listPageBo(page, queryWrapper);
-        List<LedgerVO> records = ((LedgerEntityMapper)entityMapper).boToVo(page.getRecords());
-        return new PaginationResponse<>(records, page.getCurrent(), page.getSize(), page.getTotal());
-    }
-
-    @Override
-    public void verifyIamLedgerOwner(UUID ledgerId) throws ServiceException {
-        LedgerDTO ledgerDTO = get(ledgerId);
-        if (ledgerDTO == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本不存在");
-        }
-        UUID myUserId = AccessTokenContext.getUserId();
-        if (!ledgerDTO.getOwnerId().equals(myUserId)) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "非账本拥有者");
-        }
     }
 
 }

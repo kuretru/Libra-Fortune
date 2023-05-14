@@ -11,6 +11,7 @@ import com.kuretru.web.libra.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.entity.view.LedgerVO;
 import com.kuretru.web.libra.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class LedgerController
 
     @GetMapping
     @Override
-    public ApiResponse<?> list(PaginationQuery paginationQuery, LedgerQuery query) throws ServiceException {
+    public ApiResponse<?> list(PaginationQuery paginationQuery, @Validated LedgerQuery query) throws ServiceException {
         PaginationResponse<LedgerVO> result = service.listVo(paginationQuery, query);
         if (result.getList() == null) {
             result.setList(new ArrayList<>());
