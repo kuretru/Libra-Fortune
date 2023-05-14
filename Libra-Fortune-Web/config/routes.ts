@@ -30,6 +30,12 @@ export default [
     ],
   },
   {
+    path: '/payments/channels',
+    name: '支付渠道管理',
+    icon: 'creditCard',
+    component: './PaymentChannel',
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',
