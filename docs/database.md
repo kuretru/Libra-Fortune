@@ -1,5 +1,114 @@
 # 数据库设计
 
+## ER图
+
+```mermaid
+erDiagram
+    user {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        String nickname
+        String avatar
+        UUID gemini_id
+        Instant last_login
+    }
+
+    ledger_tag {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        UUID user_id FK
+        String name
+    }
+    user ||--o{ ledger_tag : "拥有"
+
+    payment_channel {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        UUID user_id FK
+        String name
+    }
+    user ||--|{ payment_channel : "拥有"
+
+    ledger {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        UUID owner_id FK
+        String name
+        Short type
+        String remark
+    }
+    user ||--|| ledger : "拥有"
+
+    ledger_member {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        UUID ledger_id FK
+        UUID user_id FK
+    }
+    ledger ||--|{ ledger_member : ""
+    user ||--|| ledger_member : ""
+
+    ledger_category {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        UUID ledger_id FK
+        String name
+    }
+    ledger ||--|{ ledger_category : ""
+
+    ledger_entry {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        UUID ledger_id FK
+        UUID category_id FK
+        LocalDate date
+        String name
+        Long total
+        String currency_type
+        String remark
+    }
+    ledger ||--o{ ledger_entry : ""
+
+    ledger_entry_detail {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        Instant update_time
+        UUID entry_id FK
+        UUID user_id FK
+        UUID payment_channel_id FK
+        Short funded_ratio
+        Long amount
+    }
+    ledger_entry ||--o{ ledger_entry_detail : ""
+    user ||--|| ledger_entry_detail : ""
+    payment_channel ||--|| ledger_entry_detail : ""
+
+    ledger_entry_tag {
+        Long id PK
+        UUID uuid
+        Instant create_time
+        UUID entry_id FK
+        UUID tag_id FK
+    }
+    ledger_entry ||--o{ ledger_entry_tag : ""
+    ledger_tag ||--|| ledger_entry_tag : ""
+```
+
 ## 账本表(ledger)
 
 | 列名     |   长度   | 用途                                                           |
