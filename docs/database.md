@@ -82,6 +82,7 @@ erDiagram
         String remark
     }
     ledger ||--o{ ledger_entry : ""
+    ledger_entry ||--|| ledger_category : ""
 
     ledger_entry_detail {
         Long id PK
@@ -105,7 +106,7 @@ erDiagram
         UUID entry_id FK
         UUID tag_id FK
     }
-    ledger_entry ||--o{ ledger_entry_tag : ""
+    ledger_entry_detail ||--o{ ledger_entry_tag : ""
     ledger_tag ||--|| ledger_entry_tag : ""
 ```
 
