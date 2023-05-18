@@ -2,10 +2,14 @@ package com.kuretru.web.libra.service;
 
 import com.kuretru.microservices.web.entity.PaginationQuery;
 import com.kuretru.microservices.web.entity.PaginationResponse;
+import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.BaseService;
 import com.kuretru.web.libra.entity.query.LedgerMemberQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerMemberDTO;
 import com.kuretru.web.libra.entity.view.LedgerMemberVO;
+
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author 呉真(kuretru) <kuretru@gmail.com>
@@ -20,5 +24,22 @@ public interface LedgerMemberService extends BaseService<LedgerMemberDTO, Ledger
      * @return 符合查询条件，分页后的所有记录
      */
     PaginationResponse<LedgerMemberVO> listVo(PaginationQuery pagination, LedgerMemberQuery query);
+
+    /**
+     * 验证当前用户是否为指定账本成员
+     *
+     * @param ledgerId 账本ID
+     * @throws ServiceException 不是账本成员时，返回业务异常
+     */
+    void verifyIamLedgerMember(UUID ledgerId) throws ServiceException;
+
+    /**
+     * 验证传入的用户ID列表是否为指定账本成员
+     *
+     * @param ledgerId 账本ID
+     * @param userIds  用户ID列表
+     * @throws ServiceException 不是账本成员时，返回业务异常
+     */
+    void verifyTheyAreLedgerMember(UUID ledgerId, Set<UUID> userIds) throws ServiceException;
 
 }
