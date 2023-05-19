@@ -123,7 +123,8 @@ public class LedgerMemberServiceImpl
     @Override
     protected void verifyCanGet(LedgerMemberDO record) throws ServiceException {
         // 只有该账本的成员可以查看该账本的成员
-        if (UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId())) {
+        boolean isMe = UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId());
+        if (isMe) {
             return;
         }
         verifyIamLedgerMember(UUID.fromString(record.getLedgerId()));

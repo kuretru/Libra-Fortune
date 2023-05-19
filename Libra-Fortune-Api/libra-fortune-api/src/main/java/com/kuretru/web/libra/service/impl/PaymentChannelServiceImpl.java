@@ -2,7 +2,10 @@ package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.entity.PaginationQuery;
+import com.kuretru.microservices.web.entity.PaginationResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.PaymentChannelDO;
@@ -13,6 +16,9 @@ import com.kuretru.web.libra.mapper.PaymentChannelMapper;
 import com.kuretru.web.libra.service.PaymentChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author 呉真(kuretru) <kuretru@gmail.com>
@@ -28,8 +34,40 @@ public class PaymentChannelServiceImpl
     }
 
     @Override
+    public List<PaymentChannelDTO> list() {
+        throw new ServiceException(UserErrorCodes.MISSING_REQUIRED_PARAMETERS, "支出渠道必须关联用户ID查询");
+    }
+
+    @Override
+    public PaginationResponse<PaymentChannelDTO> list(PaginationQuery paginationQuery) {
+        throw new ServiceException(UserErrorCodes.MISSING_REQUIRED_PARAMETERS, "支出渠道必须关联用户ID查询");
+    }
+
+    @Override
+    protected void verifyCanGet(PaymentChannelDO record) throws ServiceException {
+        boolean notMe = !UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId());
+        if (notMe) {
+            throw new ServiceException(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能查看自己的支出渠道");
+        }
+    }
+
+    @Override
+    protected void verifyCanRemove(PaymentChannelDO record) throws ServiceException {
+        throw new ServiceException(ServiceErrorCodes.SYSTEM_NOT_IMPLEMENTED, "暂时无法删除支出渠道");
+    }
+
+    @Override
+    protected void verifyQuery(PaymentChannelQuery query) throws ServiceException {
+        boolean notMe = !query.getUserId().equals(AccessTokenContext.getUserId());
+        if (notMe) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "仅能查看自己的支出渠道");
+        }
+    }
+
+    @Override
     protected void verifyDTO(PaymentChannelDTO record) throws ServiceException {
-        if (!record.getUserId().equals(AccessTokenContext.getUserId())) {
+        boolean notMe = !record.getUserId().equals(AccessTokenContext.getUserId());
+        if (notMe) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "只有本人可以修改支出渠道");
         }
     }
