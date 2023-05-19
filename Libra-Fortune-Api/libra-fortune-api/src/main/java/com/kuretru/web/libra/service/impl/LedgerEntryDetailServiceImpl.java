@@ -3,7 +3,9 @@ package com.kuretru.web.libra.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
 import com.kuretru.microservices.common.utils.HashMapUtils;
+import com.kuretru.microservices.common.utils.UuidUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
+import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerEntryDetailDO;
@@ -49,42 +51,82 @@ public class LedgerEntryDetailServiceImpl
         return result;
     }
 
-    @Override
-    public List<LedgerEntryDetailDTO> save(UUID entryId, List<LedgerEntryDetailDTO> records) throws ServiceException {
+    private void saveList(List<LedgerEntryDetailDTO> records) {
         records.forEach(record -> {
             LedgerEntryDetailDTO newRecord = super.save(record);
 
             if (record.getUserId().equals(AccessTokenContext.getUserId())) {
                 record.getTags().forEach(tag -> tag.setEntryDetailId(newRecord.getId()));
-                entryTagService.save(record.getTags());
+                entryTagService.save(record.getId(), record.getTags());
             }
         });
+    }
 
+    @Override
+    public List<LedgerEntryDetailDTO> save(UUID entryId, List<LedgerEntryDetailDTO> records) throws ServiceException {
+        saveList(records);
         return listByEntryId(entryId);
+    }
+
+    private void updateList(List<LedgerEntryDetailDTO> records) {
+        records.forEach(record -> {
+            LedgerEntryDetailDTO newRecord = super.update(record);
+
+            if (record.getUserId().equals(AccessTokenContext.getUserId())) {
+                record.getTags().forEach(tag -> tag.setEntryDetailId(newRecord.getId()));
+                entryTagService.update(record.getId(), record.getTags());
+            }
+        });
     }
 
     @Override
     public List<LedgerEntryDetailDTO> update(UUID entryId, List<LedgerEntryDetailDTO> records) throws ServiceException {
-        QueryWrapper<LedgerEntryDetailDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("entry_id", records.get(0).toString());
-        List<LedgerEntryDetailDO> oldRecords = mapper.selectList(queryWrapper);
-        Map<UUID, LedgerEntryDetailDO> oldRecordsMap = new HashMap<>(HashMapUtils.initialCapacity(oldRecords.size()));
-        oldRecords.forEach(detail -> oldRecordsMap.put(UUID.fromString(detail.getUserId()), detail));
+        List<LedgerEntryDetailDTO> oldRecords = listByEntryId(entryId);
+        Map<UUID, LedgerEntryDetailDTO> oldRecordsMap = new HashMap<>(HashMapUtils.initialCapacity(oldRecords.size()));
+        Map<UUID, LedgerEntryDetailDTO> oldUserRecordsMap = new HashMap<>(HashMapUtils.initialCapacity(oldRecords.size()));
+        oldRecords.forEach(detail -> {
+            oldRecordsMap.put(detail.getId(), detail);
+            oldUserRecordsMap.put(detail.getUserId(), detail);
+        });
 
-        List<LedgerEntryDetailDTO> result = new ArrayList<>();
-        for (LedgerEntryDetailDTO record : records) {
-            if (!oldRecordsMap.containsKey(record.getUserId())) {
-                // 没有这条记录新增
-                result.add(super.save(record));
+        List<LedgerEntryDetailDTO> addList = new ArrayList<>();
+        List<LedgerEntryDetailDTO> updateList = new ArrayList<>();
+        List<UUID> removeList = new ArrayList<>();
+        records.forEach(record -> {
+            if (UuidUtils.isEmpty(record.getId())) {
+                // 新增的记录
+                if (oldUserRecordsMap.containsKey(record.getUserId())) {
+                    throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该明细下已存在该用户");
+                }
+                addList.add(record);
+            } else if (oldRecordsMap.containsKey(record.getId())) {
+                // 更新记录
+                LedgerEntryDetailDTO old = oldRecordsMap.get(record.getId());
+                oldRecordsMap.remove(record.getId());
+                if (!old.getEntryId().equals(record.getEntryId())) {
+                    throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不能修改条目ID");
+                } else if (!old.getUserId().equals(record.getUserId())) {
+                    throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不能修改用户ID");
+                }
+                updateList.add(record);
             } else {
-                // 有则更新
-                result.add(super.update(record));
-                oldRecordsMap.remove(record.getUserId());
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不属于该条目的明细ID");
             }
-        }
-        // 剩下的记录删除
-        oldRecordsMap.forEach((userId, detail) -> super.remove(UUID.fromString(detail.getUuid())));
-        return result;
+        });
+        oldRecordsMap.forEach((id, record) -> removeList.add(id));
+
+        saveList(addList);
+        updateList(updateList);
+        removeByUuidList(removeList);
+
+        return listByEntryId(entryId);
+    }
+
+    private void removeByUuidList(List<UUID> uuidList) {
+        List<String> ids = uuidList.stream().map(UUID::toString).toList();
+        QueryWrapper<LedgerEntryDetailDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("uuid", ids);
+        mapper.delete(queryWrapper);
     }
 
     @Override
@@ -100,15 +142,6 @@ public class LedgerEntryDetailServiceImpl
 
         List<UUID> entryDetailIds = records.stream().map(record -> UUID.fromString(record.getUuid())).toList();
         entryTagService.removeByEntryDetailIds(entryDetailIds);
-    }
-
-    LedgerEntryDetailDTO getMyEntryDetail(List<LedgerEntryDetailDTO> records) {
-        for (LedgerEntryDetailDTO record : records) {
-            if (record.getUserId().equals(AccessTokenContext.getUserId())) {
-                return record;
-            }
-        }
-        return null;
     }
 
 }

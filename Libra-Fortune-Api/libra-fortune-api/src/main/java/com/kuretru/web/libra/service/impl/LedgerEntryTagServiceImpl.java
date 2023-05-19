@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,16 +46,27 @@ public class LedgerEntryTagServiceImpl
     }
 
     @Override
-    public List<LedgerEntryTagDTO> save(List<LedgerEntryTagDTO> records) throws ServiceException {
+    public List<LedgerEntryTagDTO> save(UUID entryDetailId, List<LedgerEntryTagDTO> records) throws ServiceException {
         Map<UUID, LedgerTagDTO> myLedgerTag = tagService.listMyLedgerTags();
-        List<LedgerEntryTagDTO> result = new ArrayList<>(records.size());
         records.forEach(record -> {
             if (!myLedgerTag.containsKey(record.getTagId())) {
                 throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "非本人标签");
             }
-            result.add(super.save(record));
+            super.save(record);
         });
-        return result;
+        return listByEntryDetailId(entryDetailId);
+    }
+
+    @Override
+    public List<LedgerEntryTagDTO> update(UUID entryDetailId, List<LedgerEntryTagDTO> records) throws ServiceException {
+        Map<UUID, LedgerTagDTO> myLedgerTag = tagService.listMyLedgerTags();
+        records.forEach(record -> {
+            if (!myLedgerTag.containsKey(record.getTagId())) {
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "非本人标签");
+            }
+            super.update(record);
+        });
+        return listByEntryDetailId(entryDetailId);
     }
 
     @Override

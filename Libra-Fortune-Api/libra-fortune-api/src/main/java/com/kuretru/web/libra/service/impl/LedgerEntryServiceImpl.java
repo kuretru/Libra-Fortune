@@ -92,7 +92,7 @@ public class LedgerEntryServiceImpl
             }
         }
 
-        List<LedgerEntryDetailDTO> detailResult = entryDetailService.update(record.getDetails());
+        List<LedgerEntryDetailDTO> detailResult = entryDetailService.update(result.getId(), record.getDetails());
         result.setDetails(detailResult);
         return result;
     }
