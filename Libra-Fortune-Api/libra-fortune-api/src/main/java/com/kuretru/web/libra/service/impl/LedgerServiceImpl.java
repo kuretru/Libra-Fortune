@@ -69,12 +69,13 @@ public class LedgerServiceImpl
 
     @Override
     public void verifyIamLedgerOwner(UUID ledgerId) throws ServiceException {
-        LedgerDTO ledgerDTO = get(ledgerId);
-        if (ledgerDTO == null) {
+        LedgerDO record = getDO(ledgerId);
+        if (record == null) {
             throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本不存在");
         }
         UUID myUserId = AccessTokenContext.getUserId();
-        if (!ledgerDTO.getOwnerId().equals(myUserId)) {
+        boolean iAmNowOwner = !UUID.fromString(record.getOwnerId()).equals(myUserId);
+        if (iAmNowOwner) {
             throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "非账本拥有者");
         }
     }
@@ -82,7 +83,8 @@ public class LedgerServiceImpl
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = ServiceException.class)
     public LedgerDTO save(LedgerDTO record) throws ServiceException {
-        if (!record.getOwnerId().equals(AccessTokenContext.getUserId())) {
+        boolean iAmNotOwner = !record.getOwnerId().equals(AccessTokenContext.getUserId());
+        if (iAmNotOwner) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本所属用户必须为当前登录用户");
         }
         LedgerDTO result = super.save(record);
@@ -98,7 +100,7 @@ public class LedgerServiceImpl
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = ServiceException.class)
     public LedgerDTO update(LedgerDTO record) throws ServiceException {
-        LedgerDTO old = get(record.getId());
+        LedgerDTO old = entityMapper.doToDto(getDO(record.getId()));
         if (old == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
         } else if (!old.getOwnerId().equals(AccessTokenContext.getUserId())) {
@@ -117,10 +119,8 @@ public class LedgerServiceImpl
     }
 
     @Override
-    protected void verifyDTO(LedgerDTO record) throws ServiceException {
-        if (!record.getOwnerId().equals(AccessTokenContext.getUserId())) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本所属用户必须为当前登录用户");
-        }
+    protected void verifyCanGet(LedgerDO record) throws ServiceException {
+        ledgerMemberService.verifyIamLedgerMember(UUID.fromString(record.getUuid()));
     }
 
     @Override
