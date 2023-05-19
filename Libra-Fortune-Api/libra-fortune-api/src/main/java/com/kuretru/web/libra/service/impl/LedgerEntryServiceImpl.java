@@ -68,7 +68,7 @@ public class LedgerEntryServiceImpl
     public LedgerEntryDTO save(LedgerEntryDTO record) throws ServiceException {
         LedgerEntryDTO result = super.save(record);
         record.getDetails().forEach(detail -> detail.setEntryId(result.getId()));
-        List<LedgerEntryDetailDTO> detailResult = entryDetailService.save(record.getDetails());
+        List<LedgerEntryDetailDTO> detailResult = entryDetailService.save(result.getId(), record.getDetails());
         result.setDetails(detailResult);
         return result;
     }
@@ -85,12 +85,10 @@ public class LedgerEntryServiceImpl
         LedgerEntryDTO result = super.update(record);
 
         for (LedgerEntryDetailDTO detail : record.getDetails()) {
-            // 更新时，可以添加新明细，也可以修改原有明细
             if (UuidUtils.isEmpty(detail.getEntryId())) {
-                // 新增了明细
-                detail.setEntryId(result.getId());
+                detail.setEntryId(record.getId());
             } else if (!detail.getEntryId().equals(record.getId())) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目明细归属错误");
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目ID错误");
             }
         }
 

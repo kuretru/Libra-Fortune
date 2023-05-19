@@ -46,12 +46,18 @@ public class LedgerTagServiceImpl
 
     @Override
     public List<LedgerTagDTO> list() {
-        throw new ServiceException(UserErrorCodes.MISSING_REQUIRED_PARAMETERS, "账本标签必须关联用户ID查询");
+        QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        addDefaultOrderBy(queryWrapper);
+        return list(queryWrapper);
     }
 
     @Override
     public PaginationResponse<LedgerTagDTO> list(PaginationQuery paginationQuery) {
-        throw new ServiceException(UserErrorCodes.MISSING_REQUIRED_PARAMETERS, "账本标签必须关联用户ID查询");
+        QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        addDefaultOrderBy(queryWrapper);
+        return list(paginationQuery, queryWrapper);
     }
 
     @Override
