@@ -16,7 +16,6 @@ import java.util.UUID;
 @ToString(callSuper = true)
 public class LedgerEntryTagDTO extends BaseDTO {
 
-    @NotNull
     private UUID entryDetailId;
 
     @NotNull

@@ -5,10 +5,13 @@ import lombok.Data;
 import java.util.UUID;
 
 
+/**
+ * @author 呉真(kuretru) <kuretru@gmail.com>
+ */
 @Data
-public class EntryTagQuery {
+public class LedgerEntryTagQuery {
 
-    private UUID entryId;
+    private UUID entryDetailId;
 
     private UUID tagId;
 

@@ -11,7 +11,9 @@ import com.kuretru.web.libra.entity.query.LedgerEntryDetailQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerEntryDetailDTO;
 import com.kuretru.web.libra.mapper.LedgerEntryDetailMapper;
 import com.kuretru.web.libra.service.LedgerEntryDetailService;
+import com.kuretru.web.libra.service.LedgerEntryTagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,9 +26,13 @@ public class LedgerEntryDetailServiceImpl
         extends BaseServiceImpl<LedgerEntryDetailMapper, LedgerEntryDetailDO, LedgerEntryDetailDTO, LedgerEntryDetailQuery>
         implements LedgerEntryDetailService {
 
+    private final LedgerEntryTagService entryTagService;
+
     @Autowired
-    public LedgerEntryDetailServiceImpl(LedgerEntryDetailMapper mapper, LedgerEntryDetailEntityMapper entityMapper) {
+    public LedgerEntryDetailServiceImpl(LedgerEntryDetailMapper mapper, LedgerEntryDetailEntityMapper entityMapper,
+                                        @Lazy LedgerEntryTagService entryTagService) {
         super(mapper, entityMapper);
+        this.entryTagService = entryTagService;
     }
 
     @Override
@@ -64,10 +70,15 @@ public class LedgerEntryDetailServiceImpl
     public void removeByEntryId(UUID entryId) throws ServiceException {
         QueryWrapper<LedgerEntryDetailDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("entry_id", entryId.toString());
-        int rows = mapper.delete(queryWrapper);
-        if (rows == 0) {
+        List<LedgerEntryDetailDO> records = mapper.selectList(queryWrapper);
+        if (records.isEmpty()) {
             throw new ServiceException(ServiceErrorCodes.SYSTEM_EXECUTION_ERROR, "异常的记录，该条目下没有明细存在");
         }
+
+        mapper.delete(queryWrapper);
+
+        List<UUID> entryDetailIds = records.stream().map(record -> UUID.fromString(record.getUuid())).toList();
+        entryTagService.removeByEntryDetailIds(entryDetailIds);
     }
 
 }

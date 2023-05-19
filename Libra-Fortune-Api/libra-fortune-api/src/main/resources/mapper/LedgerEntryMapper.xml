@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuretru.web.libra.mapper.LedgerEntryMapper">
+
+    <select id="listPageBo" resultType="com.kuretru.web.libra.entity.business.LedgerEntryBO">
+        SELECT ledger_entry.id,
+               ledger_entry.uuid,
+               ledger_entry.category_id,
+               ledger_entry.`date`,
+               ledger_entry.`name`,
+               ledger_entry.total,
+               ledger_entry.currency_type,
+               ledger_entry.remark,
+               ledger_entry_detail.id                 AS detail_id,
+               ledger_entry_detail.uuid               AS detail_uuid,
+               ledger_entry_detail.user_id            AS detail_user_id,
+               ledger_entry_detail.payment_channel_id AS detail_payment_channel_id,
+               ledger_entry_detail.funded_ratio       AS detail_funded_ratio,
+               ledger_entry_detail.amount             AS detail_amount,
+               ledger_entry_detail_tag.id             AS detail_tag_id,
+               ledger_entry_detail_tag.uuid           AS detail_tag_uuid,
+               ledger_entry_detail_tag.tag_id         AS detail_tag_tag_id
+        FROM ledger_entry
+                 LEFT JOIN ledger_entry_detail ON ledger_entry.uuid = ledger_entry_detail.entry_id
+                 LEFT JOIN ledger_entry_detail_tag ON ledger_entry_detail.uuid = ledger_entry_detail_tag.entry_detail_id
+            ${ew.customSqlSegment}
+    </select>
+
+</mapper>
