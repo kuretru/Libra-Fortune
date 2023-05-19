@@ -6,7 +6,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.UUID;
 
-
+/**
+ * @author 呉真(kuretru) <kuretru@gmail.com>
+ */
 @Data
 public class LedgerEntryQuery {
 
@@ -17,6 +19,10 @@ public class LedgerEntryQuery {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate date;
 
-    private Long amount;
+    private String name;
+
+    private Long total;
+
+    private String currencyType;
 
 }

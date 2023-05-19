@@ -6,18 +6,32 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.UUID;
 
-
+/**
+ * @author 呉真(kuretru) <kuretru@gmail.com>
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class EntryTagDTO extends BaseDTO {
+public class LedgerEntryDetailDTO extends BaseDTO {
 
-    @NotNull
     private UUID entryId;
 
     @NotNull
-    private UUID tagId;
+    private UUID userId;
+
+    @NotNull
+    private UUID paymentChannelId;
+
+    @NotNull
+    private Short fundedRatio;
+
+    @NotNull
+    private Long amount;
+
+    @NotNull
+    private List<LedgerEntryTagDTO> tags;
 
 }

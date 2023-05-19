@@ -28,7 +28,10 @@ public class LedgerEntryDO extends BaseDO {
     /** 条目日期 */
     private LocalDate date;
 
-    /** 条目金额总计 */
+    /** 条目名称 */
+    private String name;
+
+    /** 条目金额总计，扩大100倍存储 */
     private Long total;
 
     /** 货币类型 */

@@ -26,10 +26,10 @@ public class LedgerEntryDetailDO extends BaseDO {
     /** 外键，支出渠道ID */
     private String paymentChannelId;
 
-    /** 承担比例 */
-    private Short fundedRation;
+    /** 承担比例，保留2位小数，扩大100倍存储 */
+    private Short fundedRatio;
 
-    /** 承担金额 */
+    /** 承担金额，扩大100倍存储 */
     private Long amount;
 
 }

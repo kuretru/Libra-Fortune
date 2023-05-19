@@ -45,6 +45,12 @@ public class LedgerCategoryServiceImpl
     }
 
     @Override
+    public LedgerCategoryDTO getDirect(UUID uuid) {
+        LedgerCategoryDO record = getDO(uuid);
+        return entityMapper.doToDto(record);
+    }
+
+    @Override
     public List<LedgerCategoryDTO> list() {
         throw new ServiceException(UserErrorCodes.MISSING_REQUIRED_PARAMETERS, "账本分类必须关联账本ID查询");
     }

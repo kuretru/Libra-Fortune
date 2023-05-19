@@ -16,6 +16,14 @@ import java.util.UUID;
 public interface LedgerService extends BaseService<LedgerDTO, LedgerQuery> {
 
     /**
+     * 不鉴权，直接根据UUID查询账本
+     *
+     * @param uuid UUID
+     * @return 账本实体
+     */
+    LedgerDTO getDirect(UUID uuid);
+
+    /**
      * 根据查询条件，分页查询所有记录
      *
      * @param pagination 分页参数

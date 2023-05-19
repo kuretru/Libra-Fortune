@@ -47,6 +47,12 @@ public class LedgerServiceImpl
     }
 
     @Override
+    public LedgerDTO getDirect(UUID uuid) {
+        LedgerDO record = getDO(uuid);
+        return entityMapper.doToDto(record);
+    }
+
+    @Override
     public PaginationResponse<LedgerVO> listVo(PaginationQuery pagination, LedgerQuery query) {
         QueryWrapper<LedgerBO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_member.user_id", AccessTokenContext.getUserId().toString());
