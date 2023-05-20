@@ -14,9 +14,9 @@ import lombok.ToString;
 public class LedgerMemberBO extends LedgerMemberDO {
 
     /** 用户昵称 */
-    private String userNickname;
+    private String nickname;
 
     /** 用户头像 */
-    private String userAvatar;
+    private String avatar;
 
 }

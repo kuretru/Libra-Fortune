@@ -11,8 +11,8 @@
                ledger_member.update_time,
                ledger_member.ledger_id,
                ledger_member.user_id,
-               `user`.nickname AS user_nickname,
-               `user`.avatar   AS user_avatar
+               `user`.nickname AS nickname,
+               `user`.avatar   AS avatar
         FROM ledger_member
                  LEFT JOIN `user` ON ledger_member.user_id = `user`.uuid
             ${ew.customSqlSegment}

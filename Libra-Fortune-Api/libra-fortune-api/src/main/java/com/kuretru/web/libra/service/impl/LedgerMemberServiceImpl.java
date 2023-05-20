@@ -55,7 +55,11 @@ public class LedgerMemberServiceImpl
         queryWrapper.eq("ledger_member.ledger_id", query.getLedgerId().toString());
         queryWrapper.orderByAsc("id");
 
-        IPage<LedgerMemberBO> page = new Page<>(pagination.getCurrent(), pagination.getPageSize());
+        IPage<LedgerMemberBO> page = new Page<>(1L, -1L);
+        if (PaginationQuery.isNotNull(pagination)) {
+            page.setCurrent(pagination.getCurrent());
+            page.setSize(pagination.getPageSize());
+        }
         page = mapper.listPageBo(page, queryWrapper);
         List<LedgerMemberVO> records = ((LedgerMemberEntityMapper)entityMapper).boToVo(page.getRecords());
 

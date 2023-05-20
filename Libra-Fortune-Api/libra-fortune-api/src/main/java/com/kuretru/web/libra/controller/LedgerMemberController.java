@@ -39,8 +39,8 @@ public class LedgerMemberController
         if (result.getList() == null) {
             result.setList(new ArrayList<>());
         }
-        if (result.getList().isEmpty()) {
-            return ApiResponse.notFound(result);
+        if (PaginationQuery.isNull(paginationQuery)) {
+            return ApiResponse.success(result.getList());
         }
         return ApiResponse.success(result);
     }

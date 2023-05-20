@@ -17,8 +17,8 @@ public class LedgerMemberVO extends BaseDTO {
 
     private UUID userId;
 
-    private String userNickname;
+    private String nickname;
 
-    private String userAvatar;
+    private String avatar;
 
 }
