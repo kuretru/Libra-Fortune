@@ -13,6 +13,7 @@ import com.kuretru.web.libra.entity.data.LedgerTagDO;
 import com.kuretru.web.libra.entity.mapper.LedgerTagEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerTagQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerTagDTO;
+import com.kuretru.web.libra.entity.view.LedgerTagVO;
 import com.kuretru.web.libra.mapper.LedgerTagMapper;
 import com.kuretru.web.libra.service.LedgerTagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,15 @@ public class LedgerTagServiceImpl
     }
 
     @Override
-    public Map<UUID, LedgerTagDTO> listMyLedgerTags() {
+    public List<LedgerTagVO> listMyLedgerTagsVO() {
+        QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        addDefaultOrderBy(queryWrapper);
+        return ((LedgerTagEntityMapper)entityMapper).doToVo(mapper.selectList(queryWrapper));
+    }
+
+    @Override
+    public Map<UUID, LedgerTagDTO> listMyLedgerTagsMap() {
         List<LedgerTagDTO> records = list();
         Map<UUID, LedgerTagDTO> result = new HashMap<>(HashMapUtils.initialCapacity(records.size()));
         records.forEach(record -> result.put(record.getId(), record));

@@ -5,25 +5,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.List;
-import java.util.UUID;
-
 /**
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class LedgerMemberVO extends BaseDTO {
+public class LedgerTagVO extends BaseDTO {
 
-    private UUID userId;
-
-    private String nickname;
-
-    private String avatar;
-
-    private List<PaymentChannelVO> paymentChannels;
-
-    private List<LedgerTagVO> tags;
+    private String name;
 
 }

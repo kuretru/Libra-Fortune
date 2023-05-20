@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuretru.web.libra.mapper.PaymentChannelMapper">
+
+    <select id="listByLedgerId" resultType="com.kuretru.web.libra.entity.data.PaymentChannelDO">
+        SELECT payment_channel.id,
+               payment_channel.uuid,
+               payment_channel.create_time,
+               payment_channel.update_time,
+               payment_channel.user_id,
+               payment_channel.`name`
+        FROM `ledger_member`
+                 RIGHT JOIN payment_channel ON ledger_member.user_id = payment_channel.user_id
+        WHERE ledger_member.ledger_id = #{ledgerId}
+    </select>
+
+</mapper>

@@ -16,16 +16,17 @@ import com.kuretru.web.libra.entity.mapper.LedgerMemberEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerMemberQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerMemberDTO;
 import com.kuretru.web.libra.entity.view.LedgerMemberVO;
+import com.kuretru.web.libra.entity.view.PaymentChannelVO;
 import com.kuretru.web.libra.mapper.LedgerMemberMapper;
 import com.kuretru.web.libra.service.LedgerMemberService;
 import com.kuretru.web.libra.service.LedgerService;
+import com.kuretru.web.libra.service.LedgerTagService;
+import com.kuretru.web.libra.service.PaymentChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 账本成员管理
@@ -41,18 +42,23 @@ public class LedgerMemberServiceImpl
         implements LedgerMemberService {
 
     private final LedgerService ledgerService;
+    private final LedgerTagService tagService;
+    private final PaymentChannelService paymentChannelService;
 
     @Autowired
     public LedgerMemberServiceImpl(LedgerMemberMapper mapper, LedgerMemberEntityMapper entityMapper,
-                                   @Lazy LedgerService ledgerService) {
+                                   @Lazy LedgerService ledgerService, @Lazy LedgerTagServiceImpl tagService,
+                                   @Lazy PaymentChannelService paymentChannelService) {
         super(mapper, entityMapper);
         this.ledgerService = ledgerService;
+        this.tagService = tagService;
+        this.paymentChannelService = paymentChannelService;
     }
 
     @Override
     public PaginationResponse<LedgerMemberVO> listVo(PaginationQuery pagination, LedgerMemberQuery query) {
         QueryWrapper<LedgerMemberBO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("ledger_member.ledger_id", query.getLedgerId().toString());
+        queryWrapper.eq("ledger_id", query.getLedgerId().toString());
         queryWrapper.orderByAsc("id");
 
         IPage<LedgerMemberBO> page = new Page<>(1L, -1L);
@@ -62,6 +68,14 @@ public class LedgerMemberServiceImpl
         }
         page = mapper.listPageBo(page, queryWrapper);
         List<LedgerMemberVO> records = ((LedgerMemberEntityMapper)entityMapper).boToVo(page.getRecords());
+        Map<UUID, List<PaymentChannelVO>> paymentChannelMap = paymentChannelService.listMapByLedgerId(query.getLedgerId());
+
+        records.forEach(record -> {
+            record.setPaymentChannels(paymentChannelMap.getOrDefault(record.getUserId(), new ArrayList<>()));
+            if (record.getUserId().equals(AccessTokenContext.getUserId())) {
+                record.setTags(tagService.listMyLedgerTagsVO());
+            }
+        });
 
         // TODO: 排序，Owner应该在最前
         return new PaginationResponse<>(records, page.getCurrent(), page.getSize(), page.getTotal());

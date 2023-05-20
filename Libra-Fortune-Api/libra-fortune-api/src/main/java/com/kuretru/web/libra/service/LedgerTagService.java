@@ -3,7 +3,9 @@ package com.kuretru.web.libra.service;
 import com.kuretru.microservices.web.service.BaseService;
 import com.kuretru.web.libra.entity.query.LedgerTagQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerTagDTO;
+import com.kuretru.web.libra.entity.view.LedgerTagVO;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,8 +17,15 @@ public interface LedgerTagService extends BaseService<LedgerTagDTO, LedgerTagQue
     /**
      * 列出我的账本标签
      *
+     * @return 账本标签VO
+     */
+    List<LedgerTagVO> listMyLedgerTagsVO();
+
+    /**
+     * 列出我的账本标签
+     *
      * @return 账本标签Map
      */
-    Map<UUID, LedgerTagDTO> listMyLedgerTags();
+    Map<UUID, LedgerTagDTO> listMyLedgerTagsMap();
 
 }

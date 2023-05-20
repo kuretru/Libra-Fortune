@@ -12,13 +12,13 @@ import com.kuretru.web.libra.entity.data.PaymentChannelDO;
 import com.kuretru.web.libra.entity.mapper.PaymentChannelEntityMapper;
 import com.kuretru.web.libra.entity.query.PaymentChannelQuery;
 import com.kuretru.web.libra.entity.transfer.PaymentChannelDTO;
+import com.kuretru.web.libra.entity.view.PaymentChannelVO;
 import com.kuretru.web.libra.mapper.PaymentChannelMapper;
 import com.kuretru.web.libra.service.PaymentChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author 呉真(kuretru) <kuretru@gmail.com>
@@ -31,6 +31,20 @@ public class PaymentChannelServiceImpl
     @Autowired
     public PaymentChannelServiceImpl(PaymentChannelMapper mapper, PaymentChannelEntityMapper entityMapper) {
         super(mapper, entityMapper);
+    }
+
+    @Override
+    public Map<UUID, List<PaymentChannelVO>> listMapByLedgerId(UUID ledgerId) {
+        List<PaymentChannelDO> records = mapper.listByLedgerId(ledgerId.toString());
+        Map<UUID, List<PaymentChannelVO>> result = new HashMap<>(16);
+        records.forEach(record -> {
+            UUID userId = UUID.fromString(record.getUserId());
+            if (!result.containsKey(userId)) {
+                result.put(userId, new ArrayList<>());
+            }
+            result.get(userId).add(((PaymentChannelEntityMapper)entityMapper).doToVo(record));
+        });
+        return result;
     }
 
     @Override
