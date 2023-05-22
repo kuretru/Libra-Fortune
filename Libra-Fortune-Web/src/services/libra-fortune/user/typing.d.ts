@@ -2,6 +2,11 @@
 /* eslint-disable */
 
 declare namespace API.User {
+  type UserVO = API.BaseDTO & {
+    nickname: string;
+    avatar: string;
+  };
+
   type PaymentChannelDTO = API.BaseDTO & {
     userId: string;
     name: string;

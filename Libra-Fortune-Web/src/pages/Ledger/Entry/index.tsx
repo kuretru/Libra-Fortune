@@ -1,8 +1,10 @@
 import BasePage from '@/components/BasePage';
+import UserNicknameWithAvatar from '@/components/UserNicknameWithAvatar';
 import LedgerCategoryService from '@/services/libra-fortune/ledger/ledger-category';
 import LedgerEntryService from '@/services/libra-fortune/ledger/ledger-entry';
 import LedgerMemberService from '@/services/libra-fortune/ledger/ledger-member';
 import LedgerTagService from '@/services/libra-fortune/ledger/ledger-tag';
+import { getMoneySymbol } from '@/utils/money-utils';
 import {
   PageContainer,
   ProColumns,
@@ -18,7 +20,6 @@ import {
   RequestOptionsType,
 } from '@ant-design/pro-components';
 import dayjs from 'dayjs';
-import { renderLedgerMember } from '../Ledger/ledger-member';
 
 interface LedgerEntryProps {
   ledgerId: string;
@@ -29,6 +30,12 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
   const memberService = new LedgerMemberService('df147163-1ff9-4a83-b0eb-4b581918dc4c');
   const tagService = new LedgerTagService();
   let membersMap: Record<string, API.Ledger.LedgerMemberVO> = {};
+
+  const currencyType = [
+    { label: '人民币', value: 'CNY' },
+    { label: '美元', value: 'USD' },
+    { label: '欧元', value: 'EUR' },
+  ];
 
   const fetchCategories = async () => {
     const data = (await categoryService.list()).data;
@@ -45,7 +52,7 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
 
     const result: RequestOptionsType[] = [];
     data.forEach((record) => {
-      result.push({ label: renderLedgerMember(record), value: record.userId });
+      result.push({ label: <UserNicknameWithAvatar user={record} />, value: record.userId });
       membersMap[record.userId] = record;
     });
     return result;
@@ -67,35 +74,51 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
       dataIndex: 'date',
       title: '日期',
       valueType: 'dateRange',
-      width: 60,
+      width: 100,
+      render: (_, record) => record.date,
     },
     {
       align: 'center',
       copyable: true,
       dataIndex: 'name',
       title: '名称',
-      width: 60,
+      width: 120,
     },
     {
       align: 'center',
       copyable: true,
       dataIndex: 'total',
       title: '金额总计',
-      width: 60,
+      width: 120,
+      renderText: (_, record) => {
+        return `${getMoneySymbol(record.currencyType)} ${record.total.toFixed(2)}`;
+      },
+    },
+    {
+      dataIndex: 'currencyType',
+      title: '货币类型',
+      valueType: 'select',
+      fieldProps: {
+        options: currencyType,
+      },
+      hideInTable: true,
     },
     {
       align: 'center',
       copyable: true,
-      dataIndex: 'currencyType',
-      title: '货币类型',
-      width: 60,
+      dataIndex: 'categoryId',
+      valueType: 'select',
+      request: fetchCategories,
+      title: '分类',
+      width: 120,
+      renderText: (_, record) => record.category.name,
     },
     {
       align: 'center',
       copyable: true,
       dataIndex: 'remark',
+      search: false,
       title: '备注',
-      width: 60,
     },
   ];
 
@@ -136,11 +159,7 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
             label="货币类型"
             name="currencyType"
             initialValue="CNY"
-            options={[
-              { label: '人民币', value: 'CNY' },
-              { label: '美元', value: 'USD' },
-              { label: '欧元', value: 'EUR' },
-            ]}
+            options={currencyType}
             placeholder="请选择货币类型"
             rules={[{ required: true }]}
             tooltip="请选择货币类型"

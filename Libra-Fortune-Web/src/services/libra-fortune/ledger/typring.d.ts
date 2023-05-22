@@ -109,7 +109,7 @@ declare namespace API.Ledger {
   type LedgerEntryDetailVO = API.BaseDTO & {
     fundedRatio: number;
     amount: number;
-    user: LedgerMemberVO;
+    user: API.User.UserVO;
     paymentChannel: API.User.PaymentChannelVO;
   };
 
