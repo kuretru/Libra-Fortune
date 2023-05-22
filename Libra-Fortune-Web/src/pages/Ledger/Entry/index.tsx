@@ -20,6 +20,7 @@ import {
   RequestOptionsType,
 } from '@ant-design/pro-components';
 import dayjs from 'dayjs';
+import LedgerEntryDetail from './entry-detail';
 
 interface LedgerEntryProps {
   ledgerId: string;
@@ -114,9 +115,19 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
       renderText: (_, record) => record.category.name,
     },
     {
+      dataIndex: 'details',
+      search: false,
+      title: '明细',
+      render: (_, record) => {
+        return <LedgerEntryDetail data={record.details} />;
+      },
+      width: 600,
+    },
+    {
       align: 'center',
       copyable: true,
       dataIndex: 'remark',
+      ellipsis: true,
       search: false,
       title: '备注',
     },
@@ -305,6 +316,9 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
         columns={columns as ProColumns<API.Ledger.LedgerEntryDTO | API.Ledger.LedgerEntryVO>[]}
         formItem={formItem()}
         transformFormValues={transformFormValues}
+        tableProps={{
+          size: 'small',
+        }}
       />
     </PageContainer>
   );
