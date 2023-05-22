@@ -20,18 +20,28 @@ import React from 'react';
 
 const { confirm } = Modal;
 
-interface IBasePageProps<T extends API.BaseDTO, Q extends API.PaginationQuery> {
+/**
+ * T -> DTO
+ * Q -> Query
+ * V -> VO default same as DTO
+ */
+interface IBasePageProps<
+  T extends API.BaseDTO,
+  Q extends API.PaginationQuery,
+  V extends API.BaseDTO = T,
+> {
   pageName: string;
-  service: BaseService<T, Q>;
-  columns: ProColumns<T>[];
+  service: BaseService<T, Q, V>;
+  columns: ProColumns<T | V>[];
   formItem: JSX.Element;
+  transformFormValues?: (record: T) => T;
   onFormValuesChange?: (
     changedValues: any,
     values: T,
     formRef: React.MutableRefObject<FormInstance>,
   ) => void;
   onSubmit?: (params: Q) => Q;
-  tableProps?: ProTableProps<T, Q>;
+  tableProps?: ProTableProps<T | V, Q>;
   modalProps?: ModalFormProps<T>;
 }
 
@@ -43,8 +53,9 @@ interface IBasePageState {
 abstract class BasePage<
   T extends API.BaseDTO,
   Q extends API.PaginationQuery,
-> extends React.Component<IBasePageProps<T, Q>, IBasePageState> {
-  columnsPrefix: ProColumns<T>[] = [
+  V extends API.BaseDTO = T,
+> extends React.Component<IBasePageProps<T, Q, V>, IBasePageState> {
+  columnsPrefix: ProColumns<T | V>[] = [
     {
       align: 'center',
       key: 'index',
@@ -53,7 +64,7 @@ abstract class BasePage<
       width: 60,
     },
   ];
-  columnsSuffix: ProColumns<T>[] = [
+  columnsSuffix: ProColumns<T | V>[] = [
     {
       align: 'center',
       key: 'action',
@@ -66,7 +77,7 @@ abstract class BasePage<
             <Button
               icon={<EditOutlined />}
               key="edit"
-              onClick={() => this.onEditButtonClick(record)}
+              onClick={() => this.onEditButtonClick(record as T)}
               type="primary"
             >
               编辑
@@ -89,7 +100,7 @@ abstract class BasePage<
   tableRef: React.RefObject<ActionType>;
   defaultFormValue: Record<string, any>;
 
-  constructor(props: IBasePageProps<T, Q>) {
+  constructor(props: IBasePageProps<T, Q, V>) {
     super(props);
     this.state = {
       modalVisible: false,
@@ -100,7 +111,7 @@ abstract class BasePage<
     this.defaultFormValue = {};
   }
 
-  componentDidUpdate(prevProps: IBasePageProps<T, Q>) {
+  componentDidUpdate(prevProps: IBasePageProps<T, Q, V>) {
     if (!isEqual(this.props.service, prevProps.service)) {
       this.tableRef.current?.reloadAndRest?.();
     }
@@ -143,7 +154,8 @@ abstract class BasePage<
     });
   };
 
-  onFormFinish = async (record: T) => {
+  onFormFinish = async (formData: T) => {
+    const record = this.props.transformFormValues?.(formData) ?? formData;
     const messageKey = 'create';
     let result = false;
     message.loading({ content: '请求处理中...', duration: 0, key: messageKey });
@@ -190,7 +202,7 @@ abstract class BasePage<
   render() {
     return (
       <>
-        <ProTable<T, Q>
+        <ProTable<T | V, Q>
           actionRef={this.tableRef}
           bordered
           columns={this.columnsPrefix.concat(this.props.columns).concat(this.columnsSuffix)}

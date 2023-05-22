@@ -1,6 +1,10 @@
 import { request } from '@umijs/max';
 
-abstract class BaseService<T extends API.BaseDTO, Q extends API.PaginationQuery> {
+abstract class BaseService<
+  T extends API.BaseDTO,
+  Q extends API.PaginationQuery,
+  V extends API.BaseDTO = T,
+> {
   protected url: string;
 
   constructor(url: string) {
@@ -21,20 +25,20 @@ abstract class BaseService<T extends API.BaseDTO, Q extends API.PaginationQuery>
     }
   }
 
-  async list(params?: Q): Promise<API.ApiResponse<T[]>> {
+  async list(params?: Q): Promise<API.ApiResponse<V[]>> {
     this.camelToUnderscore(params);
-    return request<API.ApiResponse<T[]>>(`/api${this.url}`, {
+    return request<API.ApiResponse<V[]>>(`/api${this.url}`, {
       method: 'get',
       params,
     });
   }
 
-  async listByPage(params: Q & API.PaginationQuery): Promise<API.ProTableData<T>> {
+  async listByPage(params: Q & API.PaginationQuery): Promise<API.ProTableData<V>> {
     this.camelToUnderscore(params);
-    return request<API.ApiResponse<API.PaginationResponse<T>>>(`/api${this.url}`, {
+    return request<API.ApiResponse<API.PaginationResponse<V>>>(`/api${this.url}`, {
       method: 'get',
       params,
-    }).then((response: API.ApiResponse<API.PaginationResponse<T>>) => {
+    }).then((response) => {
       return {
         success: true,
         data: response.data.list,
