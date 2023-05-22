@@ -4,6 +4,15 @@ import { ProColumns, ProFormText } from '@ant-design/pro-components';
 import { Avatar, Space } from 'antd';
 import { useEffect, useState } from 'react';
 
+const renderLedgerMember = (record: API.Ledger.LedgerMemberVO): React.ReactNode => {
+  return (
+    <Space>
+      <Avatar src={<img src={record.avatar} alt="ownerAvatar" />} />
+      {record.nickname}
+    </Space>
+  );
+};
+
 interface LedgerMemberProps {
   ledgerId: string;
 }
@@ -17,26 +26,12 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
     setLedgerMemberService(new LedgerMemberService(props.ledgerId));
   }, [props.ledgerId]);
 
-  const columns: ProColumns<API.Ledger.LedgerMemberDTO>[] = [
+  const columns: ProColumns<API.Ledger.LedgerMemberVO>[] = [
     {
       align: 'center',
       dataIndex: 'owner',
       title: '用户名',
-      render: (_, record) => {
-        return (
-          <Space>
-            <Avatar
-              src={
-                <img
-                  src={(record as unknown as API.Ledger.LedgerMemberVO).userAvatar}
-                  alt="ownerAvatar"
-                />
-              }
-            />
-            {(record as unknown as API.Ledger.LedgerMemberVO).userNickname}
-          </Space>
-        );
-      },
+      render: (_, record) => renderLedgerMember(record),
     },
   ];
 
@@ -65,10 +60,10 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
   };
 
   return (
-    <BasePage<API.Ledger.LedgerMemberDTO, API.Ledger.LedgerMemberQuery>
+    <BasePage<API.Ledger.LedgerMemberDTO, API.Ledger.LedgerMemberQuery, API.Ledger.LedgerMemberVO>
       pageName="账本成员"
       service={ledgerMemberService}
-      columns={columns}
+      columns={columns as ProColumns<API.Ledger.LedgerMemberDTO | API.Ledger.LedgerMemberVO>[]}
       formItem={formItem()}
       tableProps={{ options: { density: false, fullScreen: false, setting: false }, search: false }}
     />
@@ -76,3 +71,4 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
 };
 
 export default LedgerMember;
+export { renderLedgerMember };
