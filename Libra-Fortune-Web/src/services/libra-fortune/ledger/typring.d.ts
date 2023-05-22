@@ -32,6 +32,10 @@ declare namespace API.Ledger {
     name?: string;
   };
 
+  type LedgerTagVO = API.BaseDTO & {
+    name: string;
+  };
+
   type LedgerMemberDTO = API.BaseDTO & {
     ledgerId: string;
     userId: string;
@@ -43,8 +47,10 @@ declare namespace API.Ledger {
 
   type LedgerMemberVO = API.BaseDTO & {
     userId: string;
-    userNickname: string;
-    userAvatar: string;
+    nickname: string;
+    avatar: string;
+    paymentChannels?: API.User.PaymentChannelVO[];
+    tags?: API.Ledger.LedgerTagVO[];
   };
 
   type LedgerCategoryDTO = API.BaseDTO & {
@@ -55,5 +61,60 @@ declare namespace API.Ledger {
   type LedgerCategoryQuery = API.PaginationQuery & {
     ledgerId?: string;
     name?: string;
+  };
+
+  type LedgerCategoryVO = API.BaseDTO & {
+    name: string;
+  };
+
+  type LedgerEntryDTO = API.BaseDTO & {
+    ledgerId: string;
+    categoryId: string;
+    date: string;
+    name: string;
+    total: number;
+    currencyType: string;
+    remark: string;
+    details: LedgerEntryDetailDTO[];
+  };
+
+  type LedgerEntryQuery = API.PaginationQuery & {
+    ledgerId: string;
+    categoryId: string;
+    date: string;
+    name: string;
+    total: number;
+    currencyType: string;
+  };
+
+  type LedgerEntryVO = API.BaseDTO & {
+    date: string;
+    name: string;
+    total: number;
+    currencyType: string;
+    remark: string;
+    category: LedgerCategoryVO;
+    details: LedgerEntryDetailVO[];
+  };
+
+  type LedgerEntryDetailDTO = API.BaseDTO & {
+    entryId?: string;
+    userId: string;
+    paymentChannelId: string;
+    fundedRatio: number;
+    amount: number;
+    tags?: API.LedgerEntryDetailTagDTO[];
+  };
+
+  type LedgerEntryDetailVO = API.BaseDTO & {
+    fundedRatio: number;
+    amount: number;
+    user: LedgerMemberVO;
+    paymentChannel: API.User.PaymentChannelVO;
+  };
+
+  type LedgerEntryDetailTagDTO = API.BaseDTO & {
+    entryDetailId?: string;
+    tagId: string;
   };
 }

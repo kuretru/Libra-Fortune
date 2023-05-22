@@ -11,4 +11,8 @@ declare namespace API.User {
     userId: string;
     name?: string;
   };
+
+  type PaymentChannelVO = API.BaseDTO & {
+    name: string;
+  };
 }

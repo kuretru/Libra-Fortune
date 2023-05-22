@@ -27,6 +27,7 @@ export default [
     routes: [
       { name: '账本管理', path: '/ledgers', component: './Ledger/Ledger' },
       { name: '账本标签管理', path: '/ledgers/tags', component: './Ledger/Tag' },
+      { name: '账本条目管理', path: '/ledgers/entries', component: './Ledger/Entry' },
     ],
   },
   {
