@@ -24,6 +24,13 @@ public interface LedgerTagService extends BaseService<LedgerTagDTO, LedgerTagQue
     /**
      * 列出我的账本标签
      *
+     * @return 账本标签VO
+     */
+    Map<UUID, LedgerTagVO> listMyLedgerTagsMapVO();
+
+    /**
+     * 列出我的账本标签
+     *
      * @return 账本标签Map
      */
     Map<UUID, LedgerTagDTO> listMyLedgerTagsMap();

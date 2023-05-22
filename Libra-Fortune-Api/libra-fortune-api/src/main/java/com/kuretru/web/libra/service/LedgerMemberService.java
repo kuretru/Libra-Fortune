@@ -7,7 +7,9 @@ import com.kuretru.microservices.web.service.BaseService;
 import com.kuretru.web.libra.entity.query.LedgerMemberQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerMemberDTO;
 import com.kuretru.web.libra.entity.view.LedgerMemberVO;
+import com.kuretru.web.libra.entity.view.UserVO;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +26,15 @@ public interface LedgerMemberService extends BaseService<LedgerMemberDTO, Ledger
      * @return 符合查询条件，分页后的所有记录
      */
     PaginationResponse<LedgerMemberVO> listVo(PaginationQuery pagination, LedgerMemberQuery query);
+
+    /**
+     * 根据账本ID查询VO
+     * 调用者需确保已进行过权限验证
+     *
+     * @param ledgerId 账本ID
+     * @return VO
+     */
+    Map<UUID, UserVO> listUserMapByLedgerId(UUID ledgerId);
 
     /**
      * 验证当前用户是否为指定账本成员

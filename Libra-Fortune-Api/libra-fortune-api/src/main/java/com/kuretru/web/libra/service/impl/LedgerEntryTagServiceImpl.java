@@ -47,7 +47,7 @@ public class LedgerEntryTagServiceImpl
 
     @Override
     public List<LedgerEntryTagDTO> save(UUID entryDetailId, List<LedgerEntryTagDTO> records) throws ServiceException {
-        Map<UUID, LedgerTagDTO> myLedgerTag = tagService.listMyLedgerTags();
+        Map<UUID, LedgerTagDTO> myLedgerTag = tagService.listMyLedgerTagsMap();
         records.forEach(record -> {
             if (!myLedgerTag.containsKey(record.getTagId())) {
                 throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "非本人标签");
@@ -59,7 +59,7 @@ public class LedgerEntryTagServiceImpl
 
     @Override
     public List<LedgerEntryTagDTO> update(UUID entryDetailId, List<LedgerEntryTagDTO> records) throws ServiceException {
-        Map<UUID, LedgerTagDTO> myLedgerTag = tagService.listMyLedgerTags();
+        Map<UUID, LedgerTagDTO> myLedgerTag = tagService.listMyLedgerTagsMap();
         records.forEach(record -> {
             if (!myLedgerTag.containsKey(record.getTagId())) {
                 throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "非本人标签");

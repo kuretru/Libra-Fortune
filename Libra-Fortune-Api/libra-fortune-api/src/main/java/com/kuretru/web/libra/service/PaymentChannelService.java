@@ -15,11 +15,19 @@ import java.util.UUID;
 public interface PaymentChannelService extends BaseService<PaymentChannelDTO, PaymentChannelQuery> {
 
     /**
-     * 根据账本ID，构建用户ID->支出渠道的Map
+     * 根据账本ID，构建{ 用户ID: 支出渠道VO }的Map
      *
      * @param ledgerId 账本ID
-     * @return 用户ID->支出渠道的Map
+     * @return { 用户ID: 支出渠道VO }的Map
      */
-    Map<UUID, List<PaymentChannelVO>> listMapByLedgerId(UUID ledgerId);
+    Map<UUID, List<PaymentChannelVO>> listUserMapByLedgerId(UUID ledgerId);
+
+    /**
+     * 根据账本ID，构建{ 支出渠道ID: 支出渠道VO }的Map
+     *
+     * @param ledgerId 账本ID
+     * @return { 支出渠道ID: 支出渠道VO }的Map
+     */
+    Map<UUID, PaymentChannelVO> listMapByLedgerId(UUID ledgerId);
 
 }

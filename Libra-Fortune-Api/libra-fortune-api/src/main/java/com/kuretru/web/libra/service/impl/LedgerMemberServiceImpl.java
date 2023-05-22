@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.common.utils.HashMapUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.PaginationQuery;
@@ -17,6 +18,7 @@ import com.kuretru.web.libra.entity.query.LedgerMemberQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerMemberDTO;
 import com.kuretru.web.libra.entity.view.LedgerMemberVO;
 import com.kuretru.web.libra.entity.view.PaymentChannelVO;
+import com.kuretru.web.libra.entity.view.UserVO;
 import com.kuretru.web.libra.mapper.LedgerMemberMapper;
 import com.kuretru.web.libra.service.LedgerMemberService;
 import com.kuretru.web.libra.service.LedgerService;
@@ -68,7 +70,7 @@ public class LedgerMemberServiceImpl
         }
         page = mapper.listPageBo(page, queryWrapper);
         List<LedgerMemberVO> records = ((LedgerMemberEntityMapper)entityMapper).boToVo(page.getRecords());
-        Map<UUID, List<PaymentChannelVO>> paymentChannelMap = paymentChannelService.listMapByLedgerId(query.getLedgerId());
+        Map<UUID, List<PaymentChannelVO>> paymentChannelMap = paymentChannelService.listUserMapByLedgerId(query.getLedgerId());
 
         records.forEach(record -> {
             record.setPaymentChannels(paymentChannelMap.getOrDefault(record.getUserId(), new ArrayList<>()));
@@ -79,6 +81,23 @@ public class LedgerMemberServiceImpl
 
         // TODO: 排序，Owner应该在最前
         return new PaginationResponse<>(records, page.getCurrent(), page.getSize(), page.getTotal());
+    }
+
+    @Override
+    public Map<UUID, UserVO> listUserMapByLedgerId(UUID ledgerId) {
+        QueryWrapper<LedgerMemberBO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger_id", ledgerId.toString());
+        queryWrapper.orderByAsc("id");
+
+        IPage<LedgerMemberBO> page = new Page<>(1L, -1L);
+        page = mapper.listPageBo(page, queryWrapper);
+        List<UserVO> records = ((LedgerMemberEntityMapper)entityMapper).boToUserVo(page.getRecords());
+
+        Map<UUID, UserVO> result = new HashMap<>(HashMapUtils.initialCapacity(records.size()));
+        records.forEach(record -> {
+            result.put(record.getId(), record);
+        });
+        return result;
     }
 
     @Override

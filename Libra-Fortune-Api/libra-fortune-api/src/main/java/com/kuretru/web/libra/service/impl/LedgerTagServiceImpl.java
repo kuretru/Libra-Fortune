@@ -46,6 +46,14 @@ public class LedgerTagServiceImpl
     }
 
     @Override
+    public Map<UUID, LedgerTagVO> listMyLedgerTagsMapVO() {
+        List<LedgerTagVO> records = listMyLedgerTagsVO();
+        Map<UUID, LedgerTagVO> result = new HashMap<>(HashMapUtils.initialCapacity(records.size()));
+        records.forEach(record -> result.put(record.getId(), record));
+        return result;
+    }
+
+    @Override
     public Map<UUID, LedgerTagDTO> listMyLedgerTagsMap() {
         List<LedgerTagDTO> records = list();
         Map<UUID, LedgerTagDTO> result = new HashMap<>(HashMapUtils.initialCapacity(records.size()));

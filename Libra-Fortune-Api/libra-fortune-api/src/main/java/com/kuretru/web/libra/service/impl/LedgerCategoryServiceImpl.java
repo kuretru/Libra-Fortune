@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.common.utils.HashMapUtils;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.PaginationQuery;
 import com.kuretru.microservices.web.entity.PaginationResponse;
@@ -10,6 +11,7 @@ import com.kuretru.web.libra.entity.data.LedgerCategoryDO;
 import com.kuretru.web.libra.entity.mapper.LedgerCategoryEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerCategoryQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerCategoryDTO;
+import com.kuretru.web.libra.entity.view.LedgerCategoryVO;
 import com.kuretru.web.libra.mapper.LedgerCategoryMapper;
 import com.kuretru.web.libra.service.LedgerCategoryService;
 import com.kuretru.web.libra.service.LedgerEntryService;
@@ -19,7 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -48,6 +52,17 @@ public class LedgerCategoryServiceImpl
     public LedgerCategoryDTO getDirect(UUID uuid) {
         LedgerCategoryDO record = getDO(uuid);
         return entityMapper.doToDto(record);
+    }
+
+    @Override
+    public Map<UUID, LedgerCategoryVO> listMapByLedgerId(UUID ledgerId) {
+        QueryWrapper<LedgerCategoryDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("ledger_id", ledgerId.toString());
+        List<LedgerCategoryDO> doList = mapper.selectList(queryWrapper);
+        List<LedgerCategoryVO> volist = ((LedgerCategoryEntityMapper)entityMapper).doToVo(doList);
+        Map<UUID, LedgerCategoryVO> result = new HashMap<>(HashMapUtils.initialCapacity(doList.size()));
+        volist.forEach(vo -> result.put(vo.getId(), vo));
+        return result;
     }
 
     @Override

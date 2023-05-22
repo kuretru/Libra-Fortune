@@ -2,6 +2,7 @@ package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.common.utils.HashMapUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.PaginationQuery;
@@ -34,7 +35,7 @@ public class PaymentChannelServiceImpl
     }
 
     @Override
-    public Map<UUID, List<PaymentChannelVO>> listMapByLedgerId(UUID ledgerId) {
+    public Map<UUID, List<PaymentChannelVO>> listUserMapByLedgerId(UUID ledgerId) {
         List<PaymentChannelDO> records = mapper.listByLedgerId(ledgerId.toString());
         Map<UUID, List<PaymentChannelVO>> result = new HashMap<>(16);
         records.forEach(record -> {
@@ -43,6 +44,16 @@ public class PaymentChannelServiceImpl
                 result.put(userId, new ArrayList<>());
             }
             result.get(userId).add(((PaymentChannelEntityMapper)entityMapper).doToVo(record));
+        });
+        return result;
+    }
+
+    @Override
+    public Map<UUID, PaymentChannelVO> listMapByLedgerId(UUID ledgerId) {
+        List<PaymentChannelDO> records = mapper.listByLedgerId(ledgerId.toString());
+        Map<UUID, PaymentChannelVO> result = new HashMap<>(HashMapUtils.initialCapacity(records.size()));
+        records.forEach(record -> {
+            result.put(UUID.fromString(record.getUuid()), ((PaymentChannelEntityMapper)entityMapper).doToVo(record));
         });
         return result;
     }
