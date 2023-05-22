@@ -1,4 +1,5 @@
 import BasePage from '@/components/BasePage';
+import UserNicknameWithAvatar from '@/components/UserNicknameWithAvatar';
 import { getLedgerType } from '@/services/libra-fortune/enum';
 import LedgerService from '@/services/libra-fortune/ledger/ledger';
 import { AppstoreAddOutlined, RightCircleOutlined, UserOutlined } from '@ant-design/icons';
@@ -10,7 +11,7 @@ import {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
-import { Avatar, Button, Space } from 'antd';
+import { Button, Space } from 'antd';
 import { useState } from 'react';
 import LedgerCategory from './ledger-category';
 import LedgerMember from './ledger-member';
@@ -50,16 +51,13 @@ const Ledger: React.FC = () => {
       dataIndex: 'owner',
       title: '账本所有者',
       width: 120,
-      render: (_, record) => {
-        return (
-          <Space>
-            <Avatar
-              src={<img src={(record as API.Ledger.LedgerVO).ownerAvatar} alt="ownerAvatar" />}
-            />
-            {(record as API.Ledger.LedgerVO).ownerNickname}
-          </Space>
-        );
-      },
+      render: (_, record) => (
+        <UserNicknameWithAvatar
+          user={record as any}
+          nickname={(record as API.Ledger.LedgerVO).ownerNickname}
+          avatar={(record as API.Ledger.LedgerVO).ownerAvatar}
+        />
+      ),
     },
     {
       align: 'center',

@@ -1,17 +1,8 @@
 import BasePage from '@/components/BasePage';
+import UserNicknameWithAvatar from '@/components/UserNicknameWithAvatar';
 import LedgerMemberService from '@/services/libra-fortune/ledger/ledger-member';
 import { ProColumns, ProFormText } from '@ant-design/pro-components';
-import { Avatar, Space } from 'antd';
 import { useEffect, useState } from 'react';
-
-const renderLedgerMember = (record: API.Ledger.LedgerMemberVO): React.ReactNode => {
-  return (
-    <Space>
-      <Avatar src={<img src={record.avatar} alt="ownerAvatar" />} />
-      {record.nickname}
-    </Space>
-  );
-};
 
 interface LedgerMemberProps {
   ledgerId: string;
@@ -31,7 +22,7 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
       align: 'center',
       dataIndex: 'owner',
       title: '用户名',
-      render: (_, record) => renderLedgerMember(record),
+      render: (_, record) => <UserNicknameWithAvatar user={record} />,
     },
   ];
 
@@ -71,4 +62,3 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
 };
 
 export default LedgerMember;
-export { renderLedgerMember };
