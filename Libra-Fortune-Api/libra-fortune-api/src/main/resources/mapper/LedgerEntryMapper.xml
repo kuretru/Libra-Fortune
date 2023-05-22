@@ -4,7 +4,31 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kuretru.web.libra.mapper.LedgerEntryMapper">
 
-    <select id="listPageBo" resultType="com.kuretru.web.libra.entity.business.LedgerEntryBO">
+    <resultMap id="LedgerEntryBO" type="com.kuretru.web.libra.entity.business.LedgerEntryBO">
+        <id property="id" column="id"/>
+        <result property="uuid" column="uuid"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="date" column="date"/>
+        <result property="name" column="name"/>
+        <result property="total" column="total"/>
+        <result property="currencyType" column="currency_type"/>
+        <result property="remark" column="remark"/>
+        <collection property="details" ofType="com.kuretru.web.libra.entity.business.LedgerEntryDetailBO">
+            <id property="id" column="detail_id"/>
+            <result property="uuid" column="detail_uuid"/>
+            <result property="userId" column="detail_user_id"/>
+            <result property="paymentChannelId" column="detail_payment_channel_id"/>
+            <result property="fundedRatio" column="detail_funded_ratio"/>
+            <result property="amount" column="detail_amount"/>
+            <collection property="tags" ofType="com.kuretru.web.libra.entity.business.LedgerEntryDetailTagBO">
+                <id property="id" column="tag_id"/>
+                <result property="uuid" column="tag_uuid"/>
+                <result property="tagId" column="tag_tag_id"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="listPageBo" resultMap="LedgerEntryBO">
         SELECT ledger_entry.id,
                ledger_entry.uuid,
                ledger_entry.category_id,
@@ -13,18 +37,18 @@
                ledger_entry.total,
                ledger_entry.currency_type,
                ledger_entry.remark,
-               ledger_entry_detail.id                 AS detail_id,
-               ledger_entry_detail.uuid               AS detail_uuid,
-               ledger_entry_detail.user_id            AS detail_user_id,
-               ledger_entry_detail.payment_channel_id AS detail_payment_channel_id,
-               ledger_entry_detail.funded_ratio       AS detail_funded_ratio,
-               ledger_entry_detail.amount             AS detail_amount,
-               ledger_entry_detail_tag.id             AS detail_tag_id,
-               ledger_entry_detail_tag.uuid           AS detail_tag_uuid,
-               ledger_entry_detail_tag.tag_id         AS detail_tag_tag_id
+               detail.id                 AS detail_id,
+               detail.uuid               AS detail_uuid,
+               detail.user_id            AS detail_user_id,
+               detail.payment_channel_id AS detail_payment_channel_id,
+               detail.funded_ratio       AS detail_funded_ratio,
+               detail.amount             AS detail_amount,
+               tag.id                    AS tag_id,
+               tag.uuid                  AS tag_uuid,
+               tag.tag_id                AS tag_tag_id
         FROM ledger_entry
-                 LEFT JOIN ledger_entry_detail ON ledger_entry.uuid = ledger_entry_detail.entry_id
-                 LEFT JOIN ledger_entry_detail_tag ON ledger_entry_detail.uuid = ledger_entry_detail_tag.entry_detail_id
+                 LEFT JOIN ledger_entry_detail AS detail ON ledger_entry.uuid = detail.entry_id
+                 LEFT JOIN ledger_entry_detail_tag AS tag ON detail.uuid = tag.entry_detail_id
             ${ew.customSqlSegment}
     </select>
 

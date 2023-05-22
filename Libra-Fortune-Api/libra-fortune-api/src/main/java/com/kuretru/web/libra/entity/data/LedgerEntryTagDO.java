@@ -14,7 +14,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("ledger_entry_tag")
+@TableName("ledger_entry_detail_tag")
 public class LedgerEntryTagDO extends BaseDO {
 
     /** 外键，账本条目明细ID */

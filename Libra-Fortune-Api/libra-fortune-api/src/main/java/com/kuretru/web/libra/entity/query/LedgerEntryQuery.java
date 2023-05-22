@@ -3,6 +3,7 @@ package com.kuretru.web.libra.entity.query;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Data
 public class LedgerEntryQuery {
 
+    @NotNull
     private UUID ledgerId;
 
     private UUID categoryId;

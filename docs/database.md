@@ -99,15 +99,15 @@ erDiagram
     user ||--|| ledger_entry_detail : ""
     payment_channel ||--|| ledger_entry_detail : ""
 
-    ledger_entry_tag {
+    ledger_entry_detail_tag {
         Long id PK
         UUID uuid
         Instant create_time
         UUID entry_id FK
         UUID tag_id FK
     }
-    ledger_entry_detail ||--o{ ledger_entry_tag : ""
-    ledger_tag ||--|| ledger_entry_tag : ""
+    ledger_entry_detail ||--o{ ledger_entry_detail_tag : ""
+    ledger_tag ||--|| ledger_entry_detail_tag : ""
 ```
 
 ## 账本表(ledger)

@@ -56,8 +56,10 @@ public class LedgerEntryDetailServiceImpl
             LedgerEntryDetailDTO newRecord = super.save(record);
 
             if (record.getUserId().equals(AccessTokenContext.getUserId())) {
-                record.getTags().forEach(tag -> tag.setEntryDetailId(newRecord.getId()));
-                entryTagService.save(record.getId(), record.getTags());
+                if (record.getTags() != null && !record.getTags().isEmpty()) {
+                    record.getTags().forEach(tag -> tag.setEntryDetailId(newRecord.getId()));
+                    entryTagService.save(newRecord.getId(), record.getTags());
+                }
             }
         });
     }

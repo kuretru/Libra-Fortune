@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.kuretru.web.libra.entity.business.LedgerEntryBO;
-import com.kuretru.web.libra.entity.business.LedgerMemberBO;
 import com.kuretru.web.libra.entity.data.LedgerEntryDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,6 +24,6 @@ public interface LedgerEntryMapper extends BaseMapper<LedgerEntryDO> {
      * @param queryWrapper 查询条件
      * @return BO
      */
-    IPage<LedgerEntryBO> listPageBo(IPage<LedgerMemberBO> page, @Param(Constants.WRAPPER) QueryWrapper<LedgerEntryBO> queryWrapper);
+    IPage<LedgerEntryBO> listPageBo(IPage<LedgerEntryBO> page, @Param(Constants.WRAPPER) QueryWrapper<LedgerEntryBO> queryWrapper);
 
 }
