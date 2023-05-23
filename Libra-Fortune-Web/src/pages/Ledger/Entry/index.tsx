@@ -22,56 +22,60 @@ import {
 } from '@ant-design/pro-components';
 import { useParams } from '@umijs/max';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LedgerEntryDetail from './entry-detail';
 
 const LedgerEntry: React.FC = () => {
   const params = useParams();
+
   const [ledger, setLedger] = useState<API.Ledger.LedgerDTO>();
-  const ledgerService = new LedgerService();
-  ledgerService.get(params.ledgerId!).then((response) => {
-    setLedger(response.data);
-  });
-  const categoryService = new LedgerCategoryService(params.ledgerId!);
-  const memberService = new LedgerMemberService(params.ledgerId!);
-  const tagService = new LedgerTagService();
-  let membersMap: Record<string, API.Ledger.LedgerMemberVO> = {};
+  const [categories, setCategories] = useState<RequestOptionsType[]>([]);
+  const [members, setMembers] = useState<RequestOptionsType[]>([]);
+  const [membersMap, setMembersMap] = useState<Record<string, API.Ledger.LedgerMemberVO>>();
+  const [myTags, setMyTags] = useState<RequestOptionsType[]>([]);
+
+  useEffect(() => {
+    if (!params.ledgerId) {
+      return;
+    }
+
+    new LedgerService().get(params.ledgerId!).then((response) => {
+      setLedger(response.data);
+    });
+
+    new LedgerCategoryService(params.ledgerId!).list().then((response) => {
+      const categories: RequestOptionsType[] = [];
+      response.data.forEach((record) => {
+        categories.push({ label: record.name, value: record.id! });
+      });
+      setCategories(categories);
+    });
+
+    new LedgerMemberService(params.ledgerId!).list().then((response) => {
+      const members: RequestOptionsType[] = [];
+      const membersMap: Record<string, API.Ledger.LedgerMemberVO> = {};
+      response.data.forEach((record) => {
+        members.push({ label: <UserNicknameWithAvatar user={record} />, value: record.userId });
+        membersMap[record.userId] = record;
+      });
+      setMembers(members);
+      setMembersMap(membersMap);
+    });
+
+    new LedgerTagService().list().then((response) => {
+      const myTags: RequestOptionsType[] = [];
+      response.data.forEach((record) => {
+        categories.push({ label: record.name, value: record.id! });
+      });
+      setMyTags(myTags);
+    });
+  }, []);
 
   const currencyType = [
     { label: '人民币', value: 'CNY' },
     { label: '美元', value: 'USD' },
     { label: '欧元', value: 'EUR' },
   ];
-
-  const fetchCategories = async () => {
-    const data = (await categoryService.list()).data;
-    const result: RequestOptionsType[] = [];
-    data.forEach((record) => {
-      result.push({ label: record.name, value: record.id! });
-    });
-    return result;
-  };
-
-  const fetchMembers = async () => {
-    const data = (await memberService.list()).data;
-    membersMap = {};
-
-    const result: RequestOptionsType[] = [];
-    data.forEach((record) => {
-      result.push({ label: <UserNicknameWithAvatar user={record} />, value: record.userId });
-      membersMap[record.userId] = record;
-    });
-    return result;
-  };
-
-  const fetchMyTags = async () => {
-    const data = (await tagService.list()).data;
-    const result: RequestOptionsType[] = [];
-    data.forEach((record) => {
-      result.push({ label: record.name, value: record.id! });
-    });
-    return result;
-  };
 
   const columns: ProColumns<API.Ledger.LedgerEntryVO>[] = [
     {
@@ -114,7 +118,7 @@ const LedgerEntry: React.FC = () => {
       copyable: true,
       dataIndex: 'categoryId',
       valueType: 'select',
-      request: fetchCategories,
+      request: async () => categories,
       title: '分类',
       width: 120,
       renderText: (_, record) => record.category.name,
@@ -144,7 +148,7 @@ const LedgerEntry: React.FC = () => {
         <ProFormText
           label="账本ID"
           disabled
-          // hidden
+          hidden
           name="ledgerId"
           initialValue={params.ledgerId!}
           rules={[{ max: 36, required: true }]}
@@ -195,7 +199,7 @@ const LedgerEntry: React.FC = () => {
           label="条目分类"
           name="categoryId"
           placeholder="请选择条目分类"
-          request={fetchCategories}
+          request={async () => categories}
           rules={[{ required: true }]}
           tooltip="请选择条目分类"
           width="sm"
@@ -230,7 +234,7 @@ const LedgerEntry: React.FC = () => {
               label="分担人"
               name="userId"
               placeholder="请选择分担人"
-              request={fetchMembers}
+              request={async () => members}
               rules={[{ required: true }]}
               tooltip="请选择分担人"
               width="xs"
@@ -238,7 +242,7 @@ const LedgerEntry: React.FC = () => {
             <ProFormDependency name={['userId']}>
               {({ userId }) => {
                 const options: API.EnumDTO[] = [];
-                membersMap[userId]?.paymentChannels?.forEach((paymentChannel) => [
+                membersMap?.[userId]?.paymentChannels?.forEach((paymentChannel) => [
                   options.push({ label: paymentChannel.name, value: paymentChannel.id! }),
                 ]);
                 const initialValue: string = options.length > 0 ? options[0].value : '';
@@ -288,7 +292,7 @@ const LedgerEntry: React.FC = () => {
                       label="标签"
                       name="tags"
                       placeholder="请选择标签"
-                      request={fetchMyTags}
+                      request={async () => myTags}
                       tooltip="请选择标签"
                       width="xl"
                     />
