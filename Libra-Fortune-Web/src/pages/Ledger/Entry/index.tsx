@@ -31,8 +31,9 @@ const LedgerEntry: React.FC = () => {
   const [ledger, setLedger] = useState<API.Ledger.LedgerDTO>();
   const [categories, setCategories] = useState<RequestOptionsType[]>([]);
   const [members, setMembers] = useState<RequestOptionsType[]>([]);
-  const [membersMap, setMembersMap] = useState<Record<string, API.Ledger.LedgerMemberVO>>();
   const [myTags, setMyTags] = useState<RequestOptionsType[]>([]);
+  const [membersVo, setMembersV0] = useState<API.Ledger.LedgerMemberVO[]>([]);
+  const [membersMap, setMembersMap] = useState<Record<string, API.Ledger.LedgerMemberVO>>();
 
   useEffect(() => {
     if (!params.ledgerId) {
@@ -60,6 +61,7 @@ const LedgerEntry: React.FC = () => {
       });
       setMembers(members);
       setMembersMap(membersMap);
+      setMembersV0(response.data);
     });
 
     new LedgerTagService().list().then((response) => {
@@ -70,6 +72,22 @@ const LedgerEntry: React.FC = () => {
       setMyTags(myTags);
     });
   }, []);
+
+  const initialLedgerDetailValue = () => {
+    const fundedRatio = Math.round((100 / (membersVo?.length ?? 1)) * 100) / 100;
+    const ownerFundedRatio = 100 - fundedRatio * ((membersVo?.length ?? 1) - 1);
+
+    const result: Omit<API.Ledger.LedgerEntryDetailDTO, 'amount'>[] = [];
+    membersVo.forEach((record) => {
+      result.push({
+        userId: record.userId,
+        paymentChannelId: record.paymentChannels?.[0]?.id ?? '',
+        fundedRatio:
+          record.userId === localStorage.getItem('userId') ? ownerFundedRatio : fundedRatio,
+      });
+    });
+    return result;
+  };
 
   const currencyType = [
     { label: '人民币', value: 'CNY' },
@@ -222,12 +240,7 @@ const LedgerEntry: React.FC = () => {
           label="条目明细"
           name="details"
           required
-          // initialValue={[
-          //   {
-          //     value: '333',
-          //     label: '333',
-          //   },
-          // ]}
+          initialValue={initialLedgerDetailValue()}
         >
           <ProFormGroup>
             <ProFormSelect
@@ -245,13 +258,11 @@ const LedgerEntry: React.FC = () => {
                 membersMap?.[userId]?.paymentChannels?.forEach((paymentChannel) => [
                   options.push({ label: paymentChannel.name, value: paymentChannel.id! }),
                 ]);
-                const initialValue: string = options.length > 0 ? options[0].value : '';
                 return (
                   <ProFormSelect
                     label="支出渠道"
                     name="paymentChannelId"
                     placeholder="请选择支出渠道"
-                    initialValue={initialValue}
                     options={options}
                     rules={[{ required: true }]}
                     tooltip="请选择支出渠道"
