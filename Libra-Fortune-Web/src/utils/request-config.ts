@@ -1,6 +1,8 @@
 ﻿import { type RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
+import { history } from '@umijs/max';
 import { message } from 'antd';
+import { appendSearchParams } from './request-utils';
 
 /**
  * 用于注入AccessToken请求拦截器
@@ -61,6 +63,14 @@ export const requestConfig: RequestConfig = {
           // 请求成功发出且服务器也做出了响应，但状态代码超出了 2xx 的范围 -> 业务异常
           const response: API.ApiResponse<string> = error.response.data;
           message.error(`[${response.code}]${response.message} - ${response.data}`);
+          if (error.response.code === 10300) {
+            // 登录已过期，跳转到登录界面
+            const { location } = history;
+            history.push({
+              pathname: '/users/login',
+              search: appendSearchParams({ redirect: location.pathname }),
+            });
+          }
         } else {
           // 请求未到服务器，或产生未被服务端全局捕获的其他异常
           message.error(`请求失败：${error.response.status} - ${error.response.statusText}`);
