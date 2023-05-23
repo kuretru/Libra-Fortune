@@ -19,26 +19,33 @@ export default [
       { name: '登录回调', path: '/users/login/callback', component: './User/Callback' },
     ],
   },
-  { path: '/welcome', name: 'welcome', icon: 'smile', component: './Welcome' },
+  { name: 'welcome', path: '/welcome', icon: 'smile', component: './Welcome' },
   {
-    path: '/ledgers',
     name: '账本管理',
+    path: '/ledgers',
     icon: 'accountBook',
     routes: [
-      { name: '账本管理', path: '/ledgers', component: './Ledger/Ledger' },
-      { name: '账本标签管理', path: '/ledgers/tags', component: './Ledger/Tag' },
-      { name: '账本条目管理', path: '/ledgers/entries', component: './Ledger/Entry' },
+      { name: '账本管理', path: '/ledgers/', component: './Ledger/Ledger' },
+      {
+        name: '账本条目管理',
+        path: '/ledgers/:ledgerId/entries',
+        component: './Ledger/Entry',
+        hideInMenu: true,
+      },
     ],
   },
   {
-    path: '/payments/channels',
-    name: '支付渠道管理',
-    icon: 'creditCard',
-    component: './PaymentChannel',
+    name: '个人信息管理',
+    path: '/user',
+    icon: 'user',
+    routes: [
+      { name: '账本标签管理', path: '/user/tags', component: './Ledger/Tag' },
+      { name: '支付渠道管理', path: '/user/payment_channels', component: './PaymentChannel' },
+    ],
   },
   {
-    path: '/admin',
     name: 'admin',
+    path: '/admin',
     icon: 'crown',
     access: 'canAdmin',
     routes: [
