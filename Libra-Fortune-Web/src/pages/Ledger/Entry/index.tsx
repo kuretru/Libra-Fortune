@@ -1,5 +1,6 @@
 import BasePage from '@/components/BasePage';
 import UserNicknameWithAvatar from '@/components/UserNicknameWithAvatar';
+import LedgerService from '@/services/libra-fortune/ledger/ledger';
 import LedgerCategoryService from '@/services/libra-fortune/ledger/ledger-category';
 import LedgerEntryService from '@/services/libra-fortune/ledger/ledger-entry';
 import LedgerMemberService from '@/services/libra-fortune/ledger/ledger-member';
@@ -19,16 +20,20 @@ import {
   ProFormTextArea,
   RequestOptionsType,
 } from '@ant-design/pro-components';
+import { useParams } from '@umijs/max';
 import dayjs from 'dayjs';
+import { useState } from 'react';
 import LedgerEntryDetail from './entry-detail';
 
-interface LedgerEntryProps {
-  ledgerId: string;
-}
-
-const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
-  const categoryService = new LedgerCategoryService('df147163-1ff9-4a83-b0eb-4b581918dc4c');
-  const memberService = new LedgerMemberService('df147163-1ff9-4a83-b0eb-4b581918dc4c');
+const LedgerEntry: React.FC = () => {
+  const params = useParams();
+  const [ledger, setLedger] = useState<API.Ledger.LedgerDTO>();
+  const ledgerService = new LedgerService();
+  ledgerService.get(params.ledgerId!).then((response) => {
+    setLedger(response.data);
+  });
+  const categoryService = new LedgerCategoryService(params.ledgerId!);
+  const memberService = new LedgerMemberService(params.ledgerId!);
   const tagService = new LedgerTagService();
   let membersMap: Record<string, API.Ledger.LedgerMemberVO> = {};
 
@@ -141,7 +146,7 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
           disabled
           // hidden
           name="ledgerId"
-          initialValue={'df147163-1ff9-4a83-b0eb-4b581918dc4c'}
+          initialValue={params.ledgerId!}
           rules={[{ max: 36, required: true }]}
           tooltip="最长36位"
           width="lg"
@@ -309,10 +314,10 @@ const LedgerEntry: React.FC<LedgerEntryProps> = (props) => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer content={`当前帐本：${ledger?.name}`}>
       <BasePage<API.Ledger.LedgerEntryDTO, API.Ledger.LedgerEntryQuery, API.Ledger.LedgerEntryVO>
         pageName="账本条目"
-        service={new LedgerEntryService('df147163-1ff9-4a83-b0eb-4b581918dc4c')}
+        service={new LedgerEntryService(params.ledgerId!)}
         columns={columns as ProColumns<API.Ledger.LedgerEntryDTO | API.Ledger.LedgerEntryVO>[]}
         formItem={formItem()}
         transformFormValues={transformFormValues}

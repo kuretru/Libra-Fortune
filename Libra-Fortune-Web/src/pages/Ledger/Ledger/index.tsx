@@ -11,12 +11,14 @@ import {
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-components';
+import { useNavigate } from '@umijs/max';
 import { Button, Space } from 'antd';
 import { useState } from 'react';
 import LedgerCategory from './ledger-category';
 import LedgerMember from './ledger-member';
 
 const Ledger: React.FC = () => {
+  const navigate = useNavigate();
   const [ledgerId, setLedgerId] = useState('');
   const [managerType, setManagerType] = useState('member');
   const [modalOpen, setModalOpen] = useState(false);
@@ -84,7 +86,7 @@ const Ledger: React.FC = () => {
           <Button
             icon={<RightCircleOutlined />}
             key="go"
-            onClick={() => onCategoryManagerButtonClick(record)}
+            onClick={() => navigate(`/ledgers/${record.id!}/entries`)}
             type="primary"
           >
             开始记账
