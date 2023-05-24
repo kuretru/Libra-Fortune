@@ -7,6 +7,7 @@ import LedgerMemberService from '@/services/libra-fortune/ledger/ledger-member';
 import LedgerTagService from '@/services/libra-fortune/ledger/ledger-tag';
 import { getMoneySymbol } from '@/utils/money-utils';
 import {
+  FormListActionType,
   PageContainer,
   ProColumns,
   ProForm,
@@ -22,11 +23,12 @@ import {
 } from '@ant-design/pro-components';
 import { useParams } from '@umijs/max';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import LedgerEntryDetail from './entry-detail';
 
 const LedgerEntry: React.FC = () => {
   const params = useParams();
+  const formListActionRef = useRef<FormListActionType>();
 
   const [ledger, setLedger] = useState<API.Ledger.LedgerDTO>();
   const [categories, setCategories] = useState<RequestOptionsType[]>([]);
@@ -67,7 +69,7 @@ const LedgerEntry: React.FC = () => {
     new LedgerTagService().list().then((response) => {
       const myTags: RequestOptionsType[] = [];
       response.data.forEach((record) => {
-        categories.push({ label: record.name, value: record.id! });
+        myTags.push({ label: record.name, value: record.id! });
       });
       setMyTags(myTags);
     });
@@ -171,9 +173,9 @@ const LedgerEntry: React.FC = () => {
           initialValue={params.ledgerId!}
           rules={[{ max: 36, required: true }]}
           tooltip="最长36位"
-          width="lg"
+          width="xl"
         />
-        <ProForm.Group>
+        <ProForm.Group size={8}>
           <ProFormDatePicker
             label="日期"
             name="date"
@@ -192,7 +194,16 @@ const LedgerEntry: React.FC = () => {
             width="md"
           />
         </ProForm.Group>
-        <ProForm.Group>
+        <ProForm.Group size={8}>
+          <ProFormSelect
+            label="条目分类"
+            name="categoryId"
+            placeholder="请选择条目分类"
+            request={async () => categories}
+            rules={[{ required: true }]}
+            tooltip="请选择条目分类"
+            width="sm"
+          />
           <ProFormSelect
             label="货币类型"
             name="currencyType"
@@ -201,32 +212,43 @@ const LedgerEntry: React.FC = () => {
             placeholder="请选择货币类型"
             rules={[{ required: true }]}
             tooltip="请选择货币类型"
-            width="sm"
+            width="xs"
           />
           <ProFormDigit
             label="金额总计"
             name="total"
             placeholder="请输入金额总计"
-            fieldProps={{ precision: 2 }}
             rules={[{ required: true }]}
             tooltip="请输入金额总计"
-            width="md"
+            width="sm"
+            fieldProps={{
+              precision: 2,
+              onChange(value: number | null) {
+                const details = formListActionRef.current?.getList();
+                if (!details || details.length === 0) {
+                  return;
+                }
+
+                const total = value ?? 0;
+                let sum = 0;
+                details.forEach((detail: API.Ledger.LedgerEntryDetailDTO) => {
+                  const fundedRatio = detail?.fundedRatio ?? 0;
+                  detail.amount = Math.floor(total * fundedRatio) / 100;
+                  sum += detail.amount;
+                });
+
+                // 将剩下的1分钱加到Owner头上，如果Owner不在列表中，加在第1个人头上
+                const rest = total - sum;
+                details[0].amount += rest;
+              },
+            }}
           />
         </ProForm.Group>
-        <ProFormSelect
-          label="条目分类"
-          name="categoryId"
-          placeholder="请选择条目分类"
-          request={async () => categories}
-          rules={[{ required: true }]}
-          tooltip="请选择条目分类"
-          width="sm"
-        />
         <ProFormTextArea
           label="备注"
           name="remark"
-          placeholder="请输入备注"
           initialValue=""
+          placeholder="请输入备注"
           fieldProps={{
             allowClear: true,
             maxLength: 64,
@@ -239,10 +261,13 @@ const LedgerEntry: React.FC = () => {
         <ProFormList
           label="条目明细"
           name="details"
-          required
           initialValue={initialLedgerDetailValue()}
+          actionRef={formListActionRef}
+          required
+          min={1}
+          max={members.length}
         >
-          <ProFormGroup>
+          <ProForm.Group>
             <ProFormSelect
               label="分担人"
               name="userId"
@@ -266,11 +291,13 @@ const LedgerEntry: React.FC = () => {
                     options={options}
                     rules={[{ required: true }]}
                     tooltip="请选择支出渠道"
-                    width="xs"
+                    width="sm"
                   />
                 );
               }}
             </ProFormDependency>
+            {/* </ProForm.Group>
+          <ProForm.Group> */}
             <ProFormDigit
               label="分担比例"
               name="fundedRatio"
@@ -282,16 +309,29 @@ const LedgerEntry: React.FC = () => {
               tooltip="请输入分担比例"
               width="xs"
             />
-            <ProFormDigit
-              label="分担金额"
-              name="amount"
-              placeholder="请输入分担金额"
-              fieldProps={{ precision: 2 }}
-              rules={[{ required: true }]}
-              tooltip="请输入分担金额"
-              width="sm"
-            />
-          </ProFormGroup>
+            <ProFormDependency name={['total']} ignoreFormListField>
+              {({ total }) => {
+                return (
+                  <ProFormDependency name={['fundedRatio']}>
+                    {({ fundedRatio }) => {
+                      return (
+                        <ProFormDigit
+                          label="分担金额"
+                          name="amount"
+                          initialValue={(total ?? 0) * (fundedRatio ?? 0)}
+                          placeholder="请输入分担金额"
+                          fieldProps={{ precision: 2 }}
+                          rules={[{ required: true }]}
+                          tooltip="请输入分担金额"
+                          width="xs"
+                        />
+                      );
+                    }}
+                  </ProFormDependency>
+                );
+              }}
+            </ProFormDependency>
+          </ProForm.Group>
           <ProFormDependency name={['userId']}>
             {({ userId }) => {
               if (userId === localStorage.getItem('userId')) {
