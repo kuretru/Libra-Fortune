@@ -103,7 +103,7 @@ declare namespace API.Ledger {
     paymentChannelId: string;
     fundedRatio: number;
     amount: number;
-    tags?: API.LedgerEntryDetailTagDTO[];
+    tags?: string[];
   };
 
   type LedgerEntryDetailVO = API.BaseDTO & {
@@ -112,10 +112,5 @@ declare namespace API.Ledger {
     user: API.User.UserVO;
     paymentChannel: API.User.PaymentChannelVO;
     tags?: API.Ledger.LedgerTagVO[];
-  };
-
-  type LedgerEntryDetailTagDTO = API.BaseDTO & {
-    entryDetailId?: string;
-    tagId: string;
   };
 }

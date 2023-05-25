@@ -357,15 +357,38 @@ const LedgerEntry: React.FC = () => {
     );
   };
 
-  const transformFormValues = (record: API.Ledger.LedgerEntryDTO): API.Ledger.LedgerEntryDTO => {
-    record.details.forEach((detail) => {
-      if (detail.tags) {
-        const tagDTO: API.Ledger.LedgerEntryDetailTagDTO[] = [];
-        detail.tags.forEach((tag) => tagDTO.push({ tagId: tag }));
-        detail.tags = tagDTO;
+  const tableValueToFormValue = (record: API.Ledger.LedgerEntryVO): API.Ledger.LedgerEntryDTO => {
+    const details: API.Ledger.LedgerEntryDetailDTO[] = [];
+    record.details.forEach((detailVo) => {
+      const detail: API.Ledger.LedgerEntryDetailDTO = {
+        id: detailVo.id!,
+        entryId: record.id!,
+        userId: detailVo.user.id!,
+        paymentChannelId: detailVo.paymentChannel.id!,
+        fundedRatio: detailVo.fundedRatio,
+        amount: detailVo.amount,
+      };
+      if (detailVo.tags && detailVo.tags.length > 0) {
+        const tags: string[] = [];
+        detailVo.tags.forEach((tagVo) => {
+          tags.push(tagVo.id!);
+        });
+        detail.tags = tags;
       }
+      details.push(detail);
     });
-    return record;
+    const result: API.Ledger.LedgerEntryDTO = {
+      id: record.id!,
+      ledgerId: params.ledgerId!,
+      categoryId: record.category.id!,
+      date: record.date,
+      name: record.name,
+      total: record.total,
+      currencyType: record.currencyType,
+      remark: record.remark,
+      details: details,
+    };
+    return result;
   };
 
   return (
@@ -375,7 +398,7 @@ const LedgerEntry: React.FC = () => {
         service={new LedgerEntryService(params.ledgerId!)}
         columns={columns as ProColumns<API.Ledger.LedgerEntryDTO | API.Ledger.LedgerEntryVO>[]}
         formItem={formItem()}
-        transformFormValues={transformFormValues}
+        tableValueToFormValue={tableValueToFormValue}
         tableProps={{
           size: 'small',
         }}
