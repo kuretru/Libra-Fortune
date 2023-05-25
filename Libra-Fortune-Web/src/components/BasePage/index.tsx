@@ -35,6 +35,7 @@ interface IBasePageProps<
   columns: ProColumns<T | V>[];
   formItem: JSX.Element;
   transformFormValues?: (record: T) => T;
+  tableValueToFormValue?: (record: V) => T;
   onFormValuesChange?: (
     changedValues: any,
     values: T,
@@ -77,7 +78,7 @@ abstract class BasePage<
             <Button
               icon={<EditOutlined />}
               key="edit"
-              onClick={() => this.onEditButtonClick(record as T)}
+              onClick={() => this.onEditButtonClick(record as V)}
               type="primary"
             >
               编辑
@@ -126,8 +127,9 @@ abstract class BasePage<
     this.setState({ modalVisible: true });
   };
 
-  onEditButtonClick = (record: T) => {
-    this.formRef.current.setFieldsValue(record);
+  onEditButtonClick = (record: V) => {
+    const recordDto = this.props.tableValueToFormValue?.(record) ?? record;
+    this.formRef.current.setFieldsValue(recordDto);
     this.setState({ modalVisible: true });
   };
 
