@@ -2,8 +2,8 @@ package com.kuretru.web.libra.service;
 
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.BaseService;
-import com.kuretru.web.libra.entity.query.LedgerEntryTagQuery;
-import com.kuretru.web.libra.entity.transfer.LedgerEntryTagDTO;
+import com.kuretru.web.libra.entity.query.LedgerEntryDetailTagQuery;
+import com.kuretru.web.libra.entity.transfer.LedgerEntryDetailTagDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import java.util.UUID;
 /**
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
-public interface LedgerEntryTagService extends BaseService<LedgerEntryTagDTO, LedgerEntryTagQuery> {
+public interface LedgerEntryDetailTagService extends BaseService<LedgerEntryDetailTagDTO, LedgerEntryDetailTagQuery> {
 
     /**
      * 根据条目明细ID查询记录
@@ -20,7 +20,7 @@ public interface LedgerEntryTagService extends BaseService<LedgerEntryTagDTO, Le
      * @param entryDetailId 条目明细ID
      * @return 记录
      */
-    List<LedgerEntryTagDTO> listByEntryDetailId(UUID entryDetailId);
+    List<UUID> listByEntryDetailId(UUID entryDetailId);
 
     /**
      * 批量保存新记录
@@ -31,7 +31,7 @@ public interface LedgerEntryTagService extends BaseService<LedgerEntryTagDTO, Le
      * @return 保存后的新记录
      * @throws ServiceException 校验数据失败时会抛出业务异常
      */
-    List<LedgerEntryTagDTO> save(UUID entryDetailId, List<LedgerEntryTagDTO> records) throws ServiceException;
+    List<UUID> save(UUID entryDetailId, List<UUID> records) throws ServiceException;
 
     /**
      * 批量更新记录，必须传入所有字段
@@ -42,7 +42,7 @@ public interface LedgerEntryTagService extends BaseService<LedgerEntryTagDTO, Le
      * @return 更新后的新记录
      * @throws ServiceException 找不到指定记录时会抛出业务异常
      */
-    List<LedgerEntryTagDTO> update(UUID entryDetailId, List<LedgerEntryTagDTO> records) throws ServiceException;
+    List<UUID> update(UUID entryDetailId, List<UUID> records) throws ServiceException;
 
 
     /**

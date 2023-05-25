@@ -31,6 +31,6 @@ public class LedgerEntryDetailDTO extends BaseDTO {
     @NotNull
     private Long amount;
 
-    private List<LedgerEntryTagDTO> tags;
+    private List<UUID> tags;
 
 }

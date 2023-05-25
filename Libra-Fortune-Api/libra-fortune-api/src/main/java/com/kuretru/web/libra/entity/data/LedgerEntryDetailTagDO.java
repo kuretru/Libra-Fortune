@@ -7,7 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * 账本条目标签关联表
+ * 账本条目明细标签关联表
+ * 多对多关系
  *
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
@@ -15,7 +16,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("ledger_entry_detail_tag")
-public class LedgerEntryTagDO extends BaseDO {
+public class LedgerEntryDetailTagDO extends BaseDO {
 
     /** 外键，账本条目明细ID */
     private String entryDetailId;

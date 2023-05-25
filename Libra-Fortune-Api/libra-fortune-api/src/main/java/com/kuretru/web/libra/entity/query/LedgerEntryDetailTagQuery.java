@@ -9,7 +9,7 @@ import java.util.UUID;
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
 @Data
-public class LedgerEntryTagQuery {
+public class LedgerEntryDetailTagQuery {
 
     private UUID entryDetailId;
 

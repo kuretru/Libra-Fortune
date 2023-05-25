@@ -13,6 +13,7 @@ import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.entity.business.LedgerEntryBO;
 import com.kuretru.web.libra.entity.business.LedgerEntryDetailBO;
+import com.kuretru.web.libra.entity.business.LedgerEntryDetailTagBO;
 import com.kuretru.web.libra.entity.data.LedgerEntryDO;
 import com.kuretru.web.libra.entity.enums.LedgerTypeEnum;
 import com.kuretru.web.libra.entity.mapper.LedgerEntryEntityMapper;
@@ -120,15 +121,17 @@ public class LedgerEntryServiceImpl
                 boolean isMyLedgerDetail = UUID.fromString(detailBO.getUserId()).equals(AccessTokenContext.getUserId());
                 boolean hasTags = detailBO.getTags() != null && !detailBO.getTags().isEmpty();
                 if (isMyLedgerDetail && hasTags) {
-                    List<LedgerTagVO> tags = new ArrayList<>();
-                    detailBO.getTags().forEach(tag -> {
-                        UUID tagId = UUID.fromString(tag.getTagId());
+                    List<LedgerTagVO> tagVo = new ArrayList<>(detailBO.getTags().size());
+                    for (int k = 0; k < detailBO.getTags().size(); k++) {
+                        LedgerEntryDetailTagBO tagBo = detailBO.getTags().get(k);
+
+                        UUID tagId = UUID.fromString(tagBo.getTagId());
                         if (!myTagMap.containsKey(tagId)) {
                             throw new ServiceException(ServiceErrorCodes.SYSTEM_NOT_IMPLEMENTED, "不存在的标签ID");
                         }
-                        tags.add(myTagMap.get(tagId));
-                    });
-                    detailVO.setTags(tags);
+                        tagVo.add(myTagMap.get(tagId));
+                    }
+                    detailVO.setTags(tagVo);
                 }
             }
         }

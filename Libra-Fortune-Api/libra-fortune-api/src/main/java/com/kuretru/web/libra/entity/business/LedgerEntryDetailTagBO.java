@@ -12,6 +12,8 @@ public class LedgerEntryDetailTagBO {
 
     private String uuid;
 
+    private String entryDetailId;
+
     private String tagId;
 
 }

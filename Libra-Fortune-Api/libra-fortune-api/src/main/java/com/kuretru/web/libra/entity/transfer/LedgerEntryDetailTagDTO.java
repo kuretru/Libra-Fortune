@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class LedgerEntryTagDTO extends BaseDTO {
+public class LedgerEntryDetailTagDTO extends BaseDTO {
 
     private UUID entryDetailId;
 

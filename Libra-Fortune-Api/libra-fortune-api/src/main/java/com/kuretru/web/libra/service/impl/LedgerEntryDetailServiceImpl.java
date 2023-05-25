@@ -14,7 +14,7 @@ import com.kuretru.web.libra.entity.query.LedgerEntryDetailQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerEntryDetailDTO;
 import com.kuretru.web.libra.mapper.LedgerEntryDetailMapper;
 import com.kuretru.web.libra.service.LedgerEntryDetailService;
-import com.kuretru.web.libra.service.LedgerEntryTagService;
+import com.kuretru.web.libra.service.LedgerEntryDetailTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -29,11 +29,11 @@ public class LedgerEntryDetailServiceImpl
         extends BaseServiceImpl<LedgerEntryDetailMapper, LedgerEntryDetailDO, LedgerEntryDetailDTO, LedgerEntryDetailQuery>
         implements LedgerEntryDetailService {
 
-    private final LedgerEntryTagService entryTagService;
+    private final LedgerEntryDetailTagService entryTagService;
 
     @Autowired
     public LedgerEntryDetailServiceImpl(LedgerEntryDetailMapper mapper, LedgerEntryDetailEntityMapper entityMapper,
-                                        @Lazy LedgerEntryTagService entryTagService) {
+                                        @Lazy LedgerEntryDetailTagService entryTagService) {
         super(mapper, entityMapper);
         this.entryTagService = entryTagService;
     }
@@ -57,8 +57,7 @@ public class LedgerEntryDetailServiceImpl
 
             if (record.getUserId().equals(AccessTokenContext.getUserId())) {
                 if (record.getTags() != null && !record.getTags().isEmpty()) {
-                    record.getTags().forEach(tag -> tag.setEntryDetailId(newRecord.getId()));
-                    entryTagService.save(newRecord.getId(), record.getTags());
+                    newRecord.setTags(entryTagService.save(newRecord.getId(), record.getTags()));
                 }
             }
         });
@@ -75,8 +74,7 @@ public class LedgerEntryDetailServiceImpl
             LedgerEntryDetailDTO newRecord = super.update(record);
 
             if (record.getUserId().equals(AccessTokenContext.getUserId())) {
-                record.getTags().forEach(tag -> tag.setEntryDetailId(newRecord.getId()));
-                entryTagService.update(record.getId(), record.getTags());
+                newRecord.setTags(entryTagService.update(record.getId(), record.getTags()));
             }
         });
     }
@@ -117,9 +115,15 @@ public class LedgerEntryDetailServiceImpl
         });
         oldRecordsMap.forEach((id, record) -> removeList.add(id));
 
-        saveList(addList);
-        updateList(updateList);
-        removeByUuidList(removeList);
+        if (addList.size() > 0) {
+            saveList(addList);
+        }
+        if (updateList.size() > 0) {
+            updateList(updateList);
+        }
+        if (removeList.size() > 0) {
+            removeByUuidList(removeList);
+        }
 
         return listByEntryId(entryId);
     }

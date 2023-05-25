@@ -23,6 +23,7 @@
             <collection property="tags" ofType="com.kuretru.web.libra.entity.business.LedgerEntryDetailTagBO">
                 <id property="id" column="tag_id"/>
                 <result property="uuid" column="tag_uuid"/>
+                <result property="entryDetailId" column="tag_entry_detail_id"/>
                 <result property="tagId" column="tag_tag_id"/>
             </collection>
         </collection>
@@ -45,6 +46,7 @@
                detail.amount             AS detail_amount,
                tag.id                    AS tag_id,
                tag.uuid                  AS tag_uuid,
+               tag.entry_detail_id       as tag_entry_detail_id,
                tag.tag_id                AS tag_tag_id
         FROM ledger_entry
                  LEFT JOIN ledger_entry_detail AS detail ON ledger_entry.uuid = detail.entry_id

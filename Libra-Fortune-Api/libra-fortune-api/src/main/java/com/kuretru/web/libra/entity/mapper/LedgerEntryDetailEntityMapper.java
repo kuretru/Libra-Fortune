@@ -23,6 +23,8 @@ public interface LedgerEntryDetailEntityMapper extends BaseEntityMapper<LedgerEn
      * @return VO
      */
     @Mapping(source = "uuid", target = "id")
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "paymentChannel", ignore = true)
     @Mapping(target = "tags", ignore = true)
     LedgerEntryDetailVO boToVo(LedgerEntryDetailBO record);
 
