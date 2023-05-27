@@ -1,13 +1,15 @@
-// import { outLogin } from '@/services/ant-design-pro/api';
+import { logout } from '@/services/galaxy-oauth2-client/user';
+import { appendSearchParams } from '@/utils/request-utils';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { history, useModel } from '@umijs/max';
 import { Spin } from 'antd';
-import { stringify } from 'querystring';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
+
+const loginPath = '/users/login';
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -25,21 +27,24 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
-    await outLogin();
-    const { search, pathname } = window.location;
+    await logout();
+
+    localStorage.removeItem('userId');
+    localStorage.removeItem('accessTokenId');
+    localStorage.removeItem('accessToken');
+
     const urlParams = new URL(window.location.href).searchParams;
     /** 此方法会跳转到 redirect 参数所在的位置 */
     const redirect = urlParams.get('redirect');
     // Note: There may be security issues, please note
-    if (window.location.pathname !== '/user/login' && !redirect) {
+    if (window.location.pathname !== loginPath && !redirect) {
       history.replace({
-        pathname: '/user/login',
-        search: stringify({
-          redirect: pathname + search,
-        }),
+        pathname: loginPath,
+        search: appendSearchParams({ redirect: location.pathname }),
       });
     }
   };
+
   const actionClassName = useEmotionCss(({ token }) => {
     return {
       display: 'flex',
