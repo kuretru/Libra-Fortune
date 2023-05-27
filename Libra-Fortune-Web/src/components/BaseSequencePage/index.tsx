@@ -1,11 +1,4 @@
-import React from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
-import type { ProFormInstance } from '@ant-design/pro-form';
-import { ModalForm, ProFormText } from '@ant-design/pro-form';
-import type { FormInstance } from 'antd';
-import { Button, message, Modal } from 'antd';
+import type BaseSequenceService from '@/services/galaxy-web/base-sequence-service';
 import {
   DeleteOutlined,
   DragOutlined,
@@ -14,9 +7,20 @@ import {
   QuestionCircleOutlined,
   SortAscendingOutlined,
 } from '@ant-design/icons';
-import type BaseSequenceService from '@/services/aries-navigation/base-sequence-service';
-import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
+import type {
+  ActionType,
+  ModalFormProps,
+  ProColumns,
+  ProFormInstance,
+  ProTableProps,
+} from '@ant-design/pro-components';
+import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
+import type { FormInstance } from 'antd';
+import { Button, message, Modal, Space } from 'antd';
 import { arrayMoveImmutable } from 'array-move';
+import { isEqual } from 'lodash';
+import React from 'react';
+import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import './drag.less';
 
 const { confirm } = Modal;
@@ -24,31 +28,45 @@ const DragHandle = SortableHandle(() => <DragOutlined style={{ color: '#999', cu
 const SortableItem = SortableElement((props: any) => <tr {...props} />);
 const SortContainer = SortableContainer((props: any) => <tbody {...props} />);
 
-interface IBaseSequencePageProps<T extends API.BaseDTO, Q extends API.PaginationQuery> {
+/**
+ * T -> DTO
+ * Q -> Query
+ * V -> VO default same as DTO
+ */
+interface IBaseSequencePageProps<
+  T extends API.BaseDTO,
+  Q extends API.PaginationQuery,
+  V extends API.BaseDTO = T,
+> {
   pageName: string;
-  service: BaseSequenceService<T, Q>;
-  columns: ProColumns<T>[];
+  service: BaseSequenceService<T, Q, V>;
+  columns: ProColumns<T | V>[];
   formItem: JSX.Element;
+  transformFormValues?: (record: T) => T;
+  tableValueToFormValue?: (record: V) => T;
   onFormValuesChange?: (
     changedValues: any,
     values: T,
     formRef: React.MutableRefObject<FormInstance>,
   ) => void;
   onSubmit?: (params: Q) => Q;
+  tableProps?: ProTableProps<T | V, Q>;
+  modalProps?: ModalFormProps<T>;
 }
 
-interface IBaseSequencePageState<T> {
+interface IBaseSequencePageState<V> {
   modalVisible: boolean;
   tableLoading: boolean;
   useLocalData: boolean;
-  dataSource: API.ProTableData<T>;
+  dataSource: API.ProTableData<V>;
 }
 
-class BaseSequencePage<
+abstract class BaseSequencePage<
   T extends API.BaseDTO,
   Q extends API.PaginationQuery,
-> extends React.Component<IBaseSequencePageProps<T, Q>, IBaseSequencePageState<T>> {
-  columnsPrefix: ProColumns<T>[] = [
+  V extends API.BaseDTO = T,
+> extends React.Component<IBaseSequencePageProps<T, Q, V>, IBaseSequencePageState<V>> {
+  columnsPrefix: ProColumns<T | V>[] = [
     {
       align: 'center',
       key: 'index',
@@ -57,33 +75,35 @@ class BaseSequencePage<
       width: 60,
     },
   ];
-  columnsSuffix: ProColumns<T>[] = [
+  columnsSuffix: ProColumns<T | V>[] = [
     {
       align: 'center',
       key: 'action',
+      search: false,
       title: '操作',
-      valueType: 'option',
       width: 240,
       render: (_, record) => {
-        return [
-          <Button
-            icon={<EditOutlined />}
-            key="edit"
-            onClick={() => this.onEditButtonClick(record)}
-            type="primary"
-          >
-            编辑
-          </Button>,
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            key="delete"
-            onClick={() => this.onDeleteButtonClick(record.id!)}
-            type="primary"
-          >
-            删除
-          </Button>,
-        ];
+        return (
+          <Space>
+            <Button
+              icon={<EditOutlined />}
+              key="edit"
+              onClick={() => this.onEditButtonClick(record as V)}
+              type="primary"
+            >
+              编辑
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              key="delete"
+              onClick={() => this.onDeleteButtonClick(record.id!)}
+              type="primary"
+            >
+              删除
+            </Button>
+          </Space>
+        );
       },
     },
     {
@@ -99,7 +119,7 @@ class BaseSequencePage<
   tableRef: React.RefObject<ActionType>;
   defaultFormValue: Record<string, any>;
 
-  constructor(props: IBaseSequencePageProps<T, Q>) {
+  constructor(props: IBaseSequencePageProps<T, Q, V>) {
     super(props);
     this.state = {
       modalVisible: false,
@@ -112,14 +132,18 @@ class BaseSequencePage<
     this.defaultFormValue = {};
   }
 
-  fetchData = async (params: API.PaginationQuery) => {
+  componentDidUpdate(prevProps: IBaseSequencePageProps<T, Q, V>) {
+    if (!isEqual(this.props.service, prevProps.service)) {
+      this.tableRef.current?.reloadAndRest?.();
+    }
+  }
+
+  fetchData = async (params: Q & API.PaginationQuery) => {
     if (this.state.useLocalData) {
       this.setState({ useLocalData: false });
       return this.state.dataSource;
     }
-    const response = await this.props.service
-      .listByPage(params)
-      .catch((error: any) => message.error(error.message));
+    const response = await this.props.service.listByPage(params);
     this.setState({ dataSource: response });
     return response;
   };
@@ -130,8 +154,9 @@ class BaseSequencePage<
     this.setState({ modalVisible: true });
   };
 
-  onEditButtonClick = (record: T) => {
-    this.formRef.current.setFieldsValue(record);
+  onEditButtonClick = (record: V) => {
+    const recordDto = this.props.tableValueToFormValue?.(record) ?? record;
+    this.formRef.current.setFieldsValue(recordDto);
     this.setState({ modalVisible: true });
   };
 
@@ -151,9 +176,8 @@ class BaseSequencePage<
             tableRef.current?.reload();
             message.success({ content: '删除成功！', key: messageKey });
           })
-          .catch((error: any) => {
+          .catch(() => {
             message.destroy(messageKey);
-            message.error(error.message);
           });
       },
     });
@@ -164,18 +188,14 @@ class BaseSequencePage<
     this.state.dataSource.data.forEach((record) => {
       idList.push(record.id!);
     });
-    this.props.service
-      .reorder(idList)
-      .then((response) => {
-        message.success(response.data);
-      })
-      .catch((error: any) => {
-        message.error(error.message);
-      });
+    this.props.service.reorder(idList).then((response) => {
+      message.success(response.data);
+    });
     this.tableRef.current?.reload();
   };
 
-  onFormFinish = async (record: T) => {
+  onFormFinish = async (formData: T) => {
+    const record = this.props.transformFormValues?.(formData) ?? formData;
     const messageKey = 'create';
     let result = false;
     message.loading({ content: '请求处理中...', duration: 0, key: messageKey });
@@ -187,9 +207,8 @@ class BaseSequencePage<
           message.success({ content: '修改成功！', key: messageKey });
           result = true;
         })
-        .catch((error: any) => {
+        .catch(() => {
           message.destroy(messageKey);
-          message.error(error.message);
         });
     } else {
       await this.props.service
@@ -199,9 +218,8 @@ class BaseSequencePage<
           message.success({ content: '新增成功！', key: messageKey });
           result = true;
         })
-        .catch((error: any) => {
+        .catch(() => {
           message.destroy(messageKey);
-          message.error(error.message);
         });
     }
     return result;
@@ -223,8 +241,8 @@ class BaseSequencePage<
 
   render() {
     return (
-      <PageContainer>
-        <ProTable<T, Q>
+      <>
+        <ProTable<T | V, Q>
           actionRef={this.tableRef}
           bordered
           columns={this.columnsPrefix.concat(this.props.columns).concat(this.columnsSuffix)}
@@ -235,7 +253,7 @@ class BaseSequencePage<
           onSubmit={this.onSubmit}
           onReset={this.onReset}
           options={{ fullScreen: true, setting: true }}
-          pagination={{ defaultPageSize: 20 }}
+          pagination={{ defaultPageSize: 20, showSizeChanger: true }}
           request={this.fetchData}
           rowKey="id"
           tooltip={`${this.props.pageName}管理`}
@@ -256,19 +274,20 @@ class BaseSequencePage<
               重新排序
             </Button>,
           ]}
+          {...this.props.tableProps}
         />
         <ModalForm<T>
           formRef={this.formRef}
           modalProps={{ forceRender: true }}
           onFinish={this.onFormFinish}
           onValuesChange={this.onFormValuesChange}
-          onVisibleChange={(visible) => this.setState({ modalVisible: visible })}
+          onOpenChange={(visible) => this.setState({ modalVisible: visible })}
           title={
             this.formRef.current?.getFieldValue('id')
               ? `编辑${this.props.pageName}`
               : `新增${this.props.pageName}`
           }
-          visible={this.state.modalVisible}
+          open={this.state.modalVisible}
           submitter={{
             render: (props, defaultDoms) => {
               return [
@@ -281,11 +300,12 @@ class BaseSequencePage<
             },
             searchConfig: { resetText: '取消', submitText: '提交' },
           }}
+          {...this.props.modalProps}
         >
           <ProFormText disabled hidden label="ID" name="id" width="lg" />
           {this.props.formItem}
         </ModalForm>
-      </PageContainer>
+      </>
     );
   }
 
