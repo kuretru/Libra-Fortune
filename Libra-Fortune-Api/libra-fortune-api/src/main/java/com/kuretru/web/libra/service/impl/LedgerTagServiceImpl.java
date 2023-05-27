@@ -8,7 +8,7 @@ import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.PaginationQuery;
 import com.kuretru.microservices.web.entity.PaginationResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
+import com.kuretru.microservices.web.service.impl.BaseSequenceServiceImpl;
 import com.kuretru.web.libra.entity.data.LedgerTagDO;
 import com.kuretru.web.libra.entity.mapper.LedgerTagEntityMapper;
 import com.kuretru.web.libra.entity.query.LedgerTagQuery;
@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 @Service
 public class LedgerTagServiceImpl
-        extends BaseServiceImpl<LedgerTagMapper, LedgerTagDO, LedgerTagDTO, LedgerTagQuery>
+        extends BaseSequenceServiceImpl<LedgerTagMapper, LedgerTagDO, LedgerTagDTO, LedgerTagQuery>
         implements LedgerTagService {
 
     @Autowired
@@ -75,6 +75,14 @@ public class LedgerTagServiceImpl
         queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
         addDefaultOrderBy(queryWrapper);
         return list(paginationQuery, queryWrapper);
+    }
+
+    @Override
+    public int getMaxSequence(LedgerTagDTO record) {
+        QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        Integer result = mapper.getMaxSequence(null);
+        return null == result ? 0 : result;
     }
 
     @Override

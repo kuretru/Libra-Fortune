@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.service;
 
-import com.kuretru.microservices.web.service.BaseService;
+import com.kuretru.microservices.web.service.BaseSequenceService;
 import com.kuretru.web.libra.entity.query.LedgerTagQuery;
 import com.kuretru.web.libra.entity.transfer.LedgerTagDTO;
 import com.kuretru.web.libra.entity.view.LedgerTagVO;
@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * @author 呉真(kuretru) <kuretru@gmail.com>
  */
-public interface LedgerTagService extends BaseService<LedgerTagDTO, LedgerTagQuery> {
+public interface LedgerTagService extends BaseSequenceService<LedgerTagDTO, LedgerTagQuery> {
 
     /**
      * 列出我的账本标签

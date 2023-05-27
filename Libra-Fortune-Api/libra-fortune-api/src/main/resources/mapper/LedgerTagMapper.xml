@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuretru.web.libra.mapper.LedgerTagMapper">
+
+    <update id="updateSequenceByUuids" parameterType="com.kuretru.web.libra.entity.data.LedgerTagDO">
+        update ledger_tag
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="sequence = CASE" suffix="END">
+                <foreach collection="list" item="item">
+                    when uuid = #{item.uuid} then #{item.sequence}
+                </foreach>
+            </trim>
+        </trim>
+        where uuid in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            '${item.uuid}'
+        </foreach>
+    </update>
+
+</mapper>

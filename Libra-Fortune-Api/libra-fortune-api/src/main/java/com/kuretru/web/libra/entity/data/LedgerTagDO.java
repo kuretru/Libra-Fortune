@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.kuretru.microservices.web.entity.data.BaseDO;
+import com.kuretru.microservices.web.entity.data.BaseSequenceDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,7 +18,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("ledger_tag")
-public class LedgerTagDO extends BaseDO {
+public class LedgerTagDO extends BaseSequenceDO {
 
     /** 外键，所属用户ID */
     private String userId;
