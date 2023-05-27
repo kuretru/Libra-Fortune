@@ -19,8 +19,7 @@ abstract class BaseService<
 
   camelToUnderscore(params?: API.PaginationQuery) {
     if (params?.pageSize) {
-      // eslint-disable-next-line @typescript-eslint/dot-notation
-      params['page_size'] = params.pageSize;
+      (params as any)['page_size'] = params.pageSize;
       delete params.pageSize;
     }
   }

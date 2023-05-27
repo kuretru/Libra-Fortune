@@ -1,5 +1,5 @@
 import { galaxyCallback } from '@/services/galaxy-oauth2-client/service';
-import { ProSkeleton } from '@ant-design/pro-components';
+import { ProSkeleton } from '@ant-design/pro-skeleton';
 import { history, useModel, useSearchParams } from '@umijs/max';
 import { message } from 'antd';
 import React from 'react';
