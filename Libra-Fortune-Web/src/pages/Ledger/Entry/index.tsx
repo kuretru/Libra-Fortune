@@ -4,7 +4,7 @@ import LedgerService from '@/services/libra-fortune/ledger/ledger';
 import LedgerCategoryService from '@/services/libra-fortune/ledger/ledger-category';
 import LedgerEntryService from '@/services/libra-fortune/ledger/ledger-entry';
 import LedgerMemberService from '@/services/libra-fortune/ledger/ledger-member';
-import LedgerTagService from '@/services/libra-fortune/ledger/ledger-tag';
+import LedgerTagService from '@/services/libra-fortune/user/ledger-tag';
 import { getMoneySymbol } from '@/utils/money-utils';
 import {
   FormListActionType,

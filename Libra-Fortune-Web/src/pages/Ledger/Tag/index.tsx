@@ -1,5 +1,5 @@
-import BasePage from '@/components/BasePage';
-import LedgerTagService from '@/services/libra-fortune/ledger/ledger-tag';
+import BaseSequencePage from '@/components/BaseSequencePage';
+import LedgerTagService from '@/services/libra-fortune/user/ledger-tag';
 import { PageContainer, ProColumns, ProFormText } from '@ant-design/pro-components';
 
 const LedgerTag: React.FC = () => {
@@ -36,7 +36,7 @@ const LedgerTag: React.FC = () => {
 
   return (
     <PageContainer>
-      <BasePage<API.Ledger.LedgerTagDTO, API.Ledger.LedgerTagQuery>
+      <BaseSequencePage<API.Ledger.LedgerTagDTO, API.Ledger.LedgerTagQuery>
         pageName="账本标签"
         service={new LedgerTagService()}
         columns={columns}
