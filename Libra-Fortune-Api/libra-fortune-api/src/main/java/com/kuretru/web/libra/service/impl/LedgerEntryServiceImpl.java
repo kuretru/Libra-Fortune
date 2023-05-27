@@ -80,7 +80,7 @@ public class LedgerEntryServiceImpl
             queryWrapper.eq("ledger_entry.currency_type", query.getCurrencyType());
         }
         queryWrapper.orderByDesc("date");
-        queryWrapper.orderByAsc("id");
+        queryWrapper.orderByDesc("id");
 
         IPage<LedgerEntryBO> page = new Page<>(pagination.getCurrent(), pagination.getPageSize());
         page = mapper.listPageBo(page, queryWrapper);
@@ -248,7 +248,7 @@ public class LedgerEntryServiceImpl
         // 7. 校验总和是否相同
         if (total != record.getTotal()) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目金额总和与明细不符");
-        } else if (percentage != 100) {
+        } else if (percentage != 10000) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "承担比例总和不为100%");
         }
 
