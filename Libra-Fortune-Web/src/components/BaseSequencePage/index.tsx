@@ -14,9 +14,10 @@ import type {
   ProFormInstance,
   ProTableProps,
 } from '@ant-design/pro-components';
-import { arrayMoveImmutable, ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
+import { ModalForm, ProFormText, ProTable } from '@ant-design/pro-components';
 import type { FormInstance } from 'antd';
 import { Button, message, Modal, Space } from 'antd';
+import { arrayMoveImmutable } from 'array-move';
 import { isEqual } from 'lodash';
 import React from 'react';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
@@ -310,11 +311,11 @@ abstract class BaseSequencePage<
 
   onSortEnd = ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => {
     if (oldIndex !== newIndex) {
-      const newData = arrayMoveImmutable({
-        array: [...this.state.dataSource.data],
-        fromIndex: oldIndex,
-        toIndex: newIndex,
-      }).filter((el: any) => !!el);
+      const newData = arrayMoveImmutable(
+        [...this.state.dataSource.data],
+        oldIndex,
+        newIndex,
+      ).filter((el: any) => !!el);
       const dataSource = this.state.dataSource;
       dataSource.data = newData;
       this.setState({ useLocalData: true, dataSource: dataSource });
