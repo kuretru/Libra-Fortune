@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  libra-fortune:
+    image: ghcr.io/kuretru/libra-fortune:main
+    container_name: libra-fortune
+    hostname: libra-fortune
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    user: docker:docker
+    restart: always
+    env_file: environment
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - /home/nginx/libra.i5zhen.com/public:/web
+    network_mode: host
