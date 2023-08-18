@@ -3,6 +3,7 @@ FROM eclipse-temurin:17-jre-jammy
 ENV TZ=Asia/Shanghai
 
 RUN mkdir /web && \
+    chmod 777 /web && \
     mkdir /app
 COPY entrypoint.sh /entrypoint.sh
 COPY backend/*.jar /app/app.jar
