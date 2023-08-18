@@ -1,7 +1,5 @@
 server:
   port: 7041
-  servlet:
-    context-path: /api
 spring:
   datasource:
     hikari:
