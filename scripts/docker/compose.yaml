@@ -10,9 +10,16 @@ services:
           memory: 256M
     user: docker:docker
     restart: always
-    env_file: environment
     environment:
       TZ: Asia/Shanghai
-    volumes:
-      - /home/nginx/libra.i5zhen.com/public:/web
+      MYSQL_HOSTNAME:
+      MYSQL_PORT:
+      MYSQL_USERNAME:
+      MYSQL_PASSWORD:
+      MYSQL_SCHEMA:
+      REDIS_HOST:
+      REDIS_PORT:
+      REDIS_PASSWORD:
+      GEMINI_APPLICATION_ID:
+      GEMINI_APPLICATION_SECRET:
     network_mode: host
