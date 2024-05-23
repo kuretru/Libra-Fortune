@@ -79,7 +79,7 @@ const LedgerEntry: React.FC = () => {
     let fundedRatio = Math.round((100 / (membersVo?.length ?? 1)) * 100) / 100;
     let ownerFundedRatio = 100 - fundedRatio * ((membersVo?.length ?? 1) - 1);
     fundedRatio = 35;
-    ownerFundedRatio = 100 - 35;
+    ownerFundedRatio = 100 - (membersVo?.length ?? 1 - 1) * 35;
 
     const result: Omit<API.Ledger.LedgerEntryDetailDTO, 'amount'>[] = [];
     membersVo.forEach((record) => {
