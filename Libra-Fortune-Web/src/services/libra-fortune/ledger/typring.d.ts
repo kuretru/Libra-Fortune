@@ -39,6 +39,7 @@ declare namespace API.Ledger {
   type LedgerMemberDTO = API.BaseDTO & {
     ledgerId: string;
     userId: string;
+    defaultFundedRatio: number;
   };
 
   type LedgerMemberQuery = API.PaginationQuery & {
@@ -47,6 +48,7 @@ declare namespace API.Ledger {
 
   type LedgerMemberVO = API.BaseDTO & {
     userId: string;
+    defaultFundedRatio: number;
     nickname: string;
     avatar: string;
     paymentChannels?: API.User.PaymentChannelVO[];

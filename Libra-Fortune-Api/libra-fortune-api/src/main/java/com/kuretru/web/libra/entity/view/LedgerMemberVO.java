@@ -18,6 +18,8 @@ public class LedgerMemberVO extends BaseDTO {
 
     private UUID userId;
 
+    private Short defaultFundedRatio;
+
     private String nickname;
 
     private String avatar;
