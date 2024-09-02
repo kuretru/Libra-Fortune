@@ -23,4 +23,7 @@ public class LedgerMemberDO extends BaseDO {
     /** 外键，用户ID */
     private String userId;
 
+    /** 默认承担比例，保留2位小数，扩大100倍存储 */
+    private Short defaultFundedRatio;
+
 }

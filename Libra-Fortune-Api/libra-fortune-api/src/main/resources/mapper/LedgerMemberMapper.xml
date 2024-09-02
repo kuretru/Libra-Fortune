@@ -11,6 +11,7 @@
                ledger_member.update_time,
                ledger_member.ledger_id,
                ledger_member.user_id,
+               ledger_member.default_funded_ratio,
                `user`.nickname AS nickname,
                `user`.avatar   AS avatar
         FROM ledger_member

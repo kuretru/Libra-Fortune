@@ -22,4 +22,7 @@ public class LedgerMemberDTO extends BaseDTO {
     @NotNull
     private UUID userId;
 
+    @NotNull
+    private Short defaultFundedRatio;
+
 }
