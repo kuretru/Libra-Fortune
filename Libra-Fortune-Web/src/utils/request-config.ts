@@ -23,7 +23,7 @@ const accessTokenRequestInterceptor = (options: RequestOptions) => {
  * @doc https://umijs.org/docs/max/request#运行时配置
  */
 export const requestConfig: RequestConfig = {
-  timeout: 1000,
+  timeout: 30000,
   // 错误处理： umi@3 的错误处理方案。
   errorConfig: {
     // 错误抛出
