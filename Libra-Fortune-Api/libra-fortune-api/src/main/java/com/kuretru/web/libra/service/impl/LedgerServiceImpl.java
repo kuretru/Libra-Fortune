@@ -69,7 +69,7 @@ public class LedgerServiceImpl
 
         IPage<LedgerBO> page = new Page<>(pagination.getCurrent(), pagination.getPageSize());
         page = mapper.listPageBo(page, queryWrapper);
-        List<LedgerVO> records = ((LedgerEntityMapper)entityMapper).boToVo(page.getRecords());
+        List<LedgerVO> records = ((LedgerEntityMapper) entityMapper).boToVo(page.getRecords());
         return new PaginationResponse<>(records, page.getCurrent(), page.getSize(), page.getTotal());
     }
 
@@ -98,6 +98,7 @@ public class LedgerServiceImpl
         LedgerMemberDTO ledgerMemberDTO = new LedgerMemberDTO();
         ledgerMemberDTO.setLedgerId(result.getId());
         ledgerMemberDTO.setUserId(AccessTokenContext.getUserId());
+        ledgerMemberDTO.setDefaultFundedRatio((short) 100);
         ledgerMemberService.save(ledgerMemberDTO);
 
         return result;
