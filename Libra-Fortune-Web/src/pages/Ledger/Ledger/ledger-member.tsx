@@ -1,7 +1,7 @@
 import BasePage from '@/components/BasePage';
 import UserNicknameWithAvatar from '@/components/UserNicknameWithAvatar';
 import LedgerMemberService from '@/services/libra-fortune/ledger/ledger-member';
-import { ProColumns, ProFormText } from '@ant-design/pro-components';
+import { ProColumns, ProFormDigit, ProFormText } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 
 interface LedgerMemberProps {
@@ -24,6 +24,12 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
       title: '用户名',
       render: (_, record) => <UserNicknameWithAvatar user={record} />,
     },
+    {
+      align: 'center',
+      dataIndex: 'defaultFundedRatio',
+      title: '默认分担比例',
+      render: (_, record) => `${record.defaultFundedRatio.toFixed(2)} %`,
+    },
   ];
 
   const formItem = () => {
@@ -41,10 +47,22 @@ const LedgerMember: React.FC<LedgerMemberProps> = (props) => {
         />
         <ProFormText
           label="用户ID"
+          disabled
           name="userId"
           rules={[{ max: 36, required: true }]}
           tooltip="最长36位"
           width="lg"
+        />
+        <ProFormDigit
+          label="默认分担比例"
+          name="defaultFundedRatio"
+          placeholder="请输入默认分担比例"
+          fieldProps={{ precision: 2 }}
+          addonAfter="%"
+          max={100}
+          rules={[{ required: true }]}
+          tooltip="请输入分担比例"
+          width="xs"
         />
       </>
     );
