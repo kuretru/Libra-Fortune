@@ -91,6 +91,7 @@ const LedgerEntry: React.FC = () => {
     { label: '人民币', value: 'CNY' },
     { label: '美元', value: 'USD' },
     { label: '欧元', value: 'EUR' },
+    { label: '日元', value: 'JPY' },
   ];
 
   const columns: ProColumns<API.Ledger.LedgerEntryVO>[] = [
