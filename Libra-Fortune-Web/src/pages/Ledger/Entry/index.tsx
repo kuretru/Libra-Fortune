@@ -248,11 +248,9 @@ const LedgerEntry: React.FC = () => {
           placeholder="请输入备注"
           fieldProps={{
             allowClear: true,
-            maxLength: 64,
             showCount: true,
           }}
-          rules={[{ max: 64, required: false }]}
-          tooltip="最长64位"
+          rules={[{ required: false }]}
           width="xl"
         />
         <ProFormList

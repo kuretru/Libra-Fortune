@@ -41,7 +41,6 @@ public class LedgerEntryDTO extends BaseDTO {
     private String currencyType;
 
     @NotNull
-    @Size(max = 64)
     private String remark;
 
     @NotEmpty
