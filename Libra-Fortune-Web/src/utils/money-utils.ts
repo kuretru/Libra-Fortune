@@ -8,6 +8,8 @@ export function getMoneySymbol(currencyType: string): string {
       return '€';
     case 'JPY':
       return '日圆';
+    case 'SGD':
+      return 'S$';
   }
   return currencyType;
 }
