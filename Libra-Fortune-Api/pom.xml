@@ -14,8 +14,6 @@
         <module>../Galaxy-Microservices/galaxy-common</module>
         <module>../Galaxy-Microservices/galaxy-web</module>
         <module>../Galaxy-Microservices/galaxy-authentication</module>
-        <module>../Galaxy-Microservices/galaxy-oauth2-common</module>
-        <module>../Galaxy-Microservices/galaxy-oauth2-client</module>
         <module>libra-fortune-api</module>
     </modules>
 
