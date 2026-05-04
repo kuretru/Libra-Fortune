@@ -8,8 +8,9 @@ group = "com.kuretru.web"
 version = "0.4.0"
 
 val mybatisPlusVersion = "3.5.16"
-val guavaVersion = "33.5.0-jre"
 val mapstructVersion = "1.6.3"
+val springdocOpenapiVersion = "3.0.1"
+val guavaVersion = "33.5.0-jre"
 
 java {
     toolchain {
@@ -25,8 +26,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation ("com.baomidou:mybatis-plus-spring-boot4-starter:${mybatisPlusVersion}")
+    implementation("com.baomidou:mybatis-plus-spring-boot4-starter:${mybatisPlusVersion}")
     implementation("com.baomidou:mybatis-plus-jsqlparser:${mybatisPlusVersion}")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenapiVersion}")
     implementation("com.google.guava:guava:$guavaVersion")
 
     runtimeOnly("com.mysql:mysql-connector-j")
