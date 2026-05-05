@@ -5,3 +5,8 @@ spring:
   web:
     resources:
       static-locations: file:/web
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

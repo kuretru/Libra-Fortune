@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.common.utils.HashMapUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
@@ -70,7 +70,7 @@ public class PaymentChannelServiceImpl
 
     @Override
     protected void verifyCanGet(PaymentChannelDO record) throws ServiceException {
-        boolean notMe = !UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId());
+        boolean notMe = !UUID.fromString(record.getUserId()).equals(CurrentUserContext.getUserId());
         if (notMe) {
             throw new ServiceException(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能查看自己的支出渠道");
         }
@@ -83,7 +83,7 @@ public class PaymentChannelServiceImpl
 
     @Override
     protected void verifyQuery(PaymentChannelQuery query) throws ServiceException {
-        boolean notMe = !query.getUserId().equals(AccessTokenContext.getUserId());
+        boolean notMe = !query.getUserId().equals(CurrentUserContext.getUserId());
         if (notMe) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "仅能查看自己的支出渠道");
         }
@@ -91,7 +91,7 @@ public class PaymentChannelServiceImpl
 
     @Override
     protected void verifyDTO(PaymentChannelDTO record) throws ServiceException {
-        boolean notMe = !record.getUserId().equals(AccessTokenContext.getUserId());
+        boolean notMe = !record.getUserId().equals(CurrentUserContext.getUserId());
         if (notMe) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "只有本人可以修改支出渠道");
         }

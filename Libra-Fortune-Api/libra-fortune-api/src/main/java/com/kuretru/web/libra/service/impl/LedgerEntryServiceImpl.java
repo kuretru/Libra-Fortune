@@ -3,7 +3,7 @@ package com.kuretru.web.libra.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.common.utils.UuidUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
@@ -118,7 +118,7 @@ public class LedgerEntryServiceImpl
                 }
                 detailVO.setPaymentChannel(paymentChannelMap.get(paymentChannelId));
 
-                boolean isMyLedgerDetail = UUID.fromString(detailBO.getUserId()).equals(AccessTokenContext.getUserId());
+                boolean isMyLedgerDetail = UUID.fromString(detailBO.getUserId()).equals(CurrentUserContext.getUserId());
                 boolean hasTags = detailBO.getTags() != null && !detailBO.getTags().isEmpty();
                 if (isMyLedgerDetail && hasTags) {
                     List<LedgerTagVO> tagVo = new ArrayList<>(detailBO.getTags().size());

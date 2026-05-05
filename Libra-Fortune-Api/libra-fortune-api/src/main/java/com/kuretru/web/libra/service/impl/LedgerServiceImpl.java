@@ -3,7 +3,7 @@ package com.kuretru.web.libra.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.PaginationQuery;
@@ -55,7 +55,7 @@ public class LedgerServiceImpl
     @Override
     public PaginationResponse<LedgerVO> listVo(PaginationQuery pagination, LedgerQuery query) {
         QueryWrapper<LedgerBO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("ledger_member.user_id", AccessTokenContext.getUserId().toString());
+        queryWrapper.eq("ledger_member.user_id", CurrentUserContext.getUserId().toString());
         if (query.getOwnerId() != null) {
             queryWrapper.eq("ledger.owner_id", query.getOwnerId().toString());
         }
@@ -79,7 +79,7 @@ public class LedgerServiceImpl
         if (record == null) {
             throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定账本不存在");
         }
-        UUID myUserId = AccessTokenContext.getUserId();
+        UUID myUserId = CurrentUserContext.getUserId();
         boolean iAmNowOwner = !UUID.fromString(record.getOwnerId()).equals(myUserId);
         if (iAmNowOwner) {
             throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "非账本拥有者");
@@ -89,7 +89,7 @@ public class LedgerServiceImpl
     @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = ServiceException.class)
     public LedgerDTO save(LedgerDTO record) throws ServiceException {
-        boolean iAmNotOwner = !record.getOwnerId().equals(AccessTokenContext.getUserId());
+        boolean iAmNotOwner = !record.getOwnerId().equals(CurrentUserContext.getUserId());
         if (iAmNotOwner) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本所属用户必须为当前登录用户");
         }
@@ -97,7 +97,7 @@ public class LedgerServiceImpl
 
         LedgerMemberDTO ledgerMemberDTO = new LedgerMemberDTO();
         ledgerMemberDTO.setLedgerId(result.getId());
-        ledgerMemberDTO.setUserId(AccessTokenContext.getUserId());
+        ledgerMemberDTO.setUserId(CurrentUserContext.getUserId());
         ledgerMemberDTO.setDefaultFundedRatio((short) 100);
         ledgerMemberService.save(ledgerMemberDTO);
 
@@ -110,7 +110,7 @@ public class LedgerServiceImpl
         LedgerDTO old = entityMapper.doToDto(getDO(record.getId()));
         if (old == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账本不存在");
-        } else if (!old.getOwnerId().equals(AccessTokenContext.getUserId())) {
+        } else if (!old.getOwnerId().equals(CurrentUserContext.getUserId())) {
             throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只有账本拥有者可以修改账本");
         } else if (!record.getOwnerId().equals(old.getOwnerId())) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "暂不可修改账本拥有者");

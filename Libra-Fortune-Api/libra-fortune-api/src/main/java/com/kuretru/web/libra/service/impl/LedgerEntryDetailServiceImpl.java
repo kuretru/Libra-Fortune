@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.common.utils.HashMapUtils;
 import com.kuretru.microservices.common.utils.UuidUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
@@ -44,7 +44,7 @@ public class LedgerEntryDetailServiceImpl
         queryWrapper.orderByAsc("id");
         List<LedgerEntryDetailDTO> result = list(queryWrapper);
         result.forEach(record -> {
-            if (record.getUserId().equals(AccessTokenContext.getUserId())) {
+            if (record.getUserId().equals(CurrentUserContext.getUserId())) {
                 record.setTags(entryTagService.listByEntryDetailId(record.getId()));
             }
         });
@@ -55,7 +55,7 @@ public class LedgerEntryDetailServiceImpl
         records.forEach(record -> {
             LedgerEntryDetailDTO newRecord = super.save(record);
 
-            if (record.getUserId().equals(AccessTokenContext.getUserId())) {
+            if (record.getUserId().equals(CurrentUserContext.getUserId())) {
                 if (record.getTags() != null && !record.getTags().isEmpty()) {
                     newRecord.setTags(entryTagService.save(newRecord.getId(), record.getTags()));
                 }
@@ -73,7 +73,7 @@ public class LedgerEntryDetailServiceImpl
         records.forEach(record -> {
             LedgerEntryDetailDTO newRecord = super.update(record);
 
-            if (record.getUserId().equals(AccessTokenContext.getUserId())) {
+            if (record.getUserId().equals(CurrentUserContext.getUserId())) {
                 if (record.getTags() != null && !record.getTags().isEmpty()) {
                     newRecord.setTags(entryTagService.update(record.getId(), record.getTags()));
                 }

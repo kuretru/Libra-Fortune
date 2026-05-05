@@ -2,6 +2,11 @@ spring:
   jackson:
     mapper:
       sort-properties-alphabetically: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sso.i5zhen.com/application/o/cloud/
   datasource:
     hikari:
       maximum-pool-size: 4

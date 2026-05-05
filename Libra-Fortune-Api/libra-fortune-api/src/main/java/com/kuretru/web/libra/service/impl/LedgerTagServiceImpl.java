@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.common.utils.HashMapUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
@@ -40,7 +40,7 @@ public class LedgerTagServiceImpl
     @Override
     public List<LedgerTagVO> listMyLedgerTagsVO() {
         QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        queryWrapper.eq("user_id", CurrentUserContext.getUserId().toString());
         addDefaultOrderBy(queryWrapper);
         return ((LedgerTagEntityMapper)entityMapper).doToVo(mapper.selectList(queryWrapper));
     }
@@ -64,7 +64,7 @@ public class LedgerTagServiceImpl
     @Override
     public List<LedgerTagDTO> list() {
         QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        queryWrapper.eq("user_id", CurrentUserContext.getUserId().toString());
         addDefaultOrderBy(queryWrapper);
         return list(queryWrapper);
     }
@@ -72,7 +72,7 @@ public class LedgerTagServiceImpl
     @Override
     public PaginationResponse<LedgerTagDTO> list(PaginationQuery paginationQuery) {
         QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        queryWrapper.eq("user_id", CurrentUserContext.getUserId().toString());
         addDefaultOrderBy(queryWrapper);
         return list(paginationQuery, queryWrapper);
     }
@@ -80,20 +80,20 @@ public class LedgerTagServiceImpl
     @Override
     public int getMaxSequence(LedgerTagDTO record) {
         QueryWrapper<LedgerTagDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        queryWrapper.eq("user_id", CurrentUserContext.getUserId().toString());
         Integer result = mapper.getMaxSequence(null);
         return null == result ? 0 : result;
     }
 
     @Override
     public LedgerTagDTO save(LedgerTagDTO record) throws ServiceException {
-        record.setUserId(AccessTokenContext.getUserId());
+        record.setUserId(CurrentUserContext.getUserId());
         return super.save(record);
     }
 
     @Override
     public LedgerTagDTO update(LedgerTagDTO record) throws ServiceException {
-        record.setUserId(AccessTokenContext.getUserId());
+        record.setUserId(CurrentUserContext.getUserId());
 
         LedgerTagDO old = getDO(record.getId());
         if (old == null) {
@@ -112,13 +112,13 @@ public class LedgerTagServiceImpl
     @Override
     protected QueryWrapper<LedgerTagDO> buildQueryWrapper(LedgerTagQuery query) {
         QueryWrapper<LedgerTagDO> queryWrapper = super.buildQueryWrapper(query);
-        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        queryWrapper.eq("user_id", CurrentUserContext.getUserId().toString());
         return queryWrapper;
     }
 
     @Override
     protected void verifyCanGet(LedgerTagDO record) throws ServiceException {
-        boolean notMe = !UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId());
+        boolean notMe = !UUID.fromString(record.getUserId()).equals(CurrentUserContext.getUserId());
         if (notMe) {
             throw new ServiceException(UserErrorCodes.ACCESS_UNAUTHORIZED, "只能查询自己的账本标签");
         }

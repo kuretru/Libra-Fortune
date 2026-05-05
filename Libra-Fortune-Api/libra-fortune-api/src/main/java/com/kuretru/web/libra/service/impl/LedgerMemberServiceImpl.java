@@ -3,7 +3,7 @@ package com.kuretru.web.libra.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.kuretru.microservices.authentication.context.AccessTokenContext;
+import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.common.utils.HashMapUtils;
 import com.kuretru.microservices.web.constant.code.ServiceErrorCodes;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
@@ -74,7 +74,7 @@ public class LedgerMemberServiceImpl
 
         records.forEach(record -> {
             record.setPaymentChannels(paymentChannelMap.getOrDefault(record.getUserId(), new ArrayList<>()));
-            if (record.getUserId().equals(AccessTokenContext.getUserId())) {
+            if (record.getUserId().equals(CurrentUserContext.getUserId())) {
                 record.setTags(tagService.listMyLedgerTagsVO());
             }
         });
@@ -104,7 +104,7 @@ public class LedgerMemberServiceImpl
     public void verifyIamLedgerMember(UUID ledgerId) throws ServiceException {
         QueryWrapper<LedgerMemberDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("ledger_id", ledgerId.toString());
-        queryWrapper.eq("user_id", AccessTokenContext.getUserId().toString());
+        queryWrapper.eq("user_id", CurrentUserContext.getUserId().toString());
         LedgerMemberDO record = mapper.selectOne(queryWrapper);
         if (record == null) {
             throw new ServiceException(UserErrorCodes.ACCESS_PERMISSION_ERROR, "用户非该账本成员");
@@ -148,7 +148,7 @@ public class LedgerMemberServiceImpl
     }
 
     private void verifyListResult(List<LedgerMemberDTO> records) throws ServiceException {
-        UUID myUserId = AccessTokenContext.getUserId();
+        UUID myUserId = CurrentUserContext.getUserId();
         for (LedgerMemberDTO record : records) {
             if (myUserId.equals(record.getUserId())) {
                 return;
@@ -160,7 +160,7 @@ public class LedgerMemberServiceImpl
     @Override
     protected void verifyCanGet(LedgerMemberDO record) throws ServiceException {
         // 只有该账本的成员可以查看该账本的成员
-        boolean isMe = UUID.fromString(record.getUserId()).equals(AccessTokenContext.getUserId());
+        boolean isMe = UUID.fromString(record.getUserId()).equals(CurrentUserContext.getUserId());
         if (isMe) {
             return;
         }
@@ -169,7 +169,7 @@ public class LedgerMemberServiceImpl
 
     @Override
     protected void verifyCanRemove(LedgerMemberDO record) throws ServiceException {
-        UUID myUserId = AccessTokenContext.getUserId();
+        UUID myUserId = CurrentUserContext.getUserId();
         // 1. 自己可以主动退出某个账本
         // 2. 否则只有账本拥有者可以踢出某个成员
         boolean voluntarilyQuit = UUID.fromString(record.getUserId()).equals(myUserId);
