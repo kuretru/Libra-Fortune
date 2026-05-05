@@ -2,10 +2,3 @@ spring:
   config:
     activate:
       on-profile: development
-logging:
-  level:
-    com:
-      kuretru:
-        web:
-          libra:
-            mapper: debug

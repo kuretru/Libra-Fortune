@@ -5,10 +5,3 @@ spring:
   web:
     resources:
       static-locations: file:/web
-logging:
-  level:
-    com:
-      kuretru:
-        web:
-          libra:
-            mapper: debug
