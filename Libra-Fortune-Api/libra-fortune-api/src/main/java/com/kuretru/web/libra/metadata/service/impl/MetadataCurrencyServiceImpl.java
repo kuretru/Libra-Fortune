@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.metadata.service.impl;
 
+import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
 import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataCurrencyDO;
@@ -10,6 +11,9 @@ import com.kuretru.web.libra.metadata.service.MetadataCurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class MetadataCurrencyServiceImpl
         extends BaseSequencedServiceImpl<MetadataCurrencyMapper, MetadataCurrencyDO, MetadataCurrencyDTO, EmptyQuery>
@@ -18,6 +22,16 @@ public class MetadataCurrencyServiceImpl
     @Autowired
     public MetadataCurrencyServiceImpl(MetadataCurrencyMapper mapper, MetadataCurrencyEntityMapper entityMapper) {
         super(mapper, entityMapper);
+    }
+
+    @Override
+    public List<EnumDTO> enums() {
+        var records = list(null);
+        var result = new ArrayList<EnumDTO>();
+        for (var record : records) {
+            result.add(new EnumDTO("%s(%s)".formatted(record.getName(), record.getSymbol()), record.getCode()));
+        }
+        return result;
     }
 
 }
