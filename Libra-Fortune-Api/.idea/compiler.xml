@@ -18,16 +18,16 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/4.0.6/85a814e8afbc6c5a6637489760028688bb77860/spring-boot-configuration-processor-4.0.6.jar" />
         </processorPath>
-        <module name="com.kuretru.microservices.galaxy-authentication.main" />
-        <module name="com.kuretru.microservices.galaxy-authentication.test" />
+        <module name="galaxy-authentication.main" />
+        <module name="galaxy-authentication.test" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="com.kuretru.microservices.galaxy-common.main" />
-        <module name="com.kuretru.microservices.galaxy-common.test" />
+        <module name="galaxy-common.main" />
+        <module name="galaxy-common.test" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
@@ -35,17 +35,23 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mapstruct/mapstruct-processor/1.6.3/52e345c907fbf173b376586c7f8b131d53fa5867/mapstruct-processor-1.6.3.jar" />
         </processorPath>
-        <module name="com.kuretru.microservices.galaxy-web.main" />
-        <module name="com.kuretru.microservices.galaxy-web.test" />
+        <module name="galaxy-web.main" />
+        <module name="galaxy-web.test" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="25">
       <module name="Api-Common-Utils" target="17" />
-      <module name="galaxy-authentication" target="25" />
-      <module name="galaxy-common" target="25" />
+      <module name="com.kuretru.microservices.galaxy-authentication" target="25" />
+      <module name="com.kuretru.microservices.galaxy-authentication.main" target="25" />
+      <module name="com.kuretru.microservices.galaxy-authentication.test" target="25" />
+      <module name="com.kuretru.microservices.galaxy-common" target="25" />
+      <module name="com.kuretru.microservices.galaxy-common.main" target="25" />
+      <module name="com.kuretru.microservices.galaxy-common.test" target="25" />
+      <module name="com.kuretru.microservices.galaxy-web" target="25" />
+      <module name="com.kuretru.microservices.galaxy-web.main" target="25" />
+      <module name="com.kuretru.microservices.galaxy-web.test" target="25" />
       <module name="galaxy-oauth2-client" target="25" />
       <module name="galaxy-oauth2-common" target="25" />
-      <module name="galaxy-web" target="25" />
       <module name="libra-fortune-api" target="25" />
     </bytecodeTargetLevel>
   </component>
@@ -62,10 +68,16 @@
       <module name="com.kuretru.microservices.galaxy-web.main" options="-parameters" />
       <module name="com.kuretru.microservices.galaxy-web.test" options="-parameters" />
       <module name="galaxy-authentication" options="-parameters" />
+      <module name="galaxy-authentication.main" options="-parameters" />
+      <module name="galaxy-authentication.test" options="-parameters" />
       <module name="galaxy-common" options="-parameters" />
+      <module name="galaxy-common.main" options="-parameters" />
+      <module name="galaxy-common.test" options="-parameters" />
       <module name="galaxy-oauth2-client" options="-parameters" />
       <module name="galaxy-oauth2-common" options="-parameters" />
       <module name="galaxy-web" options="-parameters" />
+      <module name="galaxy-web.main" options="-parameters" />
+      <module name="galaxy-web.test" options="-parameters" />
       <module name="libra-fortune-api" options="-parameters" />
       <module name="libra-fortune-parent.libra-fortune-api" options="-parameters" />
       <module name="libra-fortune-parent.libra-fortune-api.main" options="-parameters" />

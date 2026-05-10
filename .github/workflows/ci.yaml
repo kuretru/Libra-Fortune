@@ -15,10 +15,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '25'
-          cache: 'maven'
+          cache: 'gradle'
       -
         name: Build Libra Fortune Parent
-        run: mvn --batch-mode --update-snapshots install
+        run: ./gradlew --no-daemon --stacktrace clean build
         working-directory: Libra-Fortune-Api/
       -
         name: Upload build artifacts
