@@ -116,7 +116,6 @@ export default defineConfig({
    */
   title: 'Ant Design Pro',
   layout: {
-    locale: true,
     ...defaultSettings,
   },
   /**
@@ -127,17 +126,6 @@ export default defineConfig({
   moment2dayjs: {
     preset: 'antd',
     plugins: ['duration', 'relativeTime'],
-  },
-  /**
-   * @name 国际化插件
-   * @doc https://umijs.org/docs/max/i18n
-   */
-  locale: {
-    // default zh-CN
-    default: 'zh-CN',
-    antd: true,
-    // default true, when it is true, will use `navigator.language` overwrite default
-    baseNavigator: true,
   },
   /**
    * @name antd 插件

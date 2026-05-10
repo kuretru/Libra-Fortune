@@ -3,7 +3,7 @@ import XMarkdown from '@ant-design/x-markdown';
 import '@ant-design/x-markdown/es/XMarkdown/index.css';
 import enUS from '@root/docs/cheatsheet.en-US.md';
 import zhCN from '@root/docs/cheatsheet.zh-CN.md';
-import { getLocale, useIntl, useModel } from '@umijs/max';
+import { useIntl, useModel } from '@umijs/max';
 import { Card } from 'antd';
 import hljs from 'highlight.js';
 import React from 'react';
@@ -141,7 +141,7 @@ const infoCards = [
 
 const Welcome: React.FC = () => {
   const intl = useIntl();
-  const locale = getLocale();
+  const locale = 'zh-CN';
   const normalizedLocale = locale.toLowerCase();
   const content =
     mdContent[locale] ??

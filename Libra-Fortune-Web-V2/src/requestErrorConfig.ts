@@ -1,6 +1,5 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { getIntl } from '@umijs/max';
 import { message, notification } from 'antd';
 
 // 错误处理方案： 错误类型
@@ -76,11 +75,7 @@ export const errorConfig: RequestConfig = {
         message.error(`Response status:${error.response.status}`);
       } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
         message.error(
-          getIntl().formatMessage({
-            id: 'app.request.offline',
-            defaultMessage:
-              'Network unavailable. Please check your connection and try again.',
-          }),
+          '网络不可用，请检查网络连接后重试。',
         );
       } else if (error.request) {
         message.error('None response! Please retry.');

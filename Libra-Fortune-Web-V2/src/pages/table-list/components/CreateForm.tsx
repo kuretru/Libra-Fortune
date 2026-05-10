@@ -6,7 +6,6 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, message } from 'antd';
 import type { FC } from 'react';
 import { addRule } from '@/services/ant-design-pro/api';
@@ -20,11 +19,6 @@ const CreateForm: FC<CreateFormProps> = (props) => {
 
   const [messageApi, contextHolder] = message.useMessage();
   const queryClient = useQueryClient();
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
-  const intl = useIntl();
 
   const { mutateAsync: run, isPending: loading } = useMutation({
     mutationFn: addRule,
@@ -42,13 +36,10 @@ const CreateForm: FC<CreateFormProps> = (props) => {
     <>
       {contextHolder}
       <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
-        })}
+        title={'新建规则'}
         trigger={
           <Button type="primary" icon={<PlusOutlined />}>
-            <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+            新建
           </Button>
         }
         width="400px"
@@ -67,10 +58,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
             {
               required: true,
               message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
+                '规则名称为必填项'
               ),
             },
           ]}
