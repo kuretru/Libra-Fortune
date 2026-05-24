@@ -5,9 +5,7 @@ import React from 'react';
 
 const Admin: React.FC = () => {
   return (
-    <PageContainer
-      content={' 这个页面只有 admin 权限才能查看'}
-    >
+    <PageContainer content={' 这个页面只有 admin 权限才能查看'}>
       <Card>
         <Alert
           title={'更快更强的重型组件，已经发布。'}
@@ -20,12 +18,12 @@ const Admin: React.FC = () => {
           }}
         />
         <Typography.Title level={2} style={{ textAlign: 'center' }}>
-          <SmileTwoTone /> Ant Design Pro 
+          <SmileTwoTone /> Ant Design Pro
           <HeartTwoTone twoToneColor="#eb2f96" /> You
         </Typography.Title>
       </Card>
       <p style={{ textAlign: 'center', marginTop: 24 }}>
-        Want to add more pages? Please refer to 
+        Want to add more pages? Please refer to
         <a
           href="https://pro.ant.design/docs/block-cn"
           target="_blank"

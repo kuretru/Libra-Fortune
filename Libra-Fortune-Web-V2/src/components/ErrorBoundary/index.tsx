@@ -1,4 +1,3 @@
-import { getIntl } from '@umijs/max';
 import { Button, Card, Result } from 'antd';
 import React from 'react';
 
@@ -10,11 +9,20 @@ function isChunkLoadError(error: Error): boolean {
   );
 }
 
-function getSubTitleId(isChunkError: boolean, isOffline: boolean): string {
-  if (!isChunkError) return 'app.error.render.description';
-  return isOffline
-    ? 'app.error.chunk.description.offline'
-    : 'app.error.chunk.description.online';
+function getFallbackCopy(isChunkError: boolean, isOffline: boolean) {
+  if (!isChunkError) {
+    return {
+      title: '页面出错了',
+      subTitle: '当前页面发生异常，请刷新页面或返回首页。',
+    };
+  }
+
+  return {
+    title: '页面资源加载失败',
+    subTitle: isOffline
+      ? '当前网络连接不可用，请检查网络后重试。'
+      : '页面资源加载失败，请刷新后重试。',
+  };
 }
 
 function renderErrorFallback(
@@ -23,29 +31,16 @@ function renderErrorFallback(
   onRetry: () => void,
   onReload: () => void,
 ) {
-  const intl = getIntl();
   const isOffline = !isOnline;
   const isChunkError = isChunkLoadError(error);
+  const copy = getFallbackCopy(isChunkError, isOffline);
 
   return (
     <Card variant="borderless" style={{ margin: 24 }}>
       <Result
         status="error"
-        title={intl.formatMessage({
-          id: isChunkError ? 'app.error.chunk.title' : 'app.error.render.title',
-          defaultMessage: isChunkError
-            ? 'Failed to load page'
-            : 'Something went wrong',
-        })}
-        subTitle={intl.formatMessage({
-          id: getSubTitleId(isChunkError, isOffline),
-          defaultMessage:
-            isChunkError && isOffline
-              ? 'Your network connection has been lost. Please check your connection and reload.'
-              : isChunkError
-                ? 'Page resources failed to load. Please reload and try again.'
-                : 'Sorry, an error occurred on this page. Please reload or go back to the home page.',
-        })}
+        title={copy.title}
+        subTitle={copy.subTitle}
         extra={[
           isChunkError && (
             <Button type="primary" key="retry" onClick={onRetry}>

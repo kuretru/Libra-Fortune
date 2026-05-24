@@ -10,6 +10,7 @@ enum ErrorShowType {
   NOTIFICATION = 3,
   REDIRECT = 9,
 }
+
 // 与后端约定的响应数据格式
 interface ResponseStructure {
   success: boolean;
@@ -74,9 +75,7 @@ export const errorConfig: RequestConfig = {
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
         message.error(`Response status:${error.response.status}`);
       } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        message.error(
-          '网络不可用，请检查网络连接后重试。',
-        );
+        message.error('网络不可用，请检查网络连接后重试。');
       } else if (error.request) {
         message.error('None response! Please retry.');
       } else {
@@ -89,7 +88,8 @@ export const errorConfig: RequestConfig = {
   requestInterceptors: [
     (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
-      const url = config?.url?.concat('?token=123');
+      // const url = config?.url?.concat('?token=123');
+      const url = config?.url;
       return { ...config, url };
     },
   ],

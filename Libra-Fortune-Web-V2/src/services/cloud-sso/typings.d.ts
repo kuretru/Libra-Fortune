@@ -16,9 +16,16 @@ declare namespace CloudSSO {
     nickname: string;
     groups: string[];
   }
-  type CurrentUser = {
-    username: string;
-    nickname: string;
-    email: string;
+  type AccessTokenResult = {
+    access_token: string;
+    token_type: string;
+    scope: string;
+    expires_in: number;
+    id_token: string;
+  }
+  type ErrorResponse = {
+    error: string;
+    error_description: string;
+    request_id?: string;
   }
 }

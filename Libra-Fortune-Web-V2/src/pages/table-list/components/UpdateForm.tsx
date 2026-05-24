@@ -94,10 +94,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         }}
         onFinish={onFinish}
       >
-        <StepsForm.StepForm
-          initialValues={values}
-          title={'基本信息'}
-        >
+        <StepsForm.StepForm initialValues={values} title={'基本信息'}>
           <ProFormText
             name="name"
             label={'规则名称'}
@@ -105,9 +102,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             rules={[
               {
                 required: true,
-                message: (
-                  '请输入规则名称！'
-                ),
+                message: '请输入规则名称！',
               },
             ]}
           />
@@ -119,9 +114,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             rules={[
               {
                 required: true,
-                message: (
-                  '请输入至少五个字符的规则描述！'
-                ),
+                message: '请输入至少五个字符的规则描述！',
                 min: 5,
               },
             ]}
@@ -181,9 +174,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
             rules={[
               {
                 required: true,
-                message: (
-                  '请选择开始时间！'
-                ),
+                message: '请选择开始时间！',
               },
             ]}
           />

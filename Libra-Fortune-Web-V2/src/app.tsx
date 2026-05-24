@@ -19,12 +19,13 @@ import {
   OfflineBanner,
   VersionDropdown,
 } from '@/components';
-import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
+import { currentUser } from '@/services/cloud-sso';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+const authFreePaths = [loginPath, '/user/register', '/user/register-result'];
 
 /**
  * @see https://umijs.org/docs/api/runtime-config#getinitialstate
@@ -38,11 +39,8 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const msg = await queryCurrentUser({
-        skipErrorHandler: true,
-      });
-      return msg.data;
-    } catch (_error) {
+      return await currentUser();
+    } catch (_cloudSsoError) {
       const { pathname, search, hash } = history.location;
       history.replace(
         `${loginPath}?redirect=${encodeURIComponent(pathname + search + hash)}`,
@@ -52,11 +50,7 @@ export async function getInitialState(): Promise<{
   };
   // 如果不是登录页面，执行
   const { location } = history;
-  if (
-    ![loginPath, '/user/register', '/user/register-result'].includes(
-      location.pathname,
-    )
-  ) {
+  if (!authFreePaths.includes(location.pathname)) {
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
@@ -101,7 +95,7 @@ export const layout: RunTimeLayoutConfig = ({
       ),
     },
     // waterMarkProps: {
-    //   content: initialState?.currentUser?.name,
+    //   content: initialState?.index?.name,
     // },
     footerRender: () => <Footer />,
     onPageChange: () => {

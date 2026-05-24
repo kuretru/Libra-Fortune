@@ -239,8 +239,8 @@ const mutation = useMutation({
 ```tsx
 // File: src/app.tsx
 export async function getInitialState() {
-  const currentUser = await fetchUserInfo();
-  return { currentUser };
+  const index = await fetchUserInfo();
+  return { index };
 }
 
 // Use in components
@@ -298,11 +298,11 @@ Auto-generates API calling code under `src/services/` based on `config/oneapi.js
 
 ```ts
 // File: src/access.ts
-export default function access(initialState: { currentUser?: API.CurrentUser }) {
-  const { currentUser } = initialState;
+export default function access(initialState: { index?: API.CurrentUser }) {
+  const { index } = initialState;
   return {
-    canAdmin: currentUser?.access === 'admin',
-    canUser: !!currentUser,
+    canAdmin: index?.access === 'admin',
+    canUser: !!index,
   };
 }
 ```
@@ -453,7 +453,7 @@ Test files go next to the component, named `*.test.ts(x)`.
 ```ts
 // File: mock/user.ts
 export default {
-  'GET /api/currentUser': { name: 'Serati Ma', access: 'admin' },
+  'GET /api/index': { name: 'Serati Ma', access: 'admin' },
   'POST /api/login': (req, res) => { res.end('ok'); },
 };
 ```

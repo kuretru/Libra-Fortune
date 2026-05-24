@@ -57,9 +57,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
           rules={[
             {
               required: true,
-              message: (
-                '规则名称为必填项'
-              ),
+              message: '规则名称为必填项',
             },
           ]}
           width="md"

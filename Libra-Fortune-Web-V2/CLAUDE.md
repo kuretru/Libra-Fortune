@@ -26,9 +26,9 @@ Other: `npm run openapi` (regenerate `src/services/`), `npm run simple` (**irrev
 
 **Convention files** (`src/`): `app.tsx` (runtime config + `getInitialState`), `access.ts` (permissions), `global.tsx` (side effects), `loading.tsx`, `typings.d.ts`.
 
-**Auth**: `getInitialState()` → `GET /api/currentUser`; 401 → redirect login. `access.ts`: `canAdmin = currentUser.access === 'admin'`. Mock creds: `admin`/`ant.design` or `user`/`ant.design`.
+**Auth**: `getInitialState()` → `GET /api/index`; 401 → redirect login. `access.ts`: `canAdmin = index.access === 'admin'`. Mock creds: `admin`/`ant.design` or `user`/`ant.design`.
 
-**State**: `useModel('filename')` for global hooks (`src/models/`). `useModel('@@initialState')` for currentUser/settings. ProTable `request` prop for most data loading. `@tanstack/react-query` for complex server state.
+**State**: `useModel('filename')` for global hooks (`src/models/`). `useModel('@@initialState')` for index/settings. ProTable `request` prop for most data loading. `@tanstack/react-query` for complex server state.
 
 **Styling priority**: Tailwind CSS v4 (layout) → antd-style v4 / `createStyles` (theme tokens) → CSS Modules → Less (legacy only).
 
