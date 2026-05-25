@@ -42,6 +42,9 @@
         "useUniqueElementIds": "off",
         "useExhaustiveDependencies": "off"
       },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
       "a11y": {
         "noStaticElementInteractions": "off",
         "useValidAnchor": "off",
