@@ -15,6 +15,17 @@ export default [
     name: '欢迎',
     icon: 'smile',
     component: './Welcome',
+  }, {
+    name: '元数据管理',
+    icon: 'database',
+    path: '/metadata',
+    routes: [
+      {
+        name: '货币',
+        path: '/metadata/currency',
+        component: './metadata/currency'
+      }
+    ]
   },
   {
     path: '/admin',
