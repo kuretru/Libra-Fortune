@@ -7,14 +7,21 @@ import {
   ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
-import React, {useEffect, useRef, useState} from 'react';
-import {create, list, remove, update} from '@/services/libra-fortune/metadata/currency';
-import {Button, Form, message, Space} from 'antd';
+import { Button, Form, message, Space } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  create,
+  list,
+  remove,
+  update,
+} from '@/services/libra-fortune/metadata/currency';
 
 const MetadataCurrency: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<LibraFortune.Metadata.CurrencyDTO | undefined>(undefined);
+  const [currentRecord, setCurrentRecord] = useState<
+    LibraFortune.Metadata.CurrencyDTO | undefined
+  >(undefined);
   const [form] = Form.useForm<LibraFortune.Metadata.CurrencyDTO>();
   const actionRef = useRef<ActionType | null>(null);
 
@@ -61,16 +68,21 @@ const MetadataCurrency: React.FC = () => {
       render: (_, record) => (
         <Space>
           <Button onClick={() => onUpdateButtonClick(record)}>编辑</Button>
-          <Button onClick={() => onRemoveButtonClick(record.id!)} danger>删除</Button>
+          <Button onClick={() => onRemoveButtonClick(record.id!)} danger>
+            删除
+          </Button>
         </Space>
       ),
     },
   ];
 
   const onRequest: NonNullable<
-    ProTableProps<LibraFortune.Metadata.CurrencyDTO, GalaxyWeb.EmptyQuery>['request']
+    ProTableProps<
+      LibraFortune.Metadata.CurrencyDTO,
+      GalaxyWeb.EmptyQuery
+    >['request']
   > = async (params) => {
-    const {pageSize, current} = params;
+    const { pageSize, current } = params;
     const response = await list({
       current: current!,
       pageSize: pageSize!,
@@ -84,7 +96,9 @@ const MetadataCurrency: React.FC = () => {
     };
   };
 
-  const onFinish = async (record: LibraFortune.Metadata.CurrencyDTO): Promise<boolean> => {
+  const onFinish = async (
+    record: LibraFortune.Metadata.CurrencyDTO,
+  ): Promise<boolean> => {
     try {
       const fn = record.id ? update : create;
       await fn(record);
@@ -94,12 +108,7 @@ const MetadataCurrency: React.FC = () => {
         content: record.id ? '更新成功' : '新增成功',
       });
       return true;
-    } catch (error) {
-      console.log(error)
-      messageApi.open({
-        type: 'error',
-        content: error instanceof Error ? error.message : '保存失败',
-      });
+    } catch {
       return false;
     }
   };
@@ -121,13 +130,8 @@ const MetadataCurrency: React.FC = () => {
         type: 'success',
         content: '删除成功',
       });
-    }).catch((error) => {
-      messageApi.open({
-        type: 'error',
-        content: error instanceof Error ? error.message : '删除失败',
-      });
-    })
-  }
+    });
+  };
 
   return (
     <PageContainer>
@@ -159,24 +163,24 @@ const MetadataCurrency: React.FC = () => {
           maskClosable: false,
         }}
       >
-        <ProFormText name="id" label="ID" hidden/>
+        <ProFormText name="id" label="ID" hidden />
         <ProFormText
           name="code"
           label="货币代码"
           placeholder="请输入货币代码"
-          rules={[{required: true}]}
+          rules={[{ required: true }]}
         />
         <ProFormText
           name="symbol"
           label="货币符号"
           placeholder="请输入货币符号"
-          rules={[{required: true}]}
+          rules={[{ required: true }]}
         />
         <ProFormText
           name="name"
           label="货币名称"
           placeholder="请输入货币名称"
-          rules={[{required: true}]}
+          rules={[{ required: true }]}
         />
       </ModalForm>
     </PageContainer>
