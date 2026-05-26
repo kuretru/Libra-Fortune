@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,10 +31,24 @@ public class MetadataCategoryServiceImpl
 
     @Override
     public List<EnumDTO> enums() {
-        var records = list(null);
+        var queryWrapper = new QueryWrapper<MetadataCategoryDO>();
+        applyDefaultOrderBy(queryWrapper);
+        var records = mapper.selectList(queryWrapper);
         var result = new ArrayList<EnumDTO>();
+        var childrenMap = new HashMap<String, List<EnumDTO>>();
         for (var record : records) {
-            result.add(new EnumDTO(record.getName(), String.valueOf(record.getId())));
+            var dto = new EnumDTO(record.getName(), String.valueOf(record.getId()));
+            if (record.getParentId() == null) {
+                result.add(dto);
+            } else {
+                var key = String.valueOf(record.getParentId());
+                var list = childrenMap.getOrDefault(key, new ArrayList<>());
+                list.add(dto);
+                childrenMap.put(key, list);
+            }
+        }
+        for (var record : result) {
+            record.setChildren(childrenMap.getOrDefault(record.getValue(), new ArrayList<>()));
         }
         return result;
     }
@@ -48,6 +63,12 @@ public class MetadataCategoryServiceImpl
         }
         Integer result = mapper.getMaxSequence(queryWrapper);
         return null == result ? 0 : result;
+    }
+
+    @Override
+    protected void applyDefaultOrderBy(QueryWrapper<MetadataCategoryDO> queryWrapper) {
+        queryWrapper.orderByAsc("parent_id");
+        queryWrapper.orderByAsc("sequence");
     }
 
     @Override
