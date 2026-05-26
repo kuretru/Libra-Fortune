@@ -13,8 +13,14 @@ import lombok.ToString;
 @TableName("metadata_category")
 public class MetadataCategoryDO extends BaseDO implements Sequenced {
 
+    /** 父分类ID */
+    private Long parentId;
+
     /** 分类名称 */
     private String name;
+
+    /** 图标 */
+    private String icon;
 
     /** 排序标识 */
     private Integer sequence;

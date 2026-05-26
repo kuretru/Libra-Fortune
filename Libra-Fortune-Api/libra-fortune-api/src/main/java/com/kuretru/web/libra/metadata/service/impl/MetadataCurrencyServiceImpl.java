@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.metadata.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
 import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
@@ -32,6 +33,13 @@ public class MetadataCurrencyServiceImpl
             result.add(new EnumDTO("%s(%s)".formatted(record.getName(), record.getSymbol()), record.getCode()));
         }
         return result;
+    }
+
+    @Override
+    protected MetadataCurrencyDO findDuplicateRecord(MetadataCurrencyDTO record) {
+        var queryWrapper = new QueryWrapper<MetadataCurrencyDO>();
+        queryWrapper.eq("code", record.getCode());
+        return mapper.selectOne(queryWrapper);
     }
 
 }

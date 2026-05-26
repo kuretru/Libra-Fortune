@@ -9,7 +9,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-731891638/galaxy-web.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-731891638/galaxy-web.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-731891638/galaxy-web.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-731891638/galaxy-web.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.test.iml" filepath="$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.test.iml" />
     </modules>
   </component>
 </project>
