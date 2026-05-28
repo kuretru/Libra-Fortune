@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableTransactionManagement
-@MapperScan({"com.kuretru.web.libra.mapper", "com.kuretru.web.libra.metadata.mapper"})
+@MapperScan({"com.kuretru.web.libra.mapper", "com.kuretru.web.libra.metadata.mapper", "com.kuretru.web.libra.account.mapper"})
 public class Application {
 
     public static void main(String[] args) {
