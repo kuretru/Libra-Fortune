@@ -12,20 +12,19 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MetadataCategoryDTO extends BaseDTO {
+public class MetadataTagSetDTO extends BaseDTO {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Schema(description = "父分类ID", accessMode = Schema.AccessMode.WRITE_ONLY)
-    private Long parentId;
-
-    @Schema(description = "分类名称")
+    @Schema(description = "标签组名称")
     private String name;
 
-    @Schema(description = "图标")
-    private String icon;
+    @Schema(description = "该标签组是否必选")
+    private Boolean required;
+
+    @Schema(description = "是否允许多选")
+    private Boolean allowMultiple;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Schema(description = "子分类", accessMode = Schema.AccessMode.READ_ONLY)
-    private List<MetadataCategoryDTO> children;
+    @Schema(description = "标签", accessMode = Schema.AccessMode.READ_ONLY)
+    private List<MetadataTagSetItemDTO> items;
 
 }

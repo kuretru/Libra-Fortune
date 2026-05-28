@@ -112,7 +112,7 @@ public class MetadataCategoryServiceImpl
         queryWrapper.in("parent_id", idList);
         var children = mapper.selectList(queryWrapper);
         var childrenMap = entityMapper.doToDto(children).stream().collect(Collectors.groupingBy(MetadataCategoryDTO::getParentId));
-        result.forEach(record -> record.setChildren(childrenMap.getOrDefault(String.valueOf(record.getId()), Collections.emptyList())));
+        result.forEach(record -> record.setChildren(childrenMap.getOrDefault(record.getId(), Collections.emptyList())));
         return result;
     }
 
