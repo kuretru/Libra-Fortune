@@ -1,0 +1,263 @@
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  type ActionType,
+  ModalForm,
+  PageContainer,
+  type ProColumns,
+  ProFormSelect,
+  ProFormText,
+  ProTable,
+  type ProTableProps,
+} from '@ant-design/pro-components';
+import { Button, Form, message, Popconfirm, Space, Tag } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  create,
+  list,
+  remove,
+  update,
+} from '@/services/libra-fortune/metadata/category';
+
+const getExpandableRowKeys = (
+  records: LibraFortune.Metadata.CategoryDTO[],
+): React.Key[] =>
+  records.flatMap((record) => {
+    if (!record.id || !record.children?.length) {
+      return [];
+    }
+    return [record.id, ...getExpandableRowKeys(record.children)];
+  });
+
+const MetadataCategory: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState<
+    LibraFortune.Metadata.CategoryDTO | undefined
+  >(undefined);
+  const [topLevelCategories, setTopLevelCategories] = useState<
+    LibraFortune.Metadata.CategoryDTO[]
+  >([]);
+  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+  const [form] = Form.useForm<LibraFortune.Metadata.CategoryDTO>();
+  const actionRef = useRef<ActionType | null>(null);
+
+  const parentOptions = useMemo(
+    () =>
+      topLevelCategories.map((category) => ({
+        label: category.name,
+        value: category.id,
+      })),
+    [topLevelCategories],
+  );
+
+  useEffect(() => {
+    if (!modalVisible) return;
+
+    if (currentRecord) {
+      form.setFieldsValue(currentRecord);
+    } else {
+      form.resetFields();
+    }
+  }, [modalVisible, currentRecord, form]);
+
+  const columns: ProColumns<LibraFortune.Metadata.CategoryDTO>[] = [
+    {
+      dataIndex: 'id',
+      title: 'ID',
+      colSize: 1,
+      valueType: 'indexBorder',
+    },
+    {
+      dataIndex: 'parentId',
+      title: '层级',
+      colSize: 2,
+      search: false,
+      render: (_, record) =>
+        record.parentId ? (
+          <Tag color="blue">二级分类</Tag>
+        ) : (
+          <Tag>一级分类</Tag>
+        ),
+    },
+    {
+      dataIndex: 'name',
+      title: '分类名称',
+      colSize: 4,
+      copyable: true,
+      search: false,
+    },
+    {
+      dataIndex: 'icon',
+      title: '图标',
+      colSize: 2,
+      search: false,
+      render: (_, record) =>
+        record.icon ? <Tag>{record.icon}</Tag> : <span>-</span>,
+    },
+    {
+      key: 'action',
+      title: '操作',
+      valueType: 'option',
+      render: (_, record) => (
+        <Space>
+          {!record.parentId && (
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => onCreateChildButtonClick(record)}
+            >
+              子分类
+            </Button>
+          )}
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => onUpdateButtonClick(record)}
+          >
+            编辑
+          </Button>
+          <Popconfirm
+            title="确认删除该分类？"
+            okText="删除"
+            cancelText="取消"
+            onConfirm={() => onRemoveButtonClick(record.id!)}
+          >
+            <Button icon={<DeleteOutlined />} danger>
+              删除
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const onRequest: NonNullable<
+    ProTableProps<
+      LibraFortune.Metadata.CategoryDTO,
+      GalaxyWeb.EmptyQuery
+    >['request']
+  > = async (params) => {
+    const { pageSize, current } = params;
+    const response = await list({
+      current: current!,
+      pageSize: pageSize!,
+      noPage: false,
+    });
+    const data = response.data.list;
+    setTopLevelCategories(data);
+    setExpandedRowKeys(getExpandableRowKeys(data));
+
+    return {
+      data,
+      success: response.code < 1000,
+      total: response.data.total,
+    };
+  };
+
+  const onFinish = async (
+    record: LibraFortune.Metadata.CategoryDTO,
+  ): Promise<boolean> => {
+    try {
+      const fn = record.id ? update : create;
+      await fn(record);
+      actionRef.current?.reload();
+      messageApi.open({
+        type: 'success',
+        content: record.id ? '更新成功' : '新增成功',
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const onCreateButtonClick = () => {
+    setCurrentRecord(undefined);
+    setModalVisible(true);
+  };
+
+  const onCreateChildButtonClick = (
+    record: LibraFortune.Metadata.CategoryDTO,
+  ) => {
+    setCurrentRecord({
+      parentId: record.id,
+    } as LibraFortune.Metadata.CategoryDTO);
+    setModalVisible(true);
+  };
+
+  const onUpdateButtonClick = (record: LibraFortune.Metadata.CategoryDTO) => {
+    setCurrentRecord(record);
+    setModalVisible(true);
+  };
+
+  const onRemoveButtonClick = (id: number) => {
+    remove(id).then(() => {
+      actionRef.current?.reload();
+      messageApi.open({
+        type: 'success',
+        content: '删除成功',
+      });
+    });
+  };
+
+  return (
+    <PageContainer>
+      {contextHolder}
+      <ProTable<LibraFortune.Metadata.CategoryDTO, GalaxyWeb.EmptyQuery>
+        actionRef={actionRef}
+        columns={columns}
+        defaultSize="small"
+        expandable={{
+          expandedRowKeys,
+          onExpandedRowsChange: (keys) => setExpandedRowKeys([...keys]),
+        }}
+        rowKey="id"
+        request={onRequest}
+        search={false}
+        toolBarRender={() => [
+          <Button
+            key="create"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onCreateButtonClick}
+          >
+            新增一级分类
+          </Button>,
+        ]}
+      />
+      <ModalForm<LibraFortune.Metadata.CategoryDTO>
+        form={form}
+        title={currentRecord?.id ? '编辑分类' : '新增分类'}
+        open={modalVisible}
+        onOpenChange={(open) => {
+          setModalVisible(open);
+          if (!open) {
+            setCurrentRecord(undefined);
+          }
+        }}
+        onFinish={onFinish}
+        modalProps={{
+          destroyOnHidden: true,
+          maskClosable: false,
+        }}
+      >
+        <ProFormText name="id" label="ID" hidden />
+        <ProFormSelect
+          name="parentId"
+          label="父分类"
+          options={parentOptions}
+          placeholder="不选择则创建一级分类"
+          allowClear
+          disabled={!!currentRecord?.id || !!currentRecord?.parentId}
+        />
+        <ProFormText
+          name="name"
+          label="分类名称"
+          placeholder="请输入分类名称"
+          rules={[{ required: true }]}
+        />
+        <ProFormText name="icon" label="图标" placeholder="请输入图标标识" />
+      </ModalForm>
+    </PageContainer>
+  );
+};
+
+export default MetadataCategory;

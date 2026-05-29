@@ -24,6 +24,11 @@ export default [
         name: '货币',
         path: '/metadata/currency',
         component: './metadata/currency'
+      },
+      {
+        name: '分类',
+        path: '/metadata/category',
+        component: './metadata/category'
       }
     ]
   },

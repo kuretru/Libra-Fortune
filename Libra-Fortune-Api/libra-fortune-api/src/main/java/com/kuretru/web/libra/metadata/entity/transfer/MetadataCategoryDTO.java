@@ -14,8 +14,7 @@ import java.util.List;
 @ToString(callSuper = true)
 public class MetadataCategoryDTO extends BaseDTO {
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Schema(description = "父分类ID", accessMode = Schema.AccessMode.WRITE_ONLY)
+    @Schema(description = "父分类ID")
     private Long parentId;
 
     @Schema(description = "分类名称")

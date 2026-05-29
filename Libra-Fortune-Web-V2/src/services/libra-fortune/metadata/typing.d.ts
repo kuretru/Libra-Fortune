@@ -4,4 +4,11 @@ declare namespace LibraFortune.Metadata {
     symbol: string;
     name: string;
   }
+
+  type CategoryDTO = GalaxyWeb.BaseDTO & {
+    parentId?: number;
+    name: string;
+    icon?: string;
+    children?: CategoryDTO[];
+  }
 }
