@@ -66,14 +66,14 @@ const MetadataCategory: React.FC = () => {
     {
       dataIndex: 'id',
       title: 'ID',
-      colSize: 1,
       valueType: 'indexBorder',
+      width: 72,
     },
     {
       dataIndex: 'parentId',
       title: '层级',
-      colSize: 2,
       search: false,
+      width: 120,
       render: (_, record) =>
         record.parentId ? (
           <Tag color="blue">二级分类</Tag>
@@ -84,15 +84,14 @@ const MetadataCategory: React.FC = () => {
     {
       dataIndex: 'name',
       title: '分类名称',
-      colSize: 4,
       copyable: true,
       search: false,
     },
     {
       dataIndex: 'icon',
       title: '图标',
-      colSize: 2,
       search: false,
+      width: 220,
       render: (_, record) => {
         const Icon = getAntIcon(record.icon);
         return record.icon ? (
@@ -108,7 +107,9 @@ const MetadataCategory: React.FC = () => {
     {
       key: 'action',
       title: '操作',
+      fixed: 'right',
       valueType: 'option',
+      width: 300,
       render: (_, record) => (
         <Space>
           {!record.parentId && (
@@ -223,6 +224,7 @@ const MetadataCategory: React.FC = () => {
         rowKey="id"
         request={onRequest}
         search={false}
+        scroll={{ x: 920 }}
         toolBarRender={() => [
           <Button
             key="create"

@@ -40,32 +40,33 @@ const MetadataCurrency: React.FC = () => {
     {
       dataIndex: 'id',
       title: 'ID',
-      colSize: 1,
       valueType: 'indexBorder',
+      width: 72,
     },
     {
       dataIndex: 'code',
       title: '货币代码',
-      colSize: 4,
       copyable: true,
       search: false,
+      width: 160,
     },
     {
       dataIndex: 'symbol',
       title: '货币符号',
-      colSize: 2,
       search: false,
+      width: 120,
     },
     {
       dataIndex: 'name',
       title: '货币名称',
-      colSize: 2,
       search: false,
     },
     {
       key: 'action',
       title: '操作',
+      fixed: 'right',
       valueType: 'option',
+      width: 180,
       render: (_, record) => (
         <Space>
           <Button
@@ -151,6 +152,8 @@ const MetadataCurrency: React.FC = () => {
         columns={columns}
         rowKey="id"
         request={onRequest}
+        search={false}
+        scroll={{ x: 640 }}
         toolBarRender={() => [
           <Button
             key="create"
