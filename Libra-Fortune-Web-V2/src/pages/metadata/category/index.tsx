@@ -4,6 +4,7 @@ import {
   ModalForm,
   PageContainer,
   type ProColumns,
+  ProFormItem,
   ProFormSelect,
   ProFormText,
   ProTable,
@@ -17,6 +18,7 @@ import {
   remove,
   update,
 } from '@/services/libra-fortune/metadata/category';
+import IconPicker, { getAntIcon } from './components/IconPicker';
 
 const getExpandableRowKeys = (
   records: LibraFortune.Metadata.CategoryDTO[],
@@ -91,8 +93,17 @@ const MetadataCategory: React.FC = () => {
       title: '图标',
       colSize: 2,
       search: false,
-      render: (_, record) =>
-        record.icon ? <Tag>{record.icon}</Tag> : <span>-</span>,
+      render: (_, record) => {
+        const Icon = getAntIcon(record.icon);
+        return record.icon ? (
+          <Space size="small">
+            {Icon && <Icon />}
+            <Tag>{record.icon}</Tag>
+          </Space>
+        ) : (
+          <span>-</span>
+        );
+      },
     },
     {
       key: 'action',
@@ -254,7 +265,9 @@ const MetadataCategory: React.FC = () => {
           placeholder="请输入分类名称"
           rules={[{ required: true }]}
         />
-        <ProFormText name="icon" label="图标" placeholder="请输入图标标识" />
+        <ProFormItem name="icon" label="图标">
+          <IconPicker />
+        </ProFormItem>
       </ModalForm>
     </PageContainer>
   );
