@@ -7,6 +7,7 @@ import {
   ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, message, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -67,8 +68,17 @@ const MetadataCurrency: React.FC = () => {
       valueType: 'option',
       render: (_, record) => (
         <Space>
-          <Button onClick={() => onUpdateButtonClick(record)}>编辑</Button>
-          <Button onClick={() => onRemoveButtonClick(record.id!)} danger>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => onUpdateButtonClick(record)}
+          >
+            编辑
+          </Button>
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => onRemoveButtonClick(record.id!)}
+            danger
+          >
             删除
           </Button>
         </Space>
@@ -142,7 +152,12 @@ const MetadataCurrency: React.FC = () => {
         rowKey="id"
         request={onRequest}
         toolBarRender={() => [
-          <Button key="create" type="primary" onClick={onCreateButtonClick}>
+          <Button
+            key="create"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onCreateButtonClick}
+          >
             新增
           </Button>,
         ]}
