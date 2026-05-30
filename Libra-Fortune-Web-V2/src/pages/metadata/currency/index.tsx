@@ -8,7 +8,7 @@ import {
   type ProTableProps,
 } from '@ant-design/pro-components';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, message, Space } from 'antd';
+import { Button, Form, message, Popconfirm, Space } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   create,
@@ -75,13 +75,16 @@ const MetadataCurrency: React.FC = () => {
           >
             编辑
           </Button>
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={() => onRemoveButtonClick(record.id!)}
-            danger
+          <Popconfirm
+            title="确认删除该货币？"
+            okText="删除"
+            cancelText="取消"
+            onConfirm={() => onRemoveButtonClick(record.id!)}
           >
-            删除
-          </Button>
+            <Button icon={<DeleteOutlined />} danger>
+              删除
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
