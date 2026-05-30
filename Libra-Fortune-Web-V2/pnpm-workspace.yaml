@@ -4,4 +4,5 @@ allowBuilds:
   core-js-pure: true
   es5-ext: true
   esbuild: true
+  nice-napi: true
   unrs-resolver: true
