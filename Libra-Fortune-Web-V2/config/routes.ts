@@ -38,6 +38,18 @@ export default [
     ]
   },
   {
+    name: '账户管理',
+    icon: 'accountBook',
+    path: '/account',
+    routes: [
+      {
+        name: '账户',
+        path: '/account/account',
+        component: './account/account'
+      }
+    ]
+  },
+  {
     path: '/admin',
     name: '管理页',
     icon: 'crown',
