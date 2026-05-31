@@ -18,7 +18,7 @@ import {
   remove,
   update,
 } from '@/services/libra-fortune/metadata/category';
-import IconPicker, { getAntIcon } from './components/IconPicker';
+import IconPicker, { getAntIcon } from '@/components/IconPicker';
 
 const getExpandableRowKeys = (
   records: LibraFortune.Metadata.CategoryDTO[],
