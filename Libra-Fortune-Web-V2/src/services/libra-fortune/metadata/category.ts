@@ -50,7 +50,8 @@ export async function update(record: LibraFortune.Metadata.CategoryDTO) {
 }
 
 export async function remove(id: number) {
-  return request<GalaxyWeb.ApiResponse<string>>(`${endpointPrefix}/${id}`, {
-    method: 'DELETE',
-  });
+  return request<GalaxyWeb.ApiResponse<string>>(
+    `${endpointPrefix}/${id}`, {
+      method: 'DELETE',
+    });
 }

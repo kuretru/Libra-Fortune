@@ -29,6 +29,11 @@ export default [
         name: '分类',
         path: '/metadata/category',
         component: './metadata/category'
+      },
+      {
+        name: '标签',
+        path: '/metadata/tag-set',
+        component: './metadata/tag-set'
       }
     ]
   },

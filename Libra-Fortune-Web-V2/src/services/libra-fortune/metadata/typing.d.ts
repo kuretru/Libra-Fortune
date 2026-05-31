@@ -11,4 +11,16 @@ declare namespace LibraFortune.Metadata {
     icon?: string;
     children?: CategoryDTO[];
   }
+
+  type TagSetDTO = GalaxyWeb.BaseDTO & {
+    name: string;
+    required: boolean;
+    allowMultiple: boolean;
+    items?: TagSetItemDTO[];
+  }
+
+  type TagSetItemDTO = GalaxyWeb.BaseDTO & {
+    setId?: number;
+    name: string;
+  }
 }

@@ -3,9 +3,10 @@ import {request} from '@umijs/max';
 const endpointPrefix = '/api/metadata/currencies';
 
 export async function enums() {
-  return request<GalaxyWeb.ApiResponse<GalaxyWeb.EnumDTO[]>>(`${endpointPrefix}/enums`, {
-    method: 'GET'
-  })
+  return request<GalaxyWeb.ApiResponse<GalaxyWeb.EnumDTO[]>>(
+    `${endpointPrefix}/enums`, {
+      method: 'GET'
+    })
 }
 
 export async function get(id: number) {
