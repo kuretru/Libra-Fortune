@@ -15,7 +15,8 @@ export default [
     name: '欢迎',
     icon: 'smile',
     component: './Welcome',
-  }, {
+  },
+  {
     name: '元数据管理',
     icon: 'database',
     path: '/metadata',
@@ -23,19 +24,19 @@ export default [
       {
         name: '货币',
         path: '/metadata/currency',
-        component: './metadata/currency'
+        component: './metadata/currency',
       },
       {
         name: '分类',
         path: '/metadata/category',
-        component: './metadata/category'
+        component: './metadata/category',
       },
       {
         name: '标签',
         path: '/metadata/tag-set',
-        component: './metadata/tag-set'
-      }
-    ]
+        component: './metadata/tag-set',
+      },
+    ],
   },
   {
     name: '账户管理',
@@ -45,9 +46,21 @@ export default [
       {
         name: '账户',
         path: '/account/account',
-        component: './account/account'
-      }
-    ]
+        component: './account/account',
+      },
+    ],
+  },
+  {
+    name: '账本管理',
+    icon: 'book',
+    path: '/ledger',
+    routes: [
+      {
+        name: '账本',
+        path: '/ledger/ledger',
+        component: './ledger/ledger',
+      },
+    ],
   },
   {
     path: '/admin',
