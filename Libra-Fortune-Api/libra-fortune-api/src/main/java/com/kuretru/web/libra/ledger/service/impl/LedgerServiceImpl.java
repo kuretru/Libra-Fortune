@@ -61,8 +61,9 @@ public class LedgerServiceImpl
 
     @Override
     protected LedgerDTO afterSave(LedgerDO record, LedgerDTO raw) throws ServiceException {
-        memberService.syncByParentId(record.getId(), raw.getMembers());
-        return super.afterSave(record, raw);
+        var result = super.afterSave(record, raw);
+        result.setMembers(memberService.syncByParentId(record.getId(), raw.getMembers()));
+        return result;
     }
 
     @Override
@@ -75,8 +76,9 @@ public class LedgerServiceImpl
 
     @Override
     protected LedgerDTO afterUpdate(LedgerDO record, LedgerDTO raw) throws ServiceException {
-        memberService.syncByParentId(record.getId(), raw.getMembers());
-        return super.afterUpdate(record, raw);
+        var result = super.afterUpdate(record, raw);
+        result.setMembers(memberService.syncByParentId(record.getId(), raw.getMembers()));
+        return result;
     }
 
     @Override

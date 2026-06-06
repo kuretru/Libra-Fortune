@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/279796529/galaxy-authentication.main.iml" filepath="$PROJECT_DIR$/.idea/modules/279796529/galaxy-authentication.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1368427579/galaxy-web.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1368427579/galaxy-web.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.test.iml" filepath="$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.test.iml" />
+    </modules>
+  </component>
+</project>

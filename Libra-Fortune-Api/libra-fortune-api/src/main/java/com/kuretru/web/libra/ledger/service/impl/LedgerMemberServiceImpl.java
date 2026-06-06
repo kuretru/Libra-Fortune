@@ -24,9 +24,13 @@ public class LedgerMemberServiceImpl extends BaseInnerChildServiceImpl<LedgerMem
     }
 
     @Override
+    protected void setParentId(Long parentId, LedgerMemberDTO record) {
+        record.setLedgerId(parentId);
+    }
+
+    @Override
     protected boolean bizEqual(LedgerMemberDO oldRecord, LedgerMemberDTO newRecord) {
-        return oldRecord.getLedgerId().equals(newRecord.getLedgerId())
-                && oldRecord.getUsername().equals(newRecord.getUsername())
+        return oldRecord.getUsername().equals(newRecord.getUsername())
                 && oldRecord.getDefaultFundedRatio().equals(newRecord.getDefaultFundedRatio());
     }
 

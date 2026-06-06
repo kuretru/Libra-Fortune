@@ -42,7 +42,7 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     private String remark;
 
     @Schema(description = "关联标签列表")
-    private List<Long> tags;
+    private List<LedgerEntryTagDTO> tags;
 
     @Schema(description = "条目明细")
     private List<LedgerEntryDetailDTO> details;
