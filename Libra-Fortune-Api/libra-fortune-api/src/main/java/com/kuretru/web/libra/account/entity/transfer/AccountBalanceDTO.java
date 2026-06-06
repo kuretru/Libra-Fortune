@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.account.entity.transfer;
 
-import com.kuretru.microservices.web.v2.entity.transfer.BaseDTO;
+import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class AccountBalanceDTO extends BaseDTO {
+public class AccountBalanceDTO extends BaseCreateUpdateDTO {
 
     @Schema(description = "账户ID")
     private Long accountId;

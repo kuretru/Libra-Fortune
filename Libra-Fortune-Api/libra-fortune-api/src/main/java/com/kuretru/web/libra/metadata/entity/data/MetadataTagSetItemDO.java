@@ -2,7 +2,7 @@ package com.kuretru.web.libra.metadata.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.kuretru.microservices.web.entity.interfaces.Sequenced;
-import com.kuretru.microservices.web.v2.entity.data.BaseDO;
+import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,7 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("metadata_tag_set_item")
-public class MetadataTagSetItemDO extends BaseDO implements Sequenced {
+public class MetadataTagSetItemDO extends BaseCreateUpdateDO implements Sequenced {
 
     /** 关联标签组ID */
     private Long setId;

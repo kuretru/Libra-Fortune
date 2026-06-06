@@ -2,7 +2,7 @@ package com.kuretru.web.libra.account.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.kuretru.microservices.web.entity.interfaces.Sequenced;
-import com.kuretru.microservices.web.v2.entity.data.BaseDO;
+import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,7 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("account")
-public class AccountDO extends BaseDO implements Sequenced {
+public class AccountDO extends BaseCreateUpdateDO implements Sequenced {
 
     /** 账户Owner */
     private String owner;

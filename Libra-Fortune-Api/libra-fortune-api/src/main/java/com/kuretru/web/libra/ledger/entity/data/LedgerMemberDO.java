@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.ledger.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.kuretru.microservices.web.v2.entity.data.BaseDO;
+import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("ledger_v2_member")
-public class LedgerMemberDO extends BaseDO {
+public class LedgerMemberDO extends BaseCreateUpdateDO {
 
     /** 外键，账本ID */
     private Long ledgerId;

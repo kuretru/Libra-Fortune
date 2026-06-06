@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.account.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.kuretru.microservices.web.v2.entity.data.BaseDO;
+import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("account_balance")
-public class AccountBalanceDO extends BaseDO {
+public class AccountBalanceDO extends BaseCreateUpdateDO {
 
     /** 账户ID */
     private Long accountId;

@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.metadata.entity.transfer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kuretru.microservices.web.v2.entity.transfer.BaseDTO;
+import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MetadataTagSetDTO extends BaseDTO {
+public class MetadataTagSetDTO extends BaseCreateUpdateDTO {
 
     @Schema(description = "标签组名称")
     private String name;

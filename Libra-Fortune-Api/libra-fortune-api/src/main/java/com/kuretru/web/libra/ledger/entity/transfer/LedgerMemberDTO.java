@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.ledger.entity.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kuretru.microservices.web.v2.entity.transfer.BaseDTO;
+import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class LedgerMemberDTO extends BaseDTO {
+public class LedgerMemberDTO extends BaseCreateUpdateDTO {
 
     @JsonIgnore
     @Schema(description = "账本ID")
