@@ -15,8 +15,6 @@ import java.util.List;
 @ToString(callSuper = true)
 public class LedgerDTO extends BaseCreateUpdateDTO {
 
-    @NotEmpty
-    @Size(min = 1, max = 32)
     @Schema(description = "账本Owner")
     private String owner;
 

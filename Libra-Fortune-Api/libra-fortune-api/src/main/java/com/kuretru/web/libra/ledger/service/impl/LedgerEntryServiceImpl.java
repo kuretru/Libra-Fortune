@@ -70,9 +70,9 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 
         var tagMap = tagService.listByParentId(idList);
         var detailMap = detailService.listByParentId(idList);
-        for (var entry : result) {
-            entry.setTags(tagMap.get(entry.getId()));
-            entry.setDetails(detailMap.get(entry.getId()));
+        for (var record : result) {
+            record.setTags(tagMap.get(record.getId()));
+            record.setDetails(detailMap.get(record.getId()));
         }
         return result;
     }

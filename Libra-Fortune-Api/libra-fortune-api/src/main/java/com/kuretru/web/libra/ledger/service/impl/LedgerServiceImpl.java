@@ -15,6 +15,8 @@ import com.kuretru.web.libra.ledger.service.LedgerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service("ledgerV2Service")
 public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery> implements LedgerService {
 
@@ -73,6 +75,21 @@ public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, Le
     protected LedgerDTO afterGet(LedgerDO record) throws ServiceException {
         var result = super.afterGet(record);
         result.setMembers(memberService.listByParentId(record.getId()));
+        return result;
+    }
+
+    @Override
+    protected List<LedgerDTO> afterList(LedgerQuery query, List<LedgerDO> records) throws ServiceException {
+        var result = super.afterList(query, records);
+        var idList = result.stream().map(LedgerDTO::getId).toList();
+        if (idList.isEmpty()) {
+            return result;
+        }
+
+        var memberMap = memberService.listByParentId(idList);
+        for (var record : result) {
+            record.setMembers(memberMap.get(record.getId()));
+        }
         return result;
     }
 
