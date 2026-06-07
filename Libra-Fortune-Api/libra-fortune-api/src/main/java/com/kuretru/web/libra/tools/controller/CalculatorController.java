@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.tools.controller;
 
+import com.kuretru.microservices.web.controller.BaseController;
 import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.web.libra.tools.entity.transfer.CalculatorDTO;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/tools/calculator")
 @Tag(name = "工具-计算器")
-public class CalculatorController {
+public class CalculatorController extends BaseController {
 
     private final CalculatorService service;
 
