@@ -1,14 +1,14 @@
 declare namespace LibraFortune.Ledger {
-  type LedgerDTO = GalaxyWeb.BaseDTO & {
+  type LedgerDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     owner?: string;
     name: string;
     members?: LedgerMemberDTO[];
   }
 
-  type LedgerMemberDTO = GalaxyWeb.BaseDTO & {
+  type LedgerMemberDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     ledgerId?: number;
     username: string;
-    defaultFundedRatio: number;
+    defaultFundedRatio: string;
   }
 
   type LedgerQuery = {

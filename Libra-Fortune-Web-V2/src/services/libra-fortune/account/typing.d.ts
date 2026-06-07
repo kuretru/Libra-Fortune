@@ -1,5 +1,5 @@
 declare namespace LibraFortune.Account {
-  type AccountDTO = GalaxyWeb.BaseDTO & {
+  type AccountDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     owner?: string;
     name: string;
     icon?: string;

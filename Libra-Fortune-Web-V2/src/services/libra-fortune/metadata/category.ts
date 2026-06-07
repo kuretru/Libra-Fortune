@@ -3,7 +3,7 @@ import {request} from '@umijs/max';
 const endpointPrefix = '/api/metadata/categories';
 
 export async function enums() {
-  return request<GalaxyWeb.ApiResponse<GalaxyWeb.EnumDTO[]>>(
+  return request<GalaxyWeb.ApiResponse<GalaxyWeb.EnumDTO<number>[]>>(
     `${endpointPrefix}/enums`, {
       method: 'GET',
     },

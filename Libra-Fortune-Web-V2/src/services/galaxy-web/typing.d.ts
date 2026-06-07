@@ -18,13 +18,18 @@ declare namespace GalaxyWeb {
   }
   type BaseDTO = {
     id?: number;
+  }
+  type BaseCreateDTO = BaseDTO & {
     createTime: string;
     createBy: string;
+  }
+  type BaseCreateUpdateDTO = BaseCreateDTO & {
     updateTime: string;
     updateBy: string;
   }
-  type EnumDTO = {
+  type EnumDTO<T = string> = {
     label: string;
-    value: string;
+    value: T;
+    children?: EnumDTO<T>[];
   }
 }

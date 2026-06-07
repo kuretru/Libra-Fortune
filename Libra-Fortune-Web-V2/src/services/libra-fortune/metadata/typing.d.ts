@@ -1,25 +1,25 @@
 declare namespace LibraFortune.Metadata {
-  type CurrencyDTO = GalaxyWeb.BaseDTO & {
+  type CurrencyDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     code: string;
     symbol: string;
     name: string;
   }
 
-  type CategoryDTO = GalaxyWeb.BaseDTO & {
+  type CategoryDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     parentId?: number;
     name: string;
     icon?: string;
     children?: CategoryDTO[];
   }
 
-  type TagSetDTO = GalaxyWeb.BaseDTO & {
+  type TagSetDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     name: string;
     required: boolean;
     allowMultiple: boolean;
     items?: TagSetItemDTO[];
   }
 
-  type TagSetItemDTO = GalaxyWeb.BaseDTO & {
+  type TagSetItemDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     setId?: number;
     name: string;
   }

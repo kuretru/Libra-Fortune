@@ -249,7 +249,8 @@ const Ledger: React.FC = () => {
             max={1}
             fieldProps={{
               precision: 2,
-              step: 0.01,
+              stringMode: true,
+              step: '0.01',
             }}
             rules={[{ required: true }]}
           />
