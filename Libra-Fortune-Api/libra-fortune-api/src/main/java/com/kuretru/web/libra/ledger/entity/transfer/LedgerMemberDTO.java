@@ -3,6 +3,9 @@ package com.kuretru.web.libra.ledger.entity.transfer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,9 +21,12 @@ public class LedgerMemberDTO extends BaseCreateUpdateDTO {
     @Schema(description = "账本ID")
     private Long ledgerId;
 
+    @NotEmpty
+    @Size(min = 1, max = 32)
     @Schema(description = "成员用户名")
     private String username;
 
+    @NotNull
     @Schema(description = "默认承担比例")
     private BigDecimal defaultFundedRatio;
 

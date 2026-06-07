@@ -2,6 +2,7 @@ package com.kuretru.web.libra.account.entity.transfer;
 
 import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -17,9 +18,11 @@ public class AccountBalanceDTO extends BaseCreateUpdateDTO {
     @Schema(description = "账户ID")
     private Long accountId;
 
+    @NotNull
     @Schema(description = "日期，表达截止当前的余额")
     private LocalDate date;
 
+    @NotNull
     @Schema(description = "余额")
     private BigDecimal balance;
 
