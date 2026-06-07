@@ -21,12 +21,17 @@ public class LedgerEntryTagServiceImpl
 
     @Override
     protected String getParentIdColumn() {
-        return "ledger_id";
+        return "entry_id";
+    }
+
+    @Override
+    protected Long getParentId(LedgerEntryTagDTO record) {
+        return record.getEntryId();
     }
 
     @Override
     protected void setParentId(Long parentId, LedgerEntryTagDTO record) {
-        record.setLedgerId(parentId);
+        record.setEntryId(parentId);
     }
 
     @Override

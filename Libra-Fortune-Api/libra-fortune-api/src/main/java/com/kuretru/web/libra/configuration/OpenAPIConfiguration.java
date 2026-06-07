@@ -4,11 +4,19 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.StringSchema;
+import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class OpenAPIConfiguration {
+
+    public OpenAPIConfiguration() {
+        SpringDocUtils.getConfig().replaceWithSchema(BigDecimal.class, new StringSchema());
+    }
 
     @Bean
     public OpenAPI openAPI() {

@@ -27,6 +27,11 @@ public class LedgerEntryDetailServiceImpl
     }
 
     @Override
+    protected Long getParentId(LedgerEntryDetailDTO record) {
+        return record.getEntryId();
+    }
+
+    @Override
     protected void setParentId(Long parentId, LedgerEntryDetailDTO record) {
         record.setEntryId(parentId);
     }

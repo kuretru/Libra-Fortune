@@ -24,6 +24,11 @@ public class LedgerMemberServiceImpl extends BaseInnerChildServiceImpl<LedgerMem
     }
 
     @Override
+    protected Long getParentId(LedgerMemberDTO record) {
+        return record.getLedgerId();
+    }
+
+    @Override
     protected void setParentId(Long parentId, LedgerMemberDTO record) {
         record.setLedgerId(parentId);
     }

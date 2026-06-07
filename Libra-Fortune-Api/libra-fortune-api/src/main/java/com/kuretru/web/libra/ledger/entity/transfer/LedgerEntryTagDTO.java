@@ -14,8 +14,8 @@ import lombok.ToString;
 public class LedgerEntryTagDTO extends BaseCreateDTO {
 
     @JsonIgnore
-    @Schema(description = "账本ID")
-    private Long ledgerId;
+    @Schema(description = "条目ID")
+    private Long entryId;
 
     @NotNull
     @Schema(description = "标签ID")

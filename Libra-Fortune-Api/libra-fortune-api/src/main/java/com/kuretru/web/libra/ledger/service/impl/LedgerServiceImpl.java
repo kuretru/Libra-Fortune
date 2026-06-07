@@ -16,17 +16,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("ledgerV2Service")
-public class LedgerServiceImpl
-        extends BaseSequencedServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery>
-        implements LedgerService {
+public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery> implements LedgerService {
 
     private final LedgerMemberService memberService;
 
     @Autowired
-    public LedgerServiceImpl(LedgerMapper mapper, LedgerEntityMapper entityMapper,
-                             LedgerMemberService memberService) {
+    public LedgerServiceImpl(LedgerMapper mapper, LedgerEntityMapper entityMapper, LedgerMemberService memberService) {
         super(mapper, entityMapper);
         this.memberService = memberService;
+    }
+
+    @Override
+    public void verifyCanManagerEntry(Long ledgerId) throws ServiceException {
+        var ledger = mapper.selectById(ledgerId);
+        if (ledger == null) {
+            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "账本不存在");
+        }
+
+        var username = CurrentUserContext.getUsername();
+        if (ledger.getOwner().equals(username)) {
+            return;
+        }
+        var members = memberService.listByParentId(ledgerId);
+        for (var member : members) {
+            if (member.getUsername().equals(username)) {
+                return;
+            }
+        }
+        throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "没有账本条目管理权限");
+    }
+
+    private void verifyIsOwner(LedgerDO record) throws ServiceException {
+        if (!CurrentUserContext.getUsername().equals(record.getOwner())) {
+            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅账本Owner可以操作");
+        }
     }
 
     @Override
@@ -69,7 +92,7 @@ public class LedgerServiceImpl
     @Override
     protected LedgerDO beforeUpdate(LedgerDTO record) throws ServiceException {
         LedgerDO oldRecord = mapper.selectById(record.getId());
-        verifyOwner(oldRecord);
+        verifyIsOwner(oldRecord);
         record.setOwner(oldRecord.getOwner());
         return super.beforeUpdate(record);
     }
@@ -84,19 +107,13 @@ public class LedgerServiceImpl
     @Override
     protected LedgerDO beforeRemove(Long id) throws ServiceException {
         LedgerDO oldRecord = mapper.selectById(id);
-        verifyOwner(oldRecord);
+        verifyIsOwner(oldRecord);
         return oldRecord;
     }
 
     @Override
     protected void afterRemove(LedgerDO record) throws ServiceException {
         memberService.removeByParentId(record.getId());
-    }
-
-    private void verifyOwner(LedgerDO record) {
-        if (!CurrentUserContext.getUsername().equals(record.getOwner())) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅账本Owner可以操作");
-        }
     }
 
 }

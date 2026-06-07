@@ -15,7 +15,7 @@ public class LedgerEntryTagDO extends BaseCreateDO {
     /** 外键，条目ID */
     private Long entryId;
 
-    /** 标签ID */
+    /** 外间，标签ID */
     private Long tagId;
 
 }
