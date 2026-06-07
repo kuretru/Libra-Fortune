@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.metadata.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetDO;
@@ -15,6 +16,7 @@ import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +33,27 @@ public class MetadataTagSetServiceImpl
                                      MetadataTagSetItemService itemService) {
         super(mapper, entityMapper);
         this.itemService = itemService;
+    }
+
+    @Override
+    public List<EnumDTO<Long>> enums() {
+        var records = list(null);
+        var result = new ArrayList<EnumDTO<Long>>();
+        for (var record : records) {
+            var item = new EnumDTO<>(record.getName(), record.getId());
+            var children = new ArrayList<EnumDTO<Long>>();
+            for (var child : record.getItems()) {
+                children.add(new EnumDTO<>(child.getName(), child.getId()));
+            }
+            item.setChildren(children);
+            result.add(item);
+        }
+        return result;
+    }
+
+    @Override
+    public void verifyTagSetItems(List<Long> tagSetItemIdList) throws ServiceException {
+
     }
 
     @Override

@@ -30,18 +30,18 @@ public class MetadataCategoryServiceImpl
     }
 
     @Override
-    public List<EnumDTO> enums() {
+    public List<EnumDTO<Long>> enums() {
         var queryWrapper = new QueryWrapper<MetadataCategoryDO>();
         applyDefaultOrderBy(queryWrapper);
         var records = mapper.selectList(queryWrapper);
-        var result = new ArrayList<EnumDTO>();
-        var childrenMap = new HashMap<String, List<EnumDTO>>();
+        var result = new ArrayList<EnumDTO<Long>>();
+        var childrenMap = new HashMap<Long, List<EnumDTO<Long>>>();
         for (var record : records) {
-            var dto = new EnumDTO(record.getName(), String.valueOf(record.getId()));
+            var dto = new EnumDTO<>(record.getName(), record.getId());
             if (record.getParentId() == null) {
                 result.add(dto);
             } else {
-                var key = String.valueOf(record.getParentId());
+                var key = record.getParentId();
                 var list = childrenMap.getOrDefault(key, new ArrayList<>());
                 list.add(dto);
                 childrenMap.put(key, list);

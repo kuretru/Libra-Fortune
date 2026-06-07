@@ -28,7 +28,7 @@ public class MetadataCurrencyController
 
     @GetMapping("/enums")
     @Operation(summary = "枚举值")
-    public ApiResponse<List<EnumDTO>> enums() {
+    public ApiResponse<List<EnumDTO<String>>> enums() {
         return ApiResponse.success(service.enums());
     }
 

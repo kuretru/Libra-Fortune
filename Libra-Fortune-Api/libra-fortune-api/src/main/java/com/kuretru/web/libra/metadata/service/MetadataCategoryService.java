@@ -14,6 +14,6 @@ public interface MetadataCategoryService extends BaseSequencedService<MetadataCa
      *
      * @return 枚举值
      */
-    List<EnumDTO> enums();
+    List<EnumDTO<Long>> enums();
 
 }

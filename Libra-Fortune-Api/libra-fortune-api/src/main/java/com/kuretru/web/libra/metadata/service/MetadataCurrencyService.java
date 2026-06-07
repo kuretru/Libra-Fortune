@@ -14,6 +14,6 @@ public interface MetadataCurrencyService extends BaseSequencedService<MetadataCu
      *
      * @return 枚举值
      */
-    List<EnumDTO> enums();
+    List<EnumDTO<String>> enums();
 
 }
