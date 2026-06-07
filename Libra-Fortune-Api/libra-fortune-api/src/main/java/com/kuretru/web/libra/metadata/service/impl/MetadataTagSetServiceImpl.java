@@ -2,6 +2,7 @@ package com.kuretru.web.libra.metadata.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
+import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetDO;
@@ -16,21 +17,20 @@ import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ListFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class MetadataTagSetServiceImpl
-        extends BaseSequencedServiceImpl<MetadataTagSetMapper, MetadataTagSetDO, MetadataTagSetDTO, MetadataTagSetQuery>
-        implements MetadataTagSetService {
+public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<MetadataTagSetMapper, MetadataTagSetDO, MetadataTagSetDTO, MetadataTagSetQuery> implements MetadataTagSetService {
 
     private final MetadataTagSetItemService itemService;
 
     @Autowired
-    public MetadataTagSetServiceImpl(MetadataTagSetMapper mapper, MetadataTagSetEntityMapper entityMapper,
-                                     MetadataTagSetItemService itemService) {
+    public MetadataTagSetServiceImpl(MetadataTagSetMapper mapper, MetadataTagSetEntityMapper entityMapper, MetadataTagSetItemService itemService) {
         super(mapper, entityMapper);
         this.itemService = itemService;
     }
@@ -53,7 +53,30 @@ public class MetadataTagSetServiceImpl
 
     @Override
     public void verifyTagSetItems(List<Long> tagSetItemIdList) throws ServiceException {
-
+        var tagSetItemIdSet = new HashSet<>(tagSetItemIdList);
+        var tagSets = list(new MetadataTagSetQuery());
+        for (var tagSet : tagSets) {
+            var hasOne = false;
+            var hasMultiple = false;
+            for (var tagSetItem : tagSet.getItems()) {
+                if (tagSetItemIdSet.contains(tagSetItem.getId())) {
+                    if (hasOne) {
+                        hasMultiple = true;
+                    } else {
+                        hasOne = true;
+                    }
+                    tagSetItemIdSet.remove(tagSetItem.getId());
+                }
+            }
+            if (tagSet.getRequired() && !hasOne) {
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("[%s]标签为必选项但未选择", tagSet.getName()));
+            } else if (!tagSet.getAllowMultiple() && hasMultiple) {
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("[%s]标签不允许多选", tagSet.getName()));
+            }
+        }
+        if (!tagSetItemIdSet.isEmpty()) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("未知的标签[%s]", ListFormat.getInstance().format(new ArrayList<>(tagSetItemIdSet))));
+        }
     }
 
     @Override
