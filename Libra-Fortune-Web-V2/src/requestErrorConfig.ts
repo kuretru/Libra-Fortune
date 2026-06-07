@@ -78,9 +78,12 @@ export const errorConfig: RequestConfig = {
       } else if (error.response) {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
-        message.error(
-          `[${error.response.data.code}]${error.response.data.message}`,
-        );
+        const { data } = error.response;
+        if (data.code) {
+          message.error(`[${data.code}]${data.message}`);
+        } else {
+          message.error(data);
+        }
       } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
         message.error('网络不可用，请检查网络连接后重试。');
       } else if (error.request) {
