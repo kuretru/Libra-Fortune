@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
@@ -50,6 +51,13 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         this.ledgerService = ledgerService;
         this.tagService = tagService;
         this.detailService = detailService;
+    }
+
+    @Override
+    protected void applyDefaultOrderBy(QueryWrapper<LedgerEntryDO> queryWrapper) {
+        queryWrapper.orderByDesc("date");
+        queryWrapper.orderByDesc("create_time");
+        queryWrapper.orderByDesc("id");
     }
 
     @Override
