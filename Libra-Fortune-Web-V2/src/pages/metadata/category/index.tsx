@@ -20,16 +20,6 @@ import {
 } from '@/services/libra-fortune/metadata/category';
 import IconPicker, { getAntIcon } from '@/components/IconPicker';
 
-const getExpandableRowKeys = (
-  records: LibraFortune.Metadata.CategoryDTO[],
-): React.Key[] =>
-  records.flatMap((record) => {
-    if (!record.id || !record.children?.length) {
-      return [];
-    }
-    return [record.id, ...getExpandableRowKeys(record.children)];
-  });
-
 const MetadataCategory: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modalVisible, setModalVisible] = useState(false);
@@ -164,7 +154,7 @@ const MetadataCategory: React.FC = () => {
     });
     const data = response.data.list;
     setTopLevelCategories(data);
-    setExpandedRowKeys(getExpandableRowKeys(data));
+    setExpandedRowKeys([]);
 
     return {
       data,
