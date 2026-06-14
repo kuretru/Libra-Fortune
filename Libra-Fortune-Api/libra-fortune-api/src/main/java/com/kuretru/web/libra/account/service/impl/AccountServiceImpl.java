@@ -29,7 +29,7 @@ public class AccountServiceImpl
         var queryWrapper = new QueryWrapper<AccountDO>();
         queryWrapper.eq("owner", record.getOwner());
         Integer result = mapper.getMaxSequence(queryWrapper);
-        return null == result ? 0 : result + 1;
+        return null == result ? 0 : result;
     }
 
     @Override
