@@ -26,6 +26,7 @@ import { errorConfig } from './requestErrorConfig';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 const authFreePaths = [loginPath, '/user/register', '/user/register-result'];
+const defaultOpenMenuKeys = ['/metadata', '/account', '/ledger', '/admin'];
 
 /**
  * @see https://umijs.org/docs/api/runtime-config#getinitialstate
@@ -72,6 +73,7 @@ export const layout: RunTimeLayoutConfig = ({
   setInitialState,
 }) => {
   return {
+    openKeys: defaultOpenMenuKeys,
     menuItemRender: (item, dom) => {
       if (item.path) {
         return (
