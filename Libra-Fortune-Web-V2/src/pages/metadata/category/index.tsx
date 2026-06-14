@@ -115,11 +115,12 @@ const MetadataCategory: React.FC = () => {
     {
       key: 'action',
       title: '操作',
+      align: 'right',
       fixed: 'right',
       valueType: 'option',
       width: 300,
       render: (_, record) => (
-        <Space>
+        <Space style={{ justifyContent: 'flex-end', width: '100%' }}>
           {!record.parentId && (
             <Button
               icon={<PlusOutlined />}
