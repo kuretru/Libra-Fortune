@@ -267,7 +267,6 @@ const MetadataCategory: React.FC = () => {
         onFinish={onFinish}
         modalProps={{
           destroyOnHidden: true,
-          maskClosable: false,
         }}
       >
         <ProFormText name="id" label="ID" hidden />
