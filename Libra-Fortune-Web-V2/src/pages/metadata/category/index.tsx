@@ -43,7 +43,7 @@ const MetadataCategory: React.FC = () => {
   const [form] = Form.useForm<LibraFortune.Metadata.CategoryDTO>();
   const selectedParentId = Form.useWatch('parentId', form);
   const actionRef = useRef<ActionType | null>(null);
-  const isChildCategory = !!selectedParentId;
+  const isChildCategory = !!(currentRecord?.parentId ?? selectedParentId);
 
   const parentOptions = useMemo(
     () =>
@@ -194,6 +194,7 @@ const MetadataCategory: React.FC = () => {
   };
 
   const onCreateButtonClick = () => {
+    form.resetFields();
     setCurrentRecord(undefined);
     setModalVisible(true);
   };
@@ -201,13 +202,18 @@ const MetadataCategory: React.FC = () => {
   const onCreateChildButtonClick = (
     record: LibraFortune.Metadata.CategoryDTO,
   ) => {
-    setCurrentRecord({
+    const childRecord = {
       parentId: record.id,
-    } as LibraFortune.Metadata.CategoryDTO);
+    } as LibraFortune.Metadata.CategoryDTO;
+    form.resetFields();
+    form.setFieldsValue(childRecord);
+    setCurrentRecord(childRecord);
     setModalVisible(true);
   };
 
   const onUpdateButtonClick = (record: LibraFortune.Metadata.CategoryDTO) => {
+    form.resetFields();
+    form.setFieldsValue(record);
     setCurrentRecord(record);
     setModalVisible(true);
   };
