@@ -10,7 +10,9 @@ export async function get(id: number) {
   );
 }
 
-export async function list(page: GalaxyWeb.PaginationQuery) {
+export async function list(
+  page: GalaxyWeb.PaginationQuery & LibraFortune.Account.AccountQuery,
+) {
   return request<
     GalaxyWeb.ApiResponse<
       GalaxyWeb.PaginationResponse<LibraFortune.Account.AccountDTO>

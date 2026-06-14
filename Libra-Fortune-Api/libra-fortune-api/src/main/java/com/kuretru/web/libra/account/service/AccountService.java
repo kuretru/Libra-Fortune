@@ -16,4 +16,13 @@ public interface AccountService extends BaseSequencedService<AccountDTO, Account
      */
     void verifyOwner(Long id) throws ServiceException;
 
+    /**
+     *
+     * 验证是否有权限访问账本
+     *
+     * @param record 账本DTO
+     * @throws ServiceException 无权限时返回异常
+     */
+    void verifyOwner(AccountDTO record) throws ServiceException;
+
 }

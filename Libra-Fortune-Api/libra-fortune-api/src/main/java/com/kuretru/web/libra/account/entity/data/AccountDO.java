@@ -22,6 +22,9 @@ public class AccountDO extends BaseCreateUpdateDO implements Sequenced {
     /** 图标 */
     private String icon;
 
+    /** 是否可以储蓄 */
+    private Boolean canHoldFunds;
+
     /** 排序标识 */
     private Integer sequence;
 

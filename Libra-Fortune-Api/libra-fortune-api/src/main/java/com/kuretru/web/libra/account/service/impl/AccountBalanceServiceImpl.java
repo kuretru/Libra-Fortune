@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.account.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.v2.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.account.entity.data.AccountBalanceDO;
@@ -49,14 +50,14 @@ public class AccountBalanceServiceImpl
 
     @Override
     protected AccountBalanceDO beforeSave(AccountBalanceDTO record) throws ServiceException {
-        accountService.verifyOwner(record.getAccountId());
+        verifyOwnerAndCanHoldFunds(record.getAccountId());
         return super.beforeSave(record);
     }
 
     @Override
     protected AccountBalanceDO beforeUpdate(AccountBalanceDTO record) throws ServiceException {
         var oldRecord = mapper.selectById(record.getId());
-        accountService.verifyOwner(oldRecord.getAccountId());
+        verifyOwnerAndCanHoldFunds(oldRecord.getAccountId());
         record.setAccountId(oldRecord.getAccountId());
         return super.beforeUpdate(record);
     }
@@ -66,6 +67,14 @@ public class AccountBalanceServiceImpl
         var record = super.beforeRemove(id);
         accountService.verifyOwner(record.getAccountId());
         return super.beforeRemove(id);
+    }
+
+    private void verifyOwnerAndCanHoldFunds(Long accountId) throws ServiceException {
+        var account = accountService.get(accountId);
+        accountService.verifyOwner(accountId);
+        if (!account.getCanHoldFunds()) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账户不允许储蓄");
+        }
     }
 
 }

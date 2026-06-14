@@ -85,4 +85,11 @@ public class AccountServiceImpl
         verifyOwner(record);
     }
 
+    @Override
+    public void verifyOwner(AccountDTO record) throws ServiceException {
+        if (!CurrentUserContext.getUsername().equals(record.getOwner())) {
+            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能访问自己的账户");
+        }
+    }
+
 }

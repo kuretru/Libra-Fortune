@@ -5,6 +5,7 @@ import {
   PageContainer,
   type ProColumns,
   ProFormItem,
+  ProFormSwitch,
   ProFormText,
   ProTable,
   type ProTableProps,
@@ -18,6 +19,11 @@ import {
   remove,
   update,
 } from '@/services/libra-fortune/account/account';
+
+type AccountSearchParams = {
+  name?: string;
+  canHoldFunds?: boolean | 'true' | 'false';
+};
 
 const Account: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -35,6 +41,7 @@ const Account: React.FC = () => {
       form.setFieldsValue(currentRecord);
     } else {
       form.resetFields();
+      form.setFieldsValue({ canHoldFunds: true });
     }
   }, [modalVisible, currentRecord, form]);
 
@@ -66,7 +73,21 @@ const Account: React.FC = () => {
       dataIndex: 'name',
       title: '账户名称',
       copyable: true,
-      search: false,
+    },
+    {
+      dataIndex: 'canHoldFunds',
+      title: '可持有资金',
+      valueType: 'select',
+      valueEnum: {
+        true: { text: '是' },
+        false: { text: '否' },
+      },
+      render: (_, record) =>
+        record.canHoldFunds ? (
+          <Tag color="success">是</Tag>
+        ) : (
+          <Tag color="default">否</Tag>
+        ),
     },
     {
       key: 'action',
@@ -100,14 +121,20 @@ const Account: React.FC = () => {
   const onRequest: NonNullable<
     ProTableProps<
       LibraFortune.Account.AccountDTO,
-      GalaxyWeb.EmptyQuery
+      AccountSearchParams
     >['request']
   > = async (params) => {
-    const { pageSize, current } = params;
+    const { pageSize, current, name, canHoldFunds } = params;
+    const canHoldFundsQuery =
+      typeof canHoldFunds === 'string'
+        ? canHoldFunds === 'true'
+        : canHoldFunds;
     const response = await list({
       current: current!,
       pageSize: pageSize!,
       noPage: false,
+      nameLike: name,
+      canHoldFunds: canHoldFundsQuery,
     });
 
     return {
@@ -157,14 +184,16 @@ const Account: React.FC = () => {
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<LibraFortune.Account.AccountDTO, GalaxyWeb.EmptyQuery>
+      <ProTable<LibraFortune.Account.AccountDTO, AccountSearchParams>
         actionRef={actionRef}
         columns={columns}
         defaultSize="small"
         rowKey="id"
         request={onRequest}
-        search={false}
-        scroll={{ x: 640 }}
+        search={{
+          labelWidth: 'auto',
+        }}
+        scroll={{ x: 760 }}
         toolBarRender={() => [
           <Button
             key="create"
@@ -197,6 +226,14 @@ const Account: React.FC = () => {
           label="账户名称"
           placeholder="请输入账户名称"
           rules={[{ required: true }]}
+        />
+        <ProFormSwitch
+          name="canHoldFunds"
+          label="可持有资金"
+          fieldProps={{
+            checkedChildren: '是',
+            unCheckedChildren: '否',
+          }}
         />
         <ProFormItem name="icon" label="图标">
           <IconPicker />
