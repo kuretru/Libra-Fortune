@@ -11,7 +11,44 @@ declare namespace LibraFortune.Ledger {
     defaultFundedRatio: string;
   }
 
+  type LedgerEntryDTO = GalaxyWeb.BaseCreateUpdateDTO & {
+    ledgerId?: number;
+    categoryId: number;
+    date: string;
+    name: string;
+    originalAmount: string;
+    originalCurrency: string;
+    settlementAmount: string;
+    settlementCurrency: string;
+    remark: string;
+    tags?: LedgerEntryTagDTO[];
+    details?: LedgerEntryDetailDTO[];
+  }
+
+  type LedgerEntryTagDTO = GalaxyWeb.BaseCreateDTO & {
+    ledgerId?: number;
+    tagId: number;
+  }
+
+  type LedgerEntryDetailDTO = GalaxyWeb.BaseCreateUpdateDTO & {
+    entryId?: number;
+    username: string;
+    accountId?: number;
+    fundedRatio: string;
+    amount: string;
+  }
+
   type LedgerQuery = {
     nameLike?: string;
+  }
+
+  type LedgerEntryQuery = {
+    categoryIdIn?: number[];
+    dateBegin?: string;
+    dateEnd?: string;
+    nameLike?: string;
+    originalCurrency?: string;
+    settlementCurrency?: string;
+    tagIdIn?: number[];
   }
 }

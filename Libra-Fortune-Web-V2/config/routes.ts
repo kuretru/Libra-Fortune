@@ -60,6 +60,12 @@ export default [
         path: '/ledger/ledger',
         component: './ledger/ledger',
       },
+      {
+        name: '账本条目',
+        path: '/ledger/:ledgerId/entry',
+        component: './ledger/entry',
+        hideInMenu: true,
+      },
     ],
   },
   {
