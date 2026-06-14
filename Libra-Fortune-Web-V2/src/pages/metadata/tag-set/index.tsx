@@ -49,16 +49,14 @@ const appendChildren = (
     })),
   }));
 
-const getExpandableRowKeys = (records: TagTableRecord[]): React.Key[] =>
-  records.flatMap((record) => {
-    if (record.recordType !== 'set' || !record.id || !record.children?.length) {
-      return [];
+const collectExpandableRowKeys = (records: TagTableRecord[]): Set<React.Key> =>
+  records.reduce<Set<React.Key>>((keys, record) => {
+    if (record.recordType === 'set' && record.id && record.children?.length) {
+      keys.add(`${record.recordType}-${record.id}`);
     }
-    return [
-      `${record.recordType}-${record.id}`,
-      ...getExpandableRowKeys(record.children),
-    ];
-  });
+
+    return keys;
+  }, new Set<React.Key>());
 
 const MetadataTagSet: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -85,8 +83,9 @@ const MetadataTagSet: React.FC = () => {
     {
       dataIndex: 'id',
       title: 'ID',
-      valueType: 'indexBorder',
-      width: 72,
+      search: false,
+      width: 104,
+      renderText: (value: number) => <Tag>{value}</Tag>,
     },
     {
       dataIndex: 'name',
@@ -125,11 +124,12 @@ const MetadataTagSet: React.FC = () => {
     {
       key: 'action',
       title: '操作',
+      align: 'right',
       fixed: 'right',
       valueType: 'option',
       width: 300,
       render: (_, record) => (
-        <Space>
+        <Space style={{ justifyContent: 'flex-end', width: '100%' }}>
           {record.recordType === 'set' && (
             <Button
               icon={<PlusOutlined />}
@@ -169,7 +169,10 @@ const MetadataTagSet: React.FC = () => {
       noPage: false,
     });
     const data = appendChildren(response.data.list);
-    setExpandedRowKeys(getExpandableRowKeys(data));
+    const expandableRowKeys = collectExpandableRowKeys(data);
+    setExpandedRowKeys((keys) =>
+      keys.filter((key) => expandableRowKeys.has(key)),
+    );
 
     return {
       data,
