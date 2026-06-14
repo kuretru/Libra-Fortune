@@ -24,8 +24,7 @@ public class MetadataCategoryDTO extends BaseCreateUpdateDTO {
     @Schema(description = "分类名称")
     private String name;
 
-    @NotEmpty
-    @Size(min = 1, max = 32)
+    @Size(max = 32)
     @Schema(description = "图标")
     private String icon;
 

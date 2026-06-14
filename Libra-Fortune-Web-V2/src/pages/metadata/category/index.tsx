@@ -41,7 +41,9 @@ const MetadataCategory: React.FC = () => {
   >([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [form] = Form.useForm<LibraFortune.Metadata.CategoryDTO>();
+  const selectedParentId = Form.useWatch('parentId', form);
   const actionRef = useRef<ActionType | null>(null);
+  const isChildCategory = !!selectedParentId;
 
   const parentOptions = useMemo(
     () =>
@@ -61,6 +63,12 @@ const MetadataCategory: React.FC = () => {
       form.resetFields();
     }
   }, [modalVisible, currentRecord, form]);
+
+  useEffect(() => {
+    if (!modalVisible || !isChildCategory) return;
+
+    form.setFieldValue('icon', undefined);
+  }, [modalVisible, isChildCategory, form]);
 
   const columns: ProColumns<LibraFortune.Metadata.CategoryDTO>[] = [
     {
@@ -168,8 +176,12 @@ const MetadataCategory: React.FC = () => {
     record: LibraFortune.Metadata.CategoryDTO,
   ): Promise<boolean> => {
     try {
+      const payload = {
+        ...record,
+        icon: record.parentId ? undefined : record.icon,
+      };
       const fn = record.id ? update : create;
-      await fn(record);
+      await fn(payload);
       actionRef.current?.reload();
       messageApi.open({
         type: 'success',
@@ -267,9 +279,11 @@ const MetadataCategory: React.FC = () => {
           placeholder="请输入分类名称"
           rules={[{ required: true }]}
         />
-        <ProFormItem name="icon" label="图标">
-          <IconPicker />
-        </ProFormItem>
+        {!isChildCategory && (
+          <ProFormItem name="icon" label="图标">
+            <IconPicker />
+          </ProFormItem>
+        )}
       </ModalForm>
     </PageContainer>
   );
