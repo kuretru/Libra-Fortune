@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.metadata.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.kuretru.microservices.web.entity.annotations.ChildrenParentId;
+import com.kuretru.microservices.web.entity.interfaces.Children;
 import com.kuretru.microservices.web.entity.interfaces.Sequenced;
 import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
 import lombok.Data;
@@ -11,9 +13,11 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @TableName("metadata_tag_set_item")
-public class MetadataTagSetItemDO extends BaseCreateUpdateDO implements Sequenced {
+public class MetadataTagSetItemDO extends BaseCreateUpdateDO
+        implements Sequenced, Children<MetadataTagSetItemDO> {
 
     /** 关联标签组ID */
+    @ChildrenParentId
     private Long setId;
 
     /** 标签名称 */
@@ -21,5 +25,10 @@ public class MetadataTagSetItemDO extends BaseCreateUpdateDO implements Sequence
 
     /** 排序标识 */
     private Integer sequence;
+
+    @Override
+    public boolean bizEqual(MetadataTagSetItemDO newRecord) {
+        return this.name.equals(newRecord.getName());
+    }
 
 }

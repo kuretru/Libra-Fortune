@@ -1,6 +1,9 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
-import com.kuretru.microservices.web.v2.service.impl.BaseOneToManyServiceImpl;
+import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
+import com.kuretru.microservices.web.v2.service.ability.children.ChildrenOperator;
+import com.kuretru.microservices.web.v2.service.ability.children.DefaultChildrenOperator;
+import com.kuretru.microservices.web.v2.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryTagDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryTagEntityMapper;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryTagDTO;
@@ -11,32 +14,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LedgerEntryTagServiceImpl
-        extends BaseOneToManyServiceImpl<LedgerEntryTagMapper, LedgerEntryTagDO, LedgerEntryTagDTO>
+        extends BaseServiceImpl<LedgerEntryTagMapper, LedgerEntryTagDO, LedgerEntryTagDTO, EmptyQuery>
         implements LedgerEntryTagService {
+
+    private final ChildrenOperator<LedgerEntryTagDTO> childrenOperator;
 
     @Autowired
     public LedgerEntryTagServiceImpl(LedgerEntryTagMapper mapper, LedgerEntryTagEntityMapper entityMapper) {
         super(mapper, entityMapper);
+        this.childrenOperator = new DefaultChildrenOperator<>(mapper, entityMapper);
     }
 
-    @Override
-    protected String getParentIdColumn() {
-        return "entry_id";
-    }
 
     @Override
-    protected Long getParentId(LedgerEntryTagDTO record) {
-        return record.getEntryId();
-    }
-
-    @Override
-    protected void setParentId(Long parentId, LedgerEntryTagDTO record) {
-        record.setEntryId(parentId);
-    }
-
-    @Override
-    protected boolean bizEqual(LedgerEntryTagDO oldRecord, LedgerEntryTagDTO newRecord) {
-        return oldRecord.getTagId().equals(newRecord.getTagId());
+    public ChildrenOperator<LedgerEntryTagDTO> childrenOperator() {
+        return childrenOperator;
     }
 
 }

@@ -7,22 +7,20 @@ import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetDO;
 import com.kuretru.web.libra.metadata.entity.mapper.MetadataTagSetEntityMapper;
-import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetItemQuery;
 import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetQuery;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataTagSetDTO;
-import com.kuretru.web.libra.metadata.entity.transfer.MetadataTagSetItemDTO;
 import com.kuretru.web.libra.metadata.mapper.MetadataTagSetMapper;
 import com.kuretru.web.libra.metadata.service.MetadataTagSetItemService;
 import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.ListFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<MetadataTagSetMapper, MetadataTagSetDO, MetadataTagSetDTO, MetadataTagSetQuery> implements MetadataTagSetService {
@@ -33,6 +31,15 @@ public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<Metadata
     public MetadataTagSetServiceImpl(MetadataTagSetMapper mapper, MetadataTagSetEntityMapper entityMapper, MetadataTagSetItemService itemService) {
         super(mapper, entityMapper);
         this.itemService = itemService;
+    }
+
+    @Override
+    protected QueryWrapper<MetadataTagSetDO> buildQueryWrapper(MetadataTagSetQuery query) {
+        var result = super.buildQueryWrapper(query);
+        if (StringUtils.hasText(query.getTagNameLike())) {
+
+        }
+        return result;
     }
 
     @Override
@@ -88,10 +95,8 @@ public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<Metadata
 
     @Override
     protected MetadataTagSetDTO afterGet(MetadataTagSetDO record) throws ServiceException {
-        var itemQuery = new MetadataTagSetItemQuery();
-        itemQuery.setSetId(record.getId());
         var result = super.afterGet(record);
-        result.setItems(itemService.list(itemQuery));
+        result.setItems(itemService.listByParentId(record.getId()));
         return result;
     }
 
@@ -103,10 +108,7 @@ public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<Metadata
             return result;
         }
 
-        var itemQuery = new MetadataTagSetItemQuery();
-        itemQuery.setSetIdIn(idList);
-        var items = itemService.list(itemQuery);
-        var itemsMap = items.stream().collect(Collectors.groupingBy(MetadataTagSetItemDTO::getSetId));
+        var itemsMap = itemService.listByParentId(idList);
         result.forEach(record -> record.setItems(itemsMap.getOrDefault(record.getId(), Collections.emptyList())));
         return result;
     }

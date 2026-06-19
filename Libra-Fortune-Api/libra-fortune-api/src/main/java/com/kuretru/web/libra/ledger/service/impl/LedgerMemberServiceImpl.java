@@ -1,6 +1,9 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
-import com.kuretru.microservices.web.v2.service.impl.BaseOneToManyServiceImpl;
+import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
+import com.kuretru.microservices.web.v2.service.ability.children.ChildrenOperator;
+import com.kuretru.microservices.web.v2.service.ability.children.DefaultChildrenOperator;
+import com.kuretru.microservices.web.v2.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.ledger.entity.data.LedgerMemberDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerMemberEntityMapper;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerMemberDTO;
@@ -10,33 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("ledgerMemberV2Service")
-public class LedgerMemberServiceImpl extends BaseOneToManyServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO>
+public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO, EmptyQuery>
         implements LedgerMemberService {
+
+    private final ChildrenOperator<LedgerMemberDTO> childrenOperator;
 
     @Autowired
     public LedgerMemberServiceImpl(LedgerMemberMapper mapper, LedgerMemberEntityMapper entityMapper) {
         super(mapper, entityMapper);
+        this.childrenOperator = new DefaultChildrenOperator<>(mapper, entityMapper);
     }
 
     @Override
-    protected String getParentIdColumn() {
-        return "ledger_id";
-    }
-
-    @Override
-    protected Long getParentId(LedgerMemberDTO record) {
-        return record.getLedgerId();
-    }
-
-    @Override
-    protected void setParentId(Long parentId, LedgerMemberDTO record) {
-        record.setLedgerId(parentId);
-    }
-
-    @Override
-    protected boolean bizEqual(LedgerMemberDO oldRecord, LedgerMemberDTO newRecord) {
-        return oldRecord.getUsername().equals(newRecord.getUsername())
-                && oldRecord.getDefaultFundedRatio().equals(newRecord.getDefaultFundedRatio());
+    public ChildrenOperator<LedgerMemberDTO> childrenOperator() {
+        return childrenOperator;
     }
 
 }
