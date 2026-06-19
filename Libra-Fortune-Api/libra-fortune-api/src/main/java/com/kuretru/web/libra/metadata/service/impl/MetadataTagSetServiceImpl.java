@@ -7,6 +7,7 @@ import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetDO;
 import com.kuretru.web.libra.metadata.entity.mapper.MetadataTagSetEntityMapper;
+import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetItemQuery;
 import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetQuery;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataTagSetDTO;
 import com.kuretru.web.libra.metadata.mapper.MetadataTagSetMapper;
@@ -37,7 +38,10 @@ public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<Metadata
     protected QueryWrapper<MetadataTagSetDO> buildQueryWrapper(MetadataTagSetQuery query) {
         var result = super.buildQueryWrapper(query);
         if (StringUtils.hasText(query.getTagNameLike())) {
-
+            var itemQuery = new MetadataTagSetItemQuery();
+            itemQuery.setNameLike(query.getTagNameLike());
+            var idList = itemService.listParentId(itemQuery);
+            result.in("id", idList);
         }
         return result;
     }
