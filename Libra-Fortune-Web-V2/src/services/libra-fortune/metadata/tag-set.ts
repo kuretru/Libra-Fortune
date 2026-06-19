@@ -10,7 +10,9 @@ export async function get(id: number) {
   );
 }
 
-export async function list(page: GalaxyWeb.PaginationQuery) {
+export async function list(
+  page: GalaxyWeb.PaginationQuery & LibraFortune.Metadata.TagSetQuery,
+) {
   return request<
     GalaxyWeb.ApiResponse<
       GalaxyWeb.PaginationResponse<LibraFortune.Metadata.TagSetDTO>

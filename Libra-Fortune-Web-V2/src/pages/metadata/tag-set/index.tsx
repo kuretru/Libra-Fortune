@@ -96,7 +96,13 @@ const MetadataTagSet: React.FC = () => {
     {
       dataIndex: 'required',
       title: '必选',
-      search: false,
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          { label: '是', value: true },
+          { label: '否', value: false },
+        ],
+      },
       width: 100,
       render: (_, record) =>
         record.recordType === 'set' ? (
@@ -110,7 +116,13 @@ const MetadataTagSet: React.FC = () => {
     {
       dataIndex: 'allowMultiple',
       title: '多选',
-      search: false,
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          { label: '是', value: true },
+          { label: '否', value: false },
+        ],
+      },
       width: 100,
       render: (_, record) =>
         record.recordType === 'set' ? (
@@ -119,7 +131,27 @@ const MetadataTagSet: React.FC = () => {
           </Tag>
         ) : (
           <span>-</span>
-        ),
+      ),
+    },
+    {
+      dataIndex: 'setName',
+      title: '标签组名称',
+      hideInTable: true,
+      search: {
+        transform: (value: string) => ({
+          nameLike: value,
+        }),
+      },
+    },
+    {
+      dataIndex: 'tagName',
+      title: '标签名称',
+      hideInTable: true,
+      search: {
+        transform: (value: string) => ({
+          tagNameLike: value,
+        }),
+      },
     },
     {
       key: 'action',
@@ -160,12 +192,15 @@ const MetadataTagSet: React.FC = () => {
   ];
 
   const onRequest: NonNullable<
-    ProTableProps<TagTableRecord, GalaxyWeb.EmptyQuery>['request']
+    ProTableProps<
+      TagTableRecord,
+      LibraFortune.Metadata.TagSetQuery
+    >['request']
   > = async (params) => {
-    const { pageSize, current } = params;
     const response = await list({
-      current: current!,
-      pageSize: pageSize!,
+      ...params,
+      current: params.current!,
+      pageSize: params.pageSize!,
       noPage: false,
     });
     const data = appendChildren(response.data.list);
@@ -252,7 +287,7 @@ const MetadataTagSet: React.FC = () => {
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<TagTableRecord, GalaxyWeb.EmptyQuery>
+      <ProTable<TagTableRecord, LibraFortune.Metadata.TagSetQuery>
         actionRef={actionRef}
         columns={columns}
         defaultSize="small"
@@ -262,7 +297,9 @@ const MetadataTagSet: React.FC = () => {
         }}
         rowKey={(record) => `${record.recordType}-${record.id}`}
         request={onRequest}
-        search={false}
+        search={{
+          labelWidth: 'auto',
+        }}
         scroll={{ x: 860 }}
         toolBarRender={() => [
           <Button

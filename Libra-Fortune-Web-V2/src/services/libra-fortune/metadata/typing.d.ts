@@ -23,4 +23,11 @@ declare namespace LibraFortune.Metadata {
     setId?: number;
     name: string;
   }
+
+  type TagSetQuery = {
+    nameLike?: string;
+    required?: boolean;
+    allowMultiple?: boolean;
+    tagNameLike?: string;
+  }
 }
