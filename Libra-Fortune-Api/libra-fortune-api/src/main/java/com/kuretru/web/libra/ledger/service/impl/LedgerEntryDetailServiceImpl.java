@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
-import com.kuretru.microservices.web.v2.service.impl.BaseInnerChildServiceImpl;
+import com.kuretru.microservices.web.v2.service.impl.BaseOneToManyServiceImpl;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryDetailDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryDetailEntityMapper;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryDetailDTO;
@@ -13,7 +13,7 @@ import java.util.Objects;
 
 @Service("ledgerV2EntryDetailService")
 public class LedgerEntryDetailServiceImpl
-        extends BaseInnerChildServiceImpl<LedgerEntryDetailMapper, LedgerEntryDetailDO, LedgerEntryDetailDTO>
+        extends BaseOneToManyServiceImpl<LedgerEntryDetailMapper, LedgerEntryDetailDO, LedgerEntryDetailDTO>
         implements LedgerEntryDetailService {
 
     @Autowired

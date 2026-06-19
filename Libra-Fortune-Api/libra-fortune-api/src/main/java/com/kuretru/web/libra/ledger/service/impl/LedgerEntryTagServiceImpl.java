@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
-import com.kuretru.microservices.web.v2.service.impl.BaseInnerChildServiceImpl;
+import com.kuretru.microservices.web.v2.service.impl.BaseOneToManyServiceImpl;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryTagDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryTagEntityMapper;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryTagDTO;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LedgerEntryTagServiceImpl
-        extends BaseInnerChildServiceImpl<LedgerEntryTagMapper, LedgerEntryTagDO, LedgerEntryTagDTO>
+        extends BaseOneToManyServiceImpl<LedgerEntryTagMapper, LedgerEntryTagDO, LedgerEntryTagDTO>
         implements LedgerEntryTagService {
 
     @Autowired

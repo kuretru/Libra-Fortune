@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
-import com.kuretru.microservices.web.v2.service.impl.BaseInnerChildServiceImpl;
+import com.kuretru.microservices.web.v2.service.impl.BaseOneToManyServiceImpl;
 import com.kuretru.web.libra.ledger.entity.data.LedgerMemberDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerMemberEntityMapper;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerMemberDTO;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service("ledgerMemberV2Service")
-public class LedgerMemberServiceImpl extends BaseInnerChildServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO>
+public class LedgerMemberServiceImpl extends BaseOneToManyServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO>
         implements LedgerMemberService {
 
     @Autowired
