@@ -17,17 +17,19 @@ public class LedgerEntryTagServiceImpl
         extends BaseServiceImpl<LedgerEntryTagMapper, LedgerEntryTagDO, LedgerEntryTagDTO, EmptyQuery>
         implements LedgerEntryTagService {
 
-    private final ChildrenOperator<LedgerEntryTagDTO> childrenOperator;
+    private final ChildrenOperator<LedgerEntryTagDTO, EmptyQuery> childrenOperator;
 
     @Autowired
     public LedgerEntryTagServiceImpl(LedgerEntryTagMapper mapper, LedgerEntryTagEntityMapper entityMapper) {
         super(mapper, entityMapper);
-        this.childrenOperator = new DefaultChildrenOperator<>(mapper, entityMapper);
+        this.childrenOperator = new DefaultChildrenOperator<>(
+                mapper, entityMapper,
+                LedgerEntryTagDO.class, LedgerEntryTagDTO.class, EmptyQuery.class);
     }
 
 
     @Override
-    public ChildrenOperator<LedgerEntryTagDTO> childrenOperator() {
+    public ChildrenOperator<LedgerEntryTagDTO, EmptyQuery> childrenOperator() {
         return childrenOperator;
     }
 

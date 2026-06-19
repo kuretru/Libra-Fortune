@@ -17,16 +17,18 @@ public class LedgerEntryDetailServiceImpl
         extends BaseServiceImpl<LedgerEntryDetailMapper, LedgerEntryDetailDO, LedgerEntryDetailDTO, EmptyQuery>
         implements LedgerEntryDetailService {
 
-    private final ChildrenOperator<LedgerEntryDetailDTO> childrenOperator;
+    private final ChildrenOperator<LedgerEntryDetailDTO, EmptyQuery> childrenOperator;
 
     @Autowired
     public LedgerEntryDetailServiceImpl(LedgerEntryDetailMapper mapper, LedgerEntryDetailEntityMapper entityMapper) {
         super(mapper, entityMapper);
-        this.childrenOperator = new DefaultChildrenOperator<>(mapper, entityMapper);
+        this.childrenOperator = new DefaultChildrenOperator<>(
+                mapper, entityMapper,
+                LedgerEntryDetailDO.class, LedgerEntryDetailDTO.class, EmptyQuery.class);
     }
 
     @Override
-    public ChildrenOperator<LedgerEntryDetailDTO> childrenOperator() {
+    public ChildrenOperator<LedgerEntryDetailDTO, EmptyQuery> childrenOperator() {
         return childrenOperator;
     }
 

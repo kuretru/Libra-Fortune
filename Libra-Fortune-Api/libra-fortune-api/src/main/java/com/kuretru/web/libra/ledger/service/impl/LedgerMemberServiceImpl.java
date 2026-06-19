@@ -16,16 +16,18 @@ import org.springframework.stereotype.Service;
 public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO, EmptyQuery>
         implements LedgerMemberService {
 
-    private final ChildrenOperator<LedgerMemberDTO> childrenOperator;
+    private final ChildrenOperator<LedgerMemberDTO, EmptyQuery> childrenOperator;
 
     @Autowired
     public LedgerMemberServiceImpl(LedgerMemberMapper mapper, LedgerMemberEntityMapper entityMapper) {
         super(mapper, entityMapper);
-        this.childrenOperator = new DefaultChildrenOperator<>(mapper, entityMapper);
+        this.childrenOperator = new DefaultChildrenOperator<>(
+                mapper, entityMapper,
+                LedgerMemberDO.class, LedgerMemberDTO.class, EmptyQuery.class);
     }
 
     @Override
-    public ChildrenOperator<LedgerMemberDTO> childrenOperator() {
+    public ChildrenOperator<LedgerMemberDTO, EmptyQuery> childrenOperator() {
         return childrenOperator;
     }
 

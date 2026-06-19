@@ -5,5 +5,6 @@ import com.kuretru.microservices.web.v2.service.BaseService;
 import com.kuretru.microservices.web.v2.service.ChildrenCapable;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryTagDTO;
 
-public interface LedgerEntryTagService extends BaseService<LedgerEntryTagDTO, EmptyQuery>, ChildrenCapable<LedgerEntryTagDTO> {
+public interface LedgerEntryTagService extends BaseService<LedgerEntryTagDTO, EmptyQuery>,
+        ChildrenCapable<LedgerEntryTagDTO, EmptyQuery> {
 }
