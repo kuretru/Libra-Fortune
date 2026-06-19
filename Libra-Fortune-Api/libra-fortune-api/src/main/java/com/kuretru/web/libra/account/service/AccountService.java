@@ -1,11 +1,12 @@
 package com.kuretru.web.libra.account.service;
 
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.v2.service.BaseSequencedService;
+import com.kuretru.microservices.web.v2.service.BaseService;
+import com.kuretru.microservices.web.v2.service.SequencedService;
 import com.kuretru.web.libra.account.entity.query.AccountQuery;
 import com.kuretru.web.libra.account.entity.transfer.AccountDTO;
 
-public interface AccountService extends BaseSequencedService<AccountDTO, AccountQuery> {
+public interface AccountService extends BaseService<AccountDTO, AccountQuery>, SequencedService<AccountDTO> {
 
     /**
      *

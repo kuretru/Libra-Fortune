@@ -2,12 +2,13 @@ package com.kuretru.web.libra.metadata.service;
 
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
-import com.kuretru.microservices.web.v2.service.BaseSequencedService;
+import com.kuretru.microservices.web.v2.service.BaseService;
+import com.kuretru.microservices.web.v2.service.SequencedService;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataCategoryDTO;
 
 import java.util.List;
 
-public interface MetadataCategoryService extends BaseSequencedService<MetadataCategoryDTO, EmptyQuery> {
+public interface MetadataCategoryService extends BaseService<MetadataCategoryDTO, EmptyQuery>, SequencedService<MetadataCategoryDTO> {
 
     /**
      * 转成枚举值
