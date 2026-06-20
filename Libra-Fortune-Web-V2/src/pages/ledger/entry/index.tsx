@@ -92,7 +92,7 @@ type LedgerEntrySearchParams = LibraFortune.Ledger.LedgerEntryQuery & {
   tagId?: number[];
 };
 
-type DecimalInputValue = string | number | null;
+type DecimalInputValue = string | null;
 
 const toDateString = (value: string | Dayjs): string =>
   typeof value === 'string' ? value : value.format('YYYY-MM-DD');
@@ -540,8 +540,8 @@ const LedgerEntry: React.FC = () => {
           }
 
           const productResponse = await calculatorApi.multiply({
-            x: String(settlementAmount),
-            y: String(detail.fundedRatio),
+            x: settlementAmount,
+            y: detail.fundedRatio,
           });
           const amountResponse = await calculatorApi.divide({
             x: productResponse.data.result,
@@ -994,7 +994,8 @@ const LedgerEntry: React.FC = () => {
             label="结算金额"
             min={0}
             fieldProps={{
-              onChange: onSettlementAmountChange,
+              onChange: (value) =>
+                onSettlementAmountChange(value as unknown as DecimalInputValue),
               precision: 2,
               stringMode: true,
               step: '0.01',

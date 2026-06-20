@@ -40,8 +40,7 @@ type LedgerSearchParams = LibraFortune.Ledger.LedgerQuery & {
 
 const formatPercent = (value?: string): string => {
   if (!value) return '-';
-  const number = Number(value);
-  return Number.isFinite(number) ? `${number.toFixed(2)}%` : '-';
+  return `${value}%`;
 };
 
 const Ledger: React.FC = () => {
