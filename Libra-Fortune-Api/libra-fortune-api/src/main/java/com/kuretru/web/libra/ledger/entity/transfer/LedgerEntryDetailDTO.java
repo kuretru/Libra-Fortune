@@ -24,7 +24,7 @@ public class LedgerEntryDetailDTO extends BaseCreateUpdateDTO {
 
     @NotEmpty
     @Size(min = 1, max = 32)
-    @Schema(description = "归属用户名")
+    @Schema(description = "分担用户名，可非账本成员")
     private String username;
 
     @Schema(description = "付款链，按顺序存储账户ID")
