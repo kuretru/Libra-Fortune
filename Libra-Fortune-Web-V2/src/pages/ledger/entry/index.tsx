@@ -705,7 +705,7 @@ const LedgerEntry: React.FC = () => {
       dataIndex: 'date',
       title: '日期',
       valueType: 'date',
-      width: 100,
+      width: 90,
       fixed: 'left',
       search: false,
     },
@@ -724,7 +724,7 @@ const LedgerEntry: React.FC = () => {
     {
       dataIndex: 'name',
       title: '条目名称',
-      width: 160,
+      width: 120,
       fixed: 'left',
       copyable: true,
     },

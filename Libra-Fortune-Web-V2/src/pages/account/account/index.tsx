@@ -49,8 +49,9 @@ const Account: React.FC = () => {
     {
       dataIndex: 'id',
       title: 'ID',
-      valueType: 'indexBorder',
-      width: 72,
+      search: false,
+      width: 64,
+      renderText: (value: number) => <Tag>{value}</Tag>,
     },
     {
       dataIndex: 'icon',

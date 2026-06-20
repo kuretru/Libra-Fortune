@@ -8,7 +8,7 @@ import {
   type ProTableProps,
 } from '@ant-design/pro-components';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, message, Popconfirm, Space } from 'antd';
+import { Button, Form, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   create,
@@ -40,8 +40,9 @@ const MetadataCurrency: React.FC = () => {
     {
       dataIndex: 'id',
       title: 'ID',
-      valueType: 'indexBorder',
-      width: 72,
+      search: false,
+      width: 64,
+      renderText: (value: number) => <Tag>{value}</Tag>,
     },
     {
       dataIndex: 'code',
