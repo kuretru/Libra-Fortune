@@ -267,6 +267,7 @@ const LedgerEntry: React.FC = () => {
   const calculateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const calculateVersionRef = useRef(0);
   const originalAmountAutoFilledRef = useRef(false);
+  const continuousEntryRef = useRef(false);
 
   const memberOptions = useMemo(
     () =>
@@ -286,6 +287,17 @@ const LedgerEntry: React.FC = () => {
       })),
     [ledger?.members],
   );
+
+  const resetEntryForm = useCallback(() => {
+    originalAmountAutoFilledRef.current = false;
+    form.resetFields();
+    form.setFieldsValue({
+      originalCurrency: currencyOptions[0]?.value,
+      settlementCurrency: currencyOptions[0]?.value,
+      tagIds: [],
+      details: defaultDetails,
+    });
+  }, [currencyOptions, defaultDetails, form]);
 
   const tagNameMap = useMemo(() => {
     const result = new Map<number, string>();
@@ -356,25 +368,18 @@ const LedgerEntry: React.FC = () => {
   useEffect(() => {
     if (!modalVisible) return;
 
-    originalAmountAutoFilledRef.current = false;
     if (currentRecord) {
+      originalAmountAutoFilledRef.current = false;
       form.setFieldsValue({
         ...currentRecord,
-        date: currentRecord.date ? dayjs(currentRecord.date) : dayjs(),
+        date: currentRecord.date ? dayjs(currentRecord.date) : undefined,
         tagIds: currentRecord.tags?.map((tag) => tag.tagId) ?? [],
         details: currentRecord.details ?? [],
       });
     } else {
-      form.resetFields();
-      form.setFieldsValue({
-        date: dayjs(),
-        originalCurrency: currencyOptions[0]?.value,
-        settlementCurrency: currencyOptions[0]?.value,
-        tagIds: [],
-        details: defaultDetails,
-      });
+      resetEntryForm();
     }
-  }, [modalVisible, currentRecord, currencyOptions, defaultDetails, form]);
+  }, [modalVisible, currentRecord, form, resetEntryForm]);
 
   const recalculateFundedAmounts = useCallback(async () => {
     const settlementAmount = form.getFieldValue('settlementAmount');
@@ -656,6 +661,8 @@ const LedgerEntry: React.FC = () => {
 
   const onFinish = async (values: LedgerEntryFormValues): Promise<boolean> => {
     if (!ledgerId) return false;
+    const isContinuousEntry = continuousEntryRef.current;
+    continuousEntryRef.current = false;
     try {
       const record: LibraFortune.Ledger.LedgerEntryDTO = {
         id: values.id,
@@ -678,6 +685,11 @@ const LedgerEntry: React.FC = () => {
         type: 'success',
         content: record.id ? '更新成功' : '新增成功',
       });
+      if (isContinuousEntry) {
+        setCurrentRecord(undefined);
+        resetEntryForm();
+        return false;
+      }
       return true;
     } catch {
       return false;
@@ -687,6 +699,21 @@ const LedgerEntry: React.FC = () => {
   const onCreateButtonClick = () => {
     setCurrentRecord(undefined);
     setModalVisible(true);
+  };
+
+  const onClearButtonClick = () => {
+    setCurrentRecord(undefined);
+    resetEntryForm();
+  };
+
+  const onContinuousEntryButtonClick = async () => {
+    try {
+      await form.validateFields();
+      continuousEntryRef.current = true;
+      form.submit();
+    } catch {
+      // 表单校验失败时，由表单展示字段错误。
+    }
   };
 
   const onUpdateButtonClick = async (
@@ -755,6 +782,21 @@ const LedgerEntry: React.FC = () => {
           }
         }}
         onFinish={onFinish}
+        submitter={{
+          searchConfig: {
+            submitText: '记账',
+          },
+          render: (_, dom) => [
+            dom[0],
+            <Button key="clear" onClick={onClearButtonClick}>
+              清空
+            </Button>,
+            dom[1],
+            <Button key="continuous-entry" onClick={onContinuousEntryButtonClick}>
+              连续记账
+            </Button>,
+          ],
+        }}
         modalProps={{
           destroyOnHidden: true,
         }}
