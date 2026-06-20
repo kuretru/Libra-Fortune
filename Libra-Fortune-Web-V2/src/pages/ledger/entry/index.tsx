@@ -1,5 +1,7 @@
 import {
+  CloseOutlined,
   DeleteOutlined,
+  DragOutlined,
   EditOutlined,
   PlusOutlined,
   RollbackOutlined,
@@ -76,6 +78,12 @@ type TagSetTagSelectorProps = {
   tagSets: GroupedTagOption[];
   value?: number[];
   onChange?: (value?: number[]) => void;
+};
+
+type PaymentChainEditorProps = {
+  accountOptions: Option<number>[];
+  onChange?: (value?: number[]) => void;
+  value?: number[];
 };
 
 type LedgerEntrySearchParams = LibraFortune.Ledger.LedgerEntryQuery & {
@@ -193,6 +201,89 @@ const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
   );
 };
 
+const PaymentChainEditor: React.FC<PaymentChainEditorProps> = ({
+  accountOptions,
+  onChange,
+  value,
+}) => {
+  const paymentChain = value ?? [];
+  const [draggedIndex, setDraggedIndex] = useState<number>();
+  const accountNameMap = new Map(
+    accountOptions.map((option) => [option.value, option.label]),
+  );
+
+  const moveByDrag = (targetIndex: number) => {
+    if (draggedIndex === undefined || draggedIndex === targetIndex) {
+      return;
+    }
+    const nextValue = [...paymentChain];
+    const [accountId] = nextValue.splice(draggedIndex, 1);
+    nextValue.splice(targetIndex, 0, accountId);
+    onChange?.(nextValue);
+    setDraggedIndex(undefined);
+  };
+
+  return (
+    <Space direction="vertical" size={8} style={{ width: '100%' }}>
+      <Select
+        allowClear
+        options={accountOptions.map((option) => ({
+          ...option,
+          disabled: paymentChain.includes(option.value),
+        }))}
+        placeholder="选择账户并追加到付款链尾部"
+        value={undefined}
+        onChange={(accountId: number) => {
+          if (!paymentChain.includes(accountId)) {
+            onChange?.([...paymentChain, accountId]);
+          }
+        }}
+      />
+      {paymentChain.length > 0 && (
+        <Space size={4} wrap>
+          {paymentChain.map((accountId, index) => (
+            <Tag
+              key={accountId}
+              draggable
+              icon={<DragOutlined />}
+              style={{
+                cursor: 'grab',
+                opacity: draggedIndex === index ? 0.5 : 1,
+              }}
+              onDragEnd={() => setDraggedIndex(undefined)}
+              onDragOver={(event) => event.preventDefault()}
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', String(accountId));
+                setDraggedIndex(index);
+              }}
+              onDrop={() => moveByDrag(index)}
+            >
+              <Space size={2}>
+                {accountNameMap.get(accountId) ?? `账户 #${accountId}`}
+                <Button
+                  aria-label="移除账户"
+                  danger
+                  icon={<CloseOutlined />}
+                  size="small"
+                  type="text"
+                  onClick={() =>
+                    onChange?.(
+                      paymentChain.filter(
+                        (_, chainIndex) => chainIndex !== index,
+                      ),
+                    )
+                  }
+                />
+              </Space>
+            </Tag>
+          ))}
+        </Space>
+      )}
+    </Space>
+  );
+};
+
 const TagSetTagSelector: React.FC<TagSetTagSelectorProps> = ({
   tagSets,
   value,
@@ -288,16 +379,24 @@ const LedgerEntry: React.FC = () => {
     [ledger?.members],
   );
 
-  const resetEntryForm = useCallback(() => {
-    originalAmountAutoFilledRef.current = false;
-    form.resetFields();
-    form.setFieldsValue({
-      originalCurrency: currencyOptions[0]?.value,
-      settlementCurrency: currencyOptions[0]?.value,
-      tagIds: [],
-      details: defaultDetails,
-    });
-  }, [currencyOptions, defaultDetails, form]);
+  const resetEntryForm = useCallback(
+    (details: LibraFortune.Ledger.LedgerEntryDetailDTO[] = defaultDetails) => {
+      originalAmountAutoFilledRef.current = false;
+      form.resetFields();
+      form.setFieldsValue({
+        originalCurrency: currencyOptions[0]?.value,
+        settlementCurrency: currencyOptions[0]?.value,
+        tagIds: [],
+        details: details.map(({ username, paymentChain, fundedRatio }) => ({
+          username,
+          paymentChain,
+          fundedRatio,
+          amount: '',
+        })),
+      });
+    },
+    [currencyOptions, defaultDetails, form],
+  );
 
   const tagNameMap = useMemo(() => {
     const result = new Map<number, string>();
@@ -687,7 +786,7 @@ const LedgerEntry: React.FC = () => {
       });
       if (isContinuousEntry) {
         setCurrentRecord(undefined);
-        resetEntryForm();
+        resetEntryForm(values.details);
         return false;
       }
       return true;
@@ -792,7 +891,10 @@ const LedgerEntry: React.FC = () => {
               清空
             </Button>,
             dom[1],
-            <Button key="continuous-entry" onClick={onContinuousEntryButtonClick}>
+            <Button
+              key="continuous-entry"
+              onClick={onContinuousEntryButtonClick}
+            >
               连续记账
             </Button>,
           ],
@@ -899,15 +1001,15 @@ const LedgerEntry: React.FC = () => {
                       ),
                     },
                     {
-                      dataIndex: 'accountId',
-                      title: '账户',
-                      width: 180,
+                      dataIndex: 'paymentChain',
+                      title: '付款链',
+                      width: 360,
                       render: (_, field) => (
                         <Form.Item
-                          name={[field.name, 'accountId']}
+                          name={[field.name, 'paymentChain']}
                           style={{ marginBottom: 0 }}
                         >
-                          <Select allowClear options={accountOptions} />
+                          <PaymentChainEditor accountOptions={accountOptions} />
                         </Form.Item>
                       ),
                     },

@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -28,7 +29,8 @@ public class LedgerMemberDO extends BaseCreateUpdateDO implements Children<Ledge
 
     @Override
     public boolean bizEqual(LedgerMemberDO newRecord) {
-        return this.username.equals(newRecord.getUsername()) && this.defaultFundedRatio.equals(newRecord.getDefaultFundedRatio());
+        return Objects.equals(username, newRecord.getUsername())
+                && Objects.equals(defaultFundedRatio, newRecord.getDefaultFundedRatio());
     }
 
 }

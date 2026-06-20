@@ -10,6 +10,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -29,7 +30,8 @@ public class AccountBalanceDO extends BaseCreateUpdateDO implements Children<Acc
 
     @Override
     public boolean bizEqual(AccountBalanceDO newRecord) {
-        return date.equals(newRecord.getDate()) && balance.equals(newRecord.getBalance());
+        return Objects.equals(date, newRecord.getDate())
+                && Objects.equals(balance, newRecord.getBalance());
     }
 
 }

@@ -33,7 +33,7 @@ declare namespace LibraFortune.Ledger {
   type LedgerEntryDetailDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     entryId?: number;
     username: string;
-    accountId?: number;
+    paymentChain?: number[];
     fundedRatio: string;
     amount: string;
   }

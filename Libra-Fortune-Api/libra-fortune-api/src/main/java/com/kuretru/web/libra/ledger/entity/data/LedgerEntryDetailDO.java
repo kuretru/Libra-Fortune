@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.ledger.entity.data;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.kuretru.microservices.web.entity.annotations.ChildrenParentId;
 import com.kuretru.microservices.web.entity.interfaces.Children;
 import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
@@ -9,11 +11,13 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@TableName("ledger_v2_entry_detail")
+@TableName(value = "ledger_v2_entry_detail", autoResultMap = true)
 public class LedgerEntryDetailDO extends BaseCreateUpdateDO implements Children<LedgerEntryDetailDO> {
 
     /** 外键，条目ID */
@@ -23,8 +27,9 @@ public class LedgerEntryDetailDO extends BaseCreateUpdateDO implements Children<
     /** 归属用户名 */
     private String username;
 
-    /** 外键，账户ID */
-    private Long accountId;
+    /** 付款链，按顺序存储账户ID */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<Long> paymentChain;
 
     /** 百分比，承担比例 */
     private BigDecimal fundedRatio;
@@ -34,8 +39,10 @@ public class LedgerEntryDetailDO extends BaseCreateUpdateDO implements Children<
 
     @Override
     public boolean bizEqual(LedgerEntryDetailDO newRecord) {
-        return username.equals(newRecord.getUsername()) && accountId.equals(newRecord.getAccountId())
-                && fundedRatio.equals(newRecord.getFundedRatio()) && amount.equals(newRecord.getAmount());
+        return Objects.equals(username, newRecord.getUsername())
+                && Objects.equals(paymentChain, newRecord.getPaymentChain())
+                && Objects.equals(fundedRatio, newRecord.getFundedRatio())
+                && Objects.equals(amount, newRecord.getAmount());
     }
 
 }

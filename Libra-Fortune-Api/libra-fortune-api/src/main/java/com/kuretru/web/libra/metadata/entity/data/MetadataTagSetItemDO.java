@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Objects;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -28,7 +30,7 @@ public class MetadataTagSetItemDO extends BaseCreateUpdateDO
 
     @Override
     public boolean bizEqual(MetadataTagSetItemDO newRecord) {
-        return this.name.equals(newRecord.getName());
+        return Objects.equals(name, newRecord.getName());
     }
 
 }

@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Objects;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -23,7 +25,7 @@ public class LedgerEntryTagDO extends BaseCreateDO implements Children<LedgerEnt
 
     @Override
     public boolean bizEqual(LedgerEntryTagDO newRecord) {
-        return tagId.equals(newRecord.getTagId());
+        return Objects.equals(tagId, newRecord.getTagId());
     }
 
 }

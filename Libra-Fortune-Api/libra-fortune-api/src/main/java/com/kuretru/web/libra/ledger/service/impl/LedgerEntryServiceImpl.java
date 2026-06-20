@@ -16,6 +16,7 @@ import com.kuretru.web.libra.ledger.service.LedgerEntryDetailService;
 import com.kuretru.web.libra.ledger.service.LedgerEntryService;
 import com.kuretru.web.libra.ledger.service.LedgerEntryTagService;
 import com.kuretru.web.libra.ledger.service.LedgerService;
+import com.kuretru.web.libra.account.service.AccountService;
 import com.kuretru.web.libra.metadata.service.MetadataCategoryService;
 import com.kuretru.web.libra.metadata.service.MetadataCurrencyService;
 import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
@@ -39,11 +40,13 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     private final LedgerService ledgerService;
     private final LedgerEntryDetailService detailService;
     private final LedgerEntryTagService tagService;
+    private final AccountService accountService;
 
     @Autowired
     public LedgerEntryServiceImpl(LedgerEntryMapper mapper, LedgerEntryEntityMapper entityMapper,
                                   MetadataCategoryService categoryService, MetadataCurrencyService currencyService, MetadataTagSetService tagSetService,
-                                  LedgerService ledgerService, LedgerEntryTagService tagService, LedgerEntryDetailService detailService) {
+                                  LedgerService ledgerService, LedgerEntryTagService tagService, LedgerEntryDetailService detailService,
+                                  AccountService accountService) {
         super(mapper, entityMapper);
         this.categoryService = categoryService;
         this.currencyService = currencyService;
@@ -51,6 +54,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         this.ledgerService = ledgerService;
         this.tagService = tagService;
         this.detailService = detailService;
+        this.accountService = accountService;
     }
 
     @Override
@@ -173,6 +177,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             if (fundedUsernameSet.contains(detail.getUsername())) {
                 throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担人重复");
             }
+            verifyPaymentChain(detail.getPaymentChain());
             fundedUsernameSet.add(detail.getUsername());
             sum = sum.add(detail.getAmount());
             ratioSum = ratioSum.add(detail.getFundedRatio());
@@ -181,6 +186,23 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "明细金额总和不等于结算金额");
         } else if (ratioSum.compareTo(HUNDRED) != 0) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担比例总和不等于100.00%");
+        }
+    }
+
+    private void verifyPaymentChain(List<Long> paymentChain) throws ServiceException {
+        if (paymentChain == null || paymentChain.isEmpty()) {
+            return;
+        }
+        if (paymentChain.contains(null)) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链不能包含空账户");
+        }
+        if (new HashSet<>(paymentChain).size() != paymentChain.size()) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链账户不能重复");
+        }
+        for (Long accountId : paymentChain) {
+            if (accountService.get(accountId) == null) {
+                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链账户不存在");
+            }
         }
     }
 

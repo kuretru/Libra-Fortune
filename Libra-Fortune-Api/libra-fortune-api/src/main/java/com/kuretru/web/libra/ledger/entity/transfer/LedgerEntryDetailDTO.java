@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -26,8 +27,8 @@ public class LedgerEntryDetailDTO extends BaseCreateUpdateDTO {
     @Schema(description = "归属用户名")
     private String username;
 
-    @Schema(description = "账户ID")
-    private Long accountId;
+    @Schema(description = "付款链，按顺序存储账户ID")
+    private List<Long> paymentChain;
 
     @NotNull
     @Schema(description = "定点数，承担比例")
