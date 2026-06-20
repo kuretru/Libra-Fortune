@@ -208,6 +208,9 @@ const PaymentChainEditor: React.FC<PaymentChainEditorProps> = ({
 }) => {
   const paymentChain = value ?? [];
   const [draggedIndex, setDraggedIndex] = useState<number>();
+  const [selectedAccountId, setSelectedAccountId] = useState<number | null>(
+    null,
+  );
   const accountNameMap = new Map(
     accountOptions.map((option) => [option.value, option.label]),
   );
@@ -232,11 +235,12 @@ const PaymentChainEditor: React.FC<PaymentChainEditorProps> = ({
           disabled: paymentChain.includes(option.value),
         }))}
         placeholder="选择账户并追加到付款链尾部"
-        value={undefined}
+        value={selectedAccountId}
         onChange={(accountId: number) => {
           if (!paymentChain.includes(accountId)) {
             onChange?.([...paymentChain, accountId]);
           }
+          setSelectedAccountId(null);
         }}
       />
       {paymentChain.length > 0 && (
@@ -887,7 +891,7 @@ const LedgerEntry: React.FC = () => {
           },
           render: (_, dom) => {
             if (currentRecord?.id) {
-              return [dom[1]];
+              return [dom[0], dom[1]];
             }
             return [
               dom[0],
