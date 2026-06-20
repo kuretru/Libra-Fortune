@@ -74,6 +74,11 @@ public class MetadataCategoryServiceImpl
     @Override
     protected MetadataCategoryDO findDuplicateRecord(MetadataCategoryDTO record) {
         var queryWrapper = new QueryWrapper<MetadataCategoryDO>();
+        if (record.getParentId() == null) {
+            queryWrapper.isNull("parent_id");
+        } else {
+            queryWrapper.eq("parent_id", record.getParentId());
+        }
         queryWrapper.eq("name", record.getName());
         return mapper.selectOne(queryWrapper);
     }
