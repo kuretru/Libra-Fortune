@@ -52,7 +52,6 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     @Schema(description = "结算货币")
     private String settlementCurrency;
 
-    @NotNull
     @Schema(description = "备注")
     private String remark;
 

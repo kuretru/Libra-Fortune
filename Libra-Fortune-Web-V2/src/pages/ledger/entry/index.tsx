@@ -667,7 +667,7 @@ const LedgerEntry: React.FC = () => {
         originalCurrency: values.originalCurrency!,
         settlementAmount: values.settlementAmount!,
         settlementCurrency: values.settlementCurrency!,
-        remark: values.remark!,
+        remark: values.remark,
         tags: (values.tagIds ?? []).map((tagId) => ({ tagId })),
         details: values.details ?? [],
       };
@@ -953,7 +953,6 @@ const LedgerEntry: React.FC = () => {
               maxRows: 6,
             },
           }}
-          rules={[{ required: true }]}
         />
       </ModalForm>
     </PageContainer>
