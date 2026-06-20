@@ -18,6 +18,7 @@ import com.kuretru.web.libra.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,10 +65,12 @@ public class AccountBalanceServiceImpl implements AccountBalanceService {
             if (dateBo == null) {
                 dateBo = new AccountBalanceDateBO();
                 dateBo.setDate(record.getDate());
+                dateBo.setTotalBalance(new BigDecimal("0.00"));
                 dateBo.setItems(new ArrayList<>());
                 dateMap.put(record.getDate(), dateBo);
                 result.getBalances().add(dateBo);
             }
+            dateBo.setTotalBalance(dateBo.getTotalBalance().add(record.getBalance()));
             var bo = new AccountBalanceBO();
             bo.setAccountId(record.getAccountId());
             bo.setBalance(record.getBalance());
