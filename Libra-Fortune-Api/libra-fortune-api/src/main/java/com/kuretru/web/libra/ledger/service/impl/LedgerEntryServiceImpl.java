@@ -5,6 +5,7 @@ import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.v2.service.impl.BaseServiceImpl;
+import com.kuretru.web.libra.account.service.AccountService;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryEntityMapper;
 import com.kuretru.web.libra.ledger.entity.query.LedgerEntryQuery;
@@ -16,12 +17,12 @@ import com.kuretru.web.libra.ledger.service.LedgerEntryDetailService;
 import com.kuretru.web.libra.ledger.service.LedgerEntryService;
 import com.kuretru.web.libra.ledger.service.LedgerEntryTagService;
 import com.kuretru.web.libra.ledger.service.LedgerService;
-import com.kuretru.web.libra.account.service.AccountService;
 import com.kuretru.web.libra.metadata.service.MetadataCategoryService;
 import com.kuretru.web.libra.metadata.service.MetadataCurrencyService;
 import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -112,6 +113,20 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     }
 
     @Override
+    protected QueryWrapper<LedgerEntryDO> beforeList(LedgerEntryQuery query) throws ServiceException {
+        var category = query.getCategory();
+        query.setCategory(null);
+        var queryWrapper = super.beforeList(query);
+        if (StringUtils.hasText(category)) {
+            if (!category.contains(",")) {
+                category += ",";
+            }
+            queryWrapper.likeRight("category", category);
+        }
+        return queryWrapper;
+    }
+
+    @Override
     protected LedgerEntryDTO afterUpdate(LedgerEntryDO record, LedgerEntryDTO raw) throws ServiceException {
         var result = super.afterUpdate(record, raw);
         result.setTags(tagService.syncByParentId(record.getId(), raw.getTags()));
@@ -133,10 +148,8 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     }
 
     protected void verifyDTO(LedgerEntryDTO record) throws ServiceException {
-        // 校验分类存在
-        if (categoryService.get(record.getCategoryId()) == null) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类不存在");
-        }
+        // 校验分类
+        verifyCategory(record.getCategory());
 
         // 校验日期
         if (record.getDate().isAfter(LocalDate.now())) {
@@ -157,6 +170,24 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 
         // 校验明细
         verifyDetails(record, record.getDetails());
+    }
+
+    private void verifyCategory(List<Long> categoryPath) throws ServiceException {
+        var category = categoryService.get(categoryPath.get(categoryPath.size() - 1));
+        if (category == null) {
+            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类不存在");
+        }
+        if (categoryPath.size() == 1 && category.getParentId() == null) {
+            return;
+        }
+        if (categoryPath.size() == 2 && category.getParentId() != null
+                && category.getParentId().equals(categoryPath.getFirst())) {
+            var parent = categoryService.get(category.getParentId());
+            if (parent != null && parent.getParentId() == null) {
+                return;
+            }
+        }
+        throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类路径不合法");
     }
 
     private void verifyDetails(LedgerEntryDTO entry, List<LedgerEntryDetailDTO> details) throws ServiceException {

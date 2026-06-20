@@ -13,8 +13,8 @@ public class LedgerEntryQuery {
     @Schema(description = "账本ID")
     private Long ledgerId;
 
-    @Schema(description = "分类ID")
-    private List<Long> categoryIdIn;
+    @Schema(description = "分类路径；一级分类传一级ID，二级分类传一级ID,二级ID")
+    private String category;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Schema(description = "交易日期开始")
