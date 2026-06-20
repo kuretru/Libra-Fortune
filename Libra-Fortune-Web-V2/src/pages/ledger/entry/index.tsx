@@ -3,7 +3,6 @@ import {
   DeleteOutlined,
   DragOutlined,
   EditOutlined,
-  LockOutlined,
   PlusOutlined,
   RollbackOutlined,
 } from '@ant-design/icons';
@@ -30,6 +29,7 @@ import {
   Popconfirm,
   Select,
   Space,
+  Switch,
   Table,
   Tag,
 } from 'antd';
@@ -1224,9 +1224,30 @@ const LedgerEntry: React.FC = () => {
                       width: 112,
                       render: (_, field) => (
                         <Space size={4}>
-                          {detailValues[field.name]?.allocationLock && (
-                            <LockOutlined />
-                          )}
+                          <Switch
+                            checked={Boolean(
+                              detailValues[field.name]?.allocationLock,
+                            )}
+                            size="small"
+                            onChange={(locked) => {
+                              const details = (form.getFieldValue('details') ??
+                                []) as LedgerEntryDetailFormValues[];
+                              form.setFieldValue(
+                                'details',
+                                details.map((detail, index) =>
+                                  index === field.name
+                                    ? {
+                                        ...detail,
+                                        allocationLock: locked
+                                          ? 'amount'
+                                          : undefined,
+                                      }
+                                    : detail,
+                                ),
+                              );
+                              scheduleRecalculateFundedAmounts();
+                            }}
+                          />
                           <Button
                             danger
                             icon={<DeleteOutlined />}
