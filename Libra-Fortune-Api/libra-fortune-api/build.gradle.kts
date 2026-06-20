@@ -9,7 +9,7 @@ version = "0.4.0"
 
 val mybatisPlusVersion = "3.5.16"
 val mapstructVersion = "1.6.3"
-val springdocOpenapiVersion = "3.0.1"
+val springdocOpenapiVersion = "3.0.3"
 val guavaVersion = "33.5.0-jre"
 
 java {

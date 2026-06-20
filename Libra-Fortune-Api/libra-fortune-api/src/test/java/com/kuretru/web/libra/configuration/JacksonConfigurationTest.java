@@ -1,7 +1,8 @@
 package com.kuretru.web.libra.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.math.BigDecimal;
 
@@ -9,8 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JacksonConfigurationTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JacksonConfiguration().bigDecimalModule());
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .addModule(new JacksonConfiguration().bigDecimalModule())
+            .build();
 
     @Test
     void serializeBigDecimalAsPlainString() throws Exception {

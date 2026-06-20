@@ -15,3 +15,4 @@
 * 大部分基建都在Galaxy-Microservice下的各个子包里，该项目可以专心业务实现，如果你觉得基建有需要修改/完善的地方，先不要修改，告诉我你的规划，由我来决定要不要修改，因为基建同时还被其他项目使用着
 * API风格使用RESTful风格，但可以酌情简化
 * 需要排序的DO(含有sequence字段)，其对应的DTO不需要暴露sequence
+* 项目使用Spring Boot4集成Jackson3，项目的依赖opendoc仍旧在使用Jackson2，需要注意区分哪些地方应使用Jackson3哪些地方应使用Jackson2

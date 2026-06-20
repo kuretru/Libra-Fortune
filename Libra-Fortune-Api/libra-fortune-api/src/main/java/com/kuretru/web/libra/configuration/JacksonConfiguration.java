@@ -1,31 +1,31 @@
 package com.kuretru.web.libra.configuration;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.module.SimpleModule;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 @Configuration
 public class JacksonConfiguration {
 
     @Bean
-    public Module bigDecimalModule() {
+    public JacksonModule bigDecimalModule() {
         var module = new SimpleModule();
         module.addSerializer(BigDecimal.class, new BigDecimalJsonSerializer());
         return module;
     }
 
-    private static class BigDecimalJsonSerializer extends JsonSerializer<BigDecimal> {
+    private static class BigDecimalJsonSerializer extends ValueSerializer<BigDecimal> {
 
         @Override
-        public void serialize(BigDecimal value, JsonGenerator generator, SerializerProvider serializers)
-                throws IOException {
+        public void serialize(BigDecimal value, JsonGenerator generator, SerializationContext serializers)
+                throws JacksonException {
             generator.writeString(value.toPlainString());
         }
 
