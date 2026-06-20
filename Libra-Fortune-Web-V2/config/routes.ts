@@ -48,6 +48,11 @@ export default [
         path: '/account/account',
         component: './account/account',
       },
+      {
+        name: '余额快照',
+        path: '/account/balance',
+        component: './account/balance',
+      },
     ],
   },
   {
