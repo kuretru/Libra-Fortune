@@ -883,21 +883,26 @@ const LedgerEntry: React.FC = () => {
         onFinish={onFinish}
         submitter={{
           searchConfig: {
-            submitText: '记账',
+            submitText: currentRecord?.id ? '保存' : '记账',
           },
-          render: (_, dom) => [
-            dom[0],
-            <Button key="clear" onClick={onClearButtonClick}>
-              清空
-            </Button>,
-            dom[1],
-            <Button
-              key="continuous-entry"
-              onClick={onContinuousEntryButtonClick}
-            >
-              连续记账
-            </Button>,
-          ],
+          render: (_, dom) => {
+            if (currentRecord?.id) {
+              return [dom[1]];
+            }
+            return [
+              dom[0],
+              <Button key="clear" onClick={onClearButtonClick}>
+                清空
+              </Button>,
+              dom[1],
+              <Button
+                key="continuous-entry"
+                onClick={onContinuousEntryButtonClick}
+              >
+                连续记账
+              </Button>,
+            ];
+          },
         }}
         modalProps={{
           destroyOnHidden: true,
