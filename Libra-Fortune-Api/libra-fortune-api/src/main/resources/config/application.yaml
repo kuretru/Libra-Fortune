@@ -25,7 +25,6 @@ springdoc:
   default-produces-media-type: application/json
 logging:
   level:
-    com.kuretru.web.libra.mapper: debug
     com.kuretru.web.libra.account.mapper: debug
     com.kuretru.web.libra.ledger.mapper: debug
     com.kuretru.web.libra.metadata.mapper: debug

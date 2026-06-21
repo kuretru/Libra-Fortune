@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableTransactionManagement
 @MapperScan({
-        "com.kuretru.web.libra.mapper",
         "com.kuretru.web.libra.account.mapper",
         "com.kuretru.web.libra.ledger.mapper",
         "com.kuretru.web.libra.metadata.mapper"
