@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("ledgerV2Controller")
+@RestController
 @RequestMapping("/api/ledgers")
 @Tag(name = "账本")
 public class LedgerController extends BaseRestController<LedgerService, LedgerDTO, LedgerQuery> {

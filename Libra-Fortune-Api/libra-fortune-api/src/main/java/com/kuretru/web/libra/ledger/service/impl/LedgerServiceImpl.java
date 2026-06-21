@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service("ledgerV2Service")
+@Service
 public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, LedgerDO, LedgerDTO, LedgerQuery> implements LedgerService {
 
     private final LedgerMemberService memberService;

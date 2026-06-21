@@ -5,7 +5,7 @@ import com.kuretru.web.libra.ledger.entity.data.LedgerMemberDO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerMemberDTO;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", implementationName = "LedgerV2MemberEntityMapperImpl")
+@Mapper(componentModel = "spring")
 public interface LedgerMemberEntityMapper extends BaseEntityMapper<LedgerMemberDO, LedgerMemberDTO> {
 
 }

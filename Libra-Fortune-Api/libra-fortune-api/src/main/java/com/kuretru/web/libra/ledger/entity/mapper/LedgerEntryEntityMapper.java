@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", implementationName = "LedgerV2EntryEntityMapperImpl")
+@Mapper(componentModel = "spring")
 public interface LedgerEntryEntityMapper extends BaseEntityMapper<LedgerEntryDO, LedgerEntryDTO> {
 
     @Override

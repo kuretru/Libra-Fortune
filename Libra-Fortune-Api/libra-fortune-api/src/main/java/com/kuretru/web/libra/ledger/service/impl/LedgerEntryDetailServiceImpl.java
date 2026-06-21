@@ -12,7 +12,7 @@ import com.kuretru.web.libra.ledger.service.LedgerEntryDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("ledgerV2EntryDetailService")
+@Service
 public class LedgerEntryDetailServiceImpl
         extends BaseServiceImpl<LedgerEntryDetailMapper, LedgerEntryDetailDO, LedgerEntryDetailDTO, EmptyQuery>
         implements LedgerEntryDetailService {

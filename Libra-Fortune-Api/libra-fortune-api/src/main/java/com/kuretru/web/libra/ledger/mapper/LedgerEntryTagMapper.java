@@ -5,7 +5,7 @@ import com.kuretru.web.libra.ledger.entity.data.LedgerEntryTagDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-@Repository("ledgerV2EntryTagMapper")
+@Repository
 @Mapper
 public interface LedgerEntryTagMapper extends BaseMapper<LedgerEntryTagDO> {
 }

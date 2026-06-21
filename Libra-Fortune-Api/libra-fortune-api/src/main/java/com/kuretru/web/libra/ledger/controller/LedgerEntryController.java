@@ -23,7 +23,7 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import java.util.Map;
 
-@RestController("ledgerV2EntryController")
+@RestController
 @RequestMapping("/api/ledgers/{ledgerId}/entries")
 @Tag(name = "账本-条目")
 public class LedgerEntryController extends BaseRestController<LedgerEntryService, LedgerEntryDTO, LedgerEntryQuery> {

@@ -31,7 +31,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 
-@Service("ledgerV2EntryService")
+@Service
 public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEntryDO, LedgerEntryDTO, LedgerEntryQuery> implements LedgerEntryService {
 
     private static final BigDecimal HUNDRED = new BigDecimal("100.00");

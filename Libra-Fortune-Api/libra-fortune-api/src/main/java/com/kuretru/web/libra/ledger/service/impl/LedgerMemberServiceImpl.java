@@ -12,7 +12,7 @@ import com.kuretru.web.libra.ledger.service.LedgerMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("ledgerMemberV2Service")
+@Service
 public class LedgerMemberServiceImpl extends BaseServiceImpl<LedgerMemberMapper, LedgerMemberDO, LedgerMemberDTO, EmptyQuery>
         implements LedgerMemberService {
 
