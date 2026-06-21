@@ -14,15 +14,18 @@ export async function list(
   ledgerId: number,
   page: GalaxyWeb.PaginationQuery & LibraFortune.Ledger.LedgerEntryQuery,
 ) {
+  const {tagIdIn, ...params} = page;
+  const tagIdQuery = tagIdIn
+    ?.map((tagId) => `tagIdIn=${encodeURIComponent(tagId)}`)
+    .join('&');
+
   return request<
     GalaxyWeb.ApiResponse<
       GalaxyWeb.PaginationResponse<LibraFortune.Ledger.LedgerEntryDTO>
     >
-  >(endpointPrefix(ledgerId), {
+  >(`${endpointPrefix(ledgerId)}${tagIdQuery ? `?${tagIdQuery}` : ''}`, {
     method: 'GET',
-    params: {
-      ...page,
-    },
+    params,
   });
 }
 

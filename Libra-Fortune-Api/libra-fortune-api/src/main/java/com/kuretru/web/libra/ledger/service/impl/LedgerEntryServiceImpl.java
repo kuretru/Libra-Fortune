@@ -9,6 +9,7 @@ import com.kuretru.web.libra.account.service.AccountService;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryEntityMapper;
 import com.kuretru.web.libra.ledger.entity.query.LedgerEntryQuery;
+import com.kuretru.web.libra.ledger.entity.query.LedgerEntryTagQuery;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryDTO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryDetailDTO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryTagDTO;
@@ -56,6 +57,18 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         this.tagService = tagService;
         this.detailService = detailService;
         this.accountService = accountService;
+    }
+
+    @Override
+    protected QueryWrapper<LedgerEntryDO> buildQueryWrapper(LedgerEntryQuery query) {
+        var queryWrapper = super.buildQueryWrapper(query);
+        if (query.getTagIdIn() != null && !query.getTagIdIn().isEmpty()) {
+            var tagQuery = new LedgerEntryTagQuery();
+            tagQuery.setTagIdIn(query.getTagIdIn());
+            var tagIdList = tagService.listParentId(tagQuery);
+            queryWrapper.in("id", tagIdList);
+        }
+        return queryWrapper;
     }
 
     @Override
