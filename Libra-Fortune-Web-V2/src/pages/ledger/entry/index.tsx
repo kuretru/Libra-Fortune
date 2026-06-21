@@ -107,6 +107,24 @@ const toDateString = (value: string | Dayjs): string =>
 const isEmptyFormValue = (value: unknown): boolean =>
   value === undefined || value === null || value === '';
 
+const sortTagIds = (
+  tagIds: number[],
+  tagSets: GroupedTagOption[],
+): number[] => {
+  const knownTagIds = new Set<number>();
+  const sortedTagIds = tagSets.flatMap((tagSet) =>
+    tagSet.options.flatMap((option) => {
+      knownTagIds.add(option.value);
+      return tagIds.includes(option.value) ? [option.value] : [];
+    }),
+  );
+
+  return [
+    ...sortedTagIds,
+    ...tagIds.filter((tagId) => !knownTagIds.has(tagId)),
+  ];
+};
+
 const amountToCents = (value: string): bigint | undefined => {
   const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(value);
   if (!match) return undefined;
@@ -883,7 +901,9 @@ const LedgerEntry: React.FC = () => {
         settlementAmount: values.settlementAmount!,
         settlementCurrency: values.settlementCurrency!,
         remark: values.remark,
-        tags: (values.tagIds ?? []).map((tagId) => ({ tagId })),
+        tags: sortTagIds(values.tagIds ?? [], tagSetOptions).map((tagId) => ({
+          tagId,
+        })),
         details: (values.details ?? []).map(
           ({ allocationLock: _, ...detail }) => detail,
         ) as LibraFortune.Ledger.LedgerEntryDetailDTO[],
