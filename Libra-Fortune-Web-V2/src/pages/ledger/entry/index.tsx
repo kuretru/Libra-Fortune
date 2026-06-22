@@ -13,6 +13,7 @@ import {
   type ProColumns,
   ProFormDatePicker,
   ProFormDigit,
+  type ProFormInstance,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
@@ -426,9 +427,14 @@ const LedgerEntry: React.FC = () => {
   const [currencyOptions, setCurrencyOptions] = useState<Option<string>[]>([]);
   const [tagSetOptions, setTagSetOptions] = useState<GroupedTagOption[]>([]);
   const [accountOptions, setAccountOptions] = useState<Option<number>[]>([]);
+  const [datePickerDefaultValue, setDatePickerDefaultValue] = useState<
+    Dayjs | undefined
+  >(undefined);
   const [form] = Form.useForm<LedgerEntryFormValues>();
   const detailValues = Form.useWatch('details', form) ?? [];
   const actionRef = useRef<ActionType | null>(null);
+  const searchFormRef =
+    useRef<ProFormInstance<LedgerEntrySearchParams>>(undefined);
   const calculateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const originalAmountAutoFilledRef = useRef(false);
   const continuousEntryRef = useRef(false);
@@ -480,6 +486,11 @@ const LedgerEntry: React.FC = () => {
     }
     return result;
   }, [tagSetOptions]);
+
+  const accountNameMap = useMemo(
+    () => new Map(accountOptions.map((option) => [option.value, option.label])),
+    [accountOptions],
+  );
 
   const categoryNameMap = useMemo(
     () =>
@@ -723,7 +734,7 @@ const LedgerEntry: React.FC = () => {
       dataIndex: 'date',
       title: '日期',
       valueType: 'date',
-      width: 90,
+      width: 100,
       fixed: 'left',
       search: false,
     },
@@ -830,6 +841,33 @@ const LedgerEntry: React.FC = () => {
       },
     },
     {
+      key: 'paymentChain',
+      title: '付款链',
+      search: false,
+      width: 280,
+      render: (_, record) => {
+        const detailsWithPaymentChain = (record.details ?? []).filter(
+          (detail) => detail.paymentChain?.length,
+        );
+        if (detailsWithPaymentChain.length === 0) return <span>-</span>;
+        return (
+          <Space size={[0, 4]} wrap>
+            {detailsWithPaymentChain.map((detail) => (
+              <Tag key={`${record.id}-${detail.username}`}>
+                {detail.username}：
+                {(detail.paymentChain ?? [])
+                  .map(
+                    (accountId) =>
+                      accountNameMap.get(accountId) ?? `账户 #${accountId}`,
+                  )
+                  .join(' → ')}
+              </Tag>
+            ))}
+          </Space>
+        );
+      },
+    },
+    {
       key: 'action',
       title: '操作',
       fixed: 'right',
@@ -927,6 +965,8 @@ const LedgerEntry: React.FC = () => {
   };
 
   const onCreateButtonClick = () => {
+    const dateRange = searchFormRef.current?.getFieldValue('dateRange');
+    setDatePickerDefaultValue(dateRange?.[0] ? dayjs(dateRange[0]) : undefined);
     setCurrentRecord(undefined);
     setModalVisible(true);
   };
@@ -984,6 +1024,7 @@ const LedgerEntry: React.FC = () => {
         actionRef={actionRef}
         columns={columns}
         defaultSize="small"
+        formRef={searchFormRef}
         rowKey="id"
         request={onRequest}
         search={{
@@ -1047,6 +1088,7 @@ const LedgerEntry: React.FC = () => {
             label="交易日期"
             rules={[{ required: true }]}
             fieldProps={{
+              defaultPickerValue: datePickerDefaultValue,
               format: 'YYYY-MM-DD',
             }}
           />
