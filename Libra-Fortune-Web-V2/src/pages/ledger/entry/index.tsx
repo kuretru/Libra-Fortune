@@ -825,7 +825,7 @@ const LedgerEntry: React.FC = () => {
       dataIndex: 'details',
       title: '分担明细',
       search: false,
-      width: 260,
+      width: 200,
       render: (_, record) => {
         const details = record.details ?? [];
         if (details.length === 0) return <span>-</span>;
