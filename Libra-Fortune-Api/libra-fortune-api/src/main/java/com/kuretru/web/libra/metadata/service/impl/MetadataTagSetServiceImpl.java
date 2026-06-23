@@ -51,10 +51,10 @@ public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<Metadata
         var records = list(null);
         var result = new ArrayList<EnumDTO<Long>>();
         for (var record : records) {
-            var item = new EnumDTO<>(record.getName(), record.getId());
+            var item = new EnumDTO<>(record.getId(), record.getName());
             var children = new ArrayList<EnumDTO<Long>>();
             for (var child : record.getItems()) {
-                children.add(new EnumDTO<>(child.getName(), child.getId()));
+                children.add(new EnumDTO<>(child.getId(), child.getName()));
             }
             item.setChildren(children);
             result.add(item);

@@ -37,7 +37,7 @@ public class MetadataCategoryServiceImpl
         var result = new ArrayList<EnumDTO<Long>>();
         var childrenMap = new HashMap<Long, List<EnumDTO<Long>>>();
         for (var record : records) {
-            var dto = new EnumDTO<>(record.getName(), record.getId());
+            var dto = new EnumDTO<>(record.getId(), record.getName());
             if (record.getParentId() == null) {
                 result.add(dto);
             } else {

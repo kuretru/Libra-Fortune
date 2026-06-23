@@ -30,7 +30,7 @@ public class MetadataCurrencyServiceImpl
         var records = list(null);
         var result = new ArrayList<EnumDTO<String>>();
         for (var record : records) {
-            result.add(new EnumDTO<>("%s(%s)".formatted(record.getName(), record.getSymbol()), record.getCode()));
+            result.add(new EnumDTO<>(record.getCode(), "%s(%s)".formatted(record.getName(), record.getSymbol())));
         }
         return result;
     }
