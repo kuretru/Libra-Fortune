@@ -2,6 +2,14 @@ import {request} from '@umijs/max';
 
 const endpointPrefix = '/api/ledgers';
 
+export async function enums() {
+  return request<GalaxyWeb.ApiResponse<LibraFortune.Ledger.LedgerEnumDTO>>(
+    `${endpointPrefix}/enums`, {
+      method: 'GET',
+    },
+  );
+}
+
 export async function get(id: number) {
   return request<GalaxyWeb.ApiResponse<LibraFortune.Ledger.LedgerDTO>>(
     `${endpointPrefix}/${id}`, {

@@ -3,8 +3,10 @@ import {
   DeleteOutlined,
   DragOutlined,
   EditOutlined,
+  LockOutlined,
   PlusOutlined,
   RollbackOutlined,
+  UnlockOutlined,
 } from '@ant-design/icons';
 import {
   type ActionType,
@@ -30,7 +32,6 @@ import {
   Popconfirm,
   Select,
   Space,
-  Switch,
   Table,
   Tag,
 } from 'antd';
@@ -44,7 +45,7 @@ import React, {
 } from 'react';
 import * as accountApi from '@/services/libra-fortune/account/account';
 import * as entryApi from '@/services/libra-fortune/ledger/entry';
-import { get as getLedger } from '@/services/libra-fortune/ledger/ledger';
+import * as ledgerApi from '@/services/libra-fortune/ledger/ledger';
 import * as categoryApi from '@/services/libra-fortune/metadata/category';
 import * as currencyApi from '@/services/libra-fortune/metadata/currency';
 import * as tagSetApi from '@/services/libra-fortune/metadata/tag-set';
@@ -59,9 +60,7 @@ type LedgerEntryFormValues = Omit<
 };
 
 type LedgerEntryDetailFormValues =
-  Partial<LibraFortune.Ledger.LedgerEntryDetailDTO> & {
-    allocationLock?: 'amount' | 'ratio';
-  };
+  Partial<LibraFortune.Ledger.LedgerEntryDetailDTO>;
 
 type Option<T extends string | number = string | number> = {
   label: string;
@@ -427,6 +426,9 @@ const LedgerEntry: React.FC = () => {
   const [currencyOptions, setCurrencyOptions] = useState<Option<string>[]>([]);
   const [tagSetOptions, setTagSetOptions] = useState<GroupedTagOption[]>([]);
   const [accountOptions, setAccountOptions] = useState<Option<number>[]>([]);
+  const [detailLockTypeOptions, setDetailLockTypeOptions] = useState<
+    Option<string>[]
+  >([]);
   const [datePickerDefaultValue, setDatePickerDefaultValue] = useState<
     Dayjs | undefined
   >(undefined);
@@ -458,6 +460,25 @@ const LedgerEntry: React.FC = () => {
     [ledger?.members],
   );
 
+  const detailLockTypes = useMemo(() => {
+    const getValue = (value: string) =>
+      detailLockTypeOptions.find((option) => option.value === value)?.value ??
+      value;
+    return {
+      unlock: getValue('unlock'),
+      ratio: getValue('lock_ratio'),
+      amount: getValue('local_amount'),
+    };
+  }, [detailLockTypeOptions]);
+
+  const detailLockTypeLabelMap = useMemo(
+    () =>
+      new Map(
+        detailLockTypeOptions.map((option) => [option.value, option.label]),
+      ),
+    [detailLockTypeOptions],
+  );
+
   const resetEntryForm = useCallback(
     (details: LedgerEntryDetailFormValues[] = defaultDetails) => {
       originalAmountAutoFilledRef.current = false;
@@ -468,13 +489,14 @@ const LedgerEntry: React.FC = () => {
         tagIds: [],
         details: details.map(({ username, paymentChain, fundedRatio }) => ({
           username,
+          lockType: detailLockTypes.unlock,
           paymentChain,
           fundedRatio,
           amount: '',
         })),
       });
     },
-    [currencyOptions, defaultDetails, form],
+    [currencyOptions, defaultDetails, detailLockTypes.unlock, form],
   );
 
   const tagNameMap = useMemo(() => {
@@ -505,11 +527,12 @@ const LedgerEntry: React.FC = () => {
     }
 
     Promise.all([
-      getLedger(ledgerId),
+      ledgerApi.get(ledgerId),
       categoryApi.enums(),
       currencyApi.enums(),
       tagSetApi.list({ current: 1, pageSize: 1000, noPage: true }),
       accountApi.list({ current: 1, pageSize: 1000, noPage: true }),
+      ledgerApi.enums(),
     ])
       .then(
         ([
@@ -518,6 +541,7 @@ const LedgerEntry: React.FC = () => {
           currencyResponse,
           tagSetResponse,
           accountResponse,
+          ledgerEnumResponse,
         ]) => {
           setLedger(ledgerResponse.data);
           setCategories(categoryResponse.data);
@@ -544,6 +568,7 @@ const LedgerEntry: React.FC = () => {
               value: account.id!,
             })),
           );
+          setDetailLockTypeOptions(ledgerEnumResponse.data.detailLockTypes);
         },
       )
       .catch(() => {
@@ -560,28 +585,28 @@ const LedgerEntry: React.FC = () => {
         ...currentRecord,
         date: currentRecord.date ? dayjs(currentRecord.date) : undefined,
         tagIds: currentRecord.tags?.map((tag) => tag.tagId) ?? [],
-        details: currentRecord.details ?? [],
+        details: (currentRecord.details ?? []).map((detail) => ({
+          ...detail,
+          lockType: detail.lockType ?? detailLockTypes.unlock,
+        })),
       });
     } else {
       resetEntryForm();
     }
-  }, [modalVisible, currentRecord, form, resetEntryForm]);
+  }, [
+    modalVisible,
+    currentRecord,
+    detailLockTypes.unlock,
+    form,
+    resetEntryForm,
+  ]);
 
   const recalculateFundedAmounts = useCallback(() => {
     const settlementAmount = form.getFieldValue('settlementAmount');
     const details = (form.getFieldValue('details') ??
       []) as LedgerEntryDetailFormValues[];
     if (details.length === 0) return;
-    if (!settlementAmount) {
-      form.setFieldValue(
-        'details',
-        details.map((detail) => ({
-          ...detail,
-          amount: '',
-        })),
-      );
-      return;
-    }
+    if (!settlementAmount) return;
 
     const settlementCents = amountToCents(settlementAmount);
     if (settlementCents === undefined || settlementCents === 0n) return;
@@ -591,7 +616,7 @@ const LedgerEntry: React.FC = () => {
      *    后续的均分只会作用于未锁定行，绝不覆盖用户的手动输入。
      */
     const amounts = details.map((detail) => {
-      if (detail.allocationLock === 'ratio') {
+      if (detail.lockType === detailLockTypes.ratio) {
         const ratio = detail.fundedRatio
           ? ratioToUnits(detail.fundedRatio)
           : undefined;
@@ -599,7 +624,7 @@ const LedgerEntry: React.FC = () => {
           ? undefined
           : (settlementCents * ratio + 5000n) / 10000n;
       }
-      if (detail.allocationLock === 'amount') {
+      if (detail.lockType === detailLockTypes.amount) {
         return detail.amount ? amountToCents(detail.amount) : undefined;
       }
       return undefined;
@@ -607,7 +632,8 @@ const LedgerEntry: React.FC = () => {
     if (
       details.some(
         (detail, index) =>
-          detail.allocationLock && amounts[index] === undefined,
+          detail.lockType !== detailLockTypes.unlock &&
+          amounts[index] === undefined,
       )
     ) {
       messageApi.open({
@@ -631,7 +657,7 @@ const LedgerEntry: React.FC = () => {
 
     /* 2. 未锁定行均分余额；按分取整后，把所有余分交给第一位未锁定人。 */
     const unlockedIndexes = details.flatMap((detail, index) =>
-      detail.allocationLock ? [] : [index],
+      detail.lockType === detailLockTypes.unlock ? [index] : [],
     );
     const remaining = settlementCents - lockedAmount;
     if (unlockedIndexes.length === 0 && remaining !== 0n) {
@@ -652,24 +678,35 @@ const LedgerEntry: React.FC = () => {
     });
 
     /*
-     * 3. 金额确定后，统一反算比例。比例保留两位小数；最后把舍入差额交给
-     *    第一位未锁定人（没有未锁定人时交给第一行），以保证总计恰好为 100.00%。
+     * 3. 金额确定后，反算非比例锁定行的比例。比例锁定行必须保持用户输入的
+     *    原始比例；舍入差额只能交给未锁比例的行。
      */
-    const ratios = amounts.map((amount) =>
-      ratioUnitsFromCents(amount ?? 0n, settlementCents),
+    const ratios = amounts.map((amount, index) => {
+      const detail = details[index];
+      if (detail.lockType === detailLockTypes.ratio) {
+        return ratioToUnits(detail.fundedRatio ?? '') ?? 0n;
+      }
+      return ratioUnitsFromCents(amount ?? 0n, settlementCents);
+    });
+    const ratioAdjustmentIndex = details.findIndex(
+      (detail) => detail.lockType !== detailLockTypes.ratio,
     );
-    const ratioAdjustmentIndex = unlockedIndexes[0] ?? 0;
-    ratios[ratioAdjustmentIndex] +=
-      10000n - ratios.reduce((total, ratio) => total + ratio, 0n);
+    if (ratioAdjustmentIndex >= 0) {
+      ratios[ratioAdjustmentIndex] +=
+        10000n - ratios.reduce((total, ratio) => total + ratio, 0n);
+    }
     form.setFieldValue(
       'details',
       details.map((detail, index) => ({
         ...detail,
         amount: centsToAmount(amounts[index] ?? 0n),
-        fundedRatio: ratioUnitsToString(ratios[index]),
+        fundedRatio:
+          detail.lockType === detailLockTypes.ratio
+            ? detail.fundedRatio
+            : ratioUnitsToString(ratios[index]),
       })),
     );
-  }, [form, messageApi]);
+  }, [detailLockTypes, form, messageApi]);
 
   const scheduleRecalculateFundedAmounts = useCallback(() => {
     if (calculateTimerRef.current) {
@@ -696,6 +733,14 @@ const LedgerEntry: React.FC = () => {
         originalAmountAutoFilledRef.current = !isEmptyFormValue(value);
       }
 
+      if (isEmptyFormValue(value)) {
+        if (calculateTimerRef.current) {
+          clearTimeout(calculateTimerRef.current);
+          calculateTimerRef.current = null;
+        }
+        return;
+      }
+
       scheduleRecalculateFundedAmounts();
     },
     [form, scheduleRecalculateFundedAmounts],
@@ -704,6 +749,29 @@ const LedgerEntry: React.FC = () => {
   const onOriginalAmountChange = useCallback(() => {
     originalAmountAutoFilledRef.current = false;
   }, []);
+
+  const toggleDetailLockType = useCallback(
+    (detailIndex: number, lockType: string) => {
+      const details = (form.getFieldValue('details') ??
+        []) as LedgerEntryDetailFormValues[];
+      form.setFieldValue(
+        'details',
+        details.map((detail, index) =>
+          index === detailIndex
+            ? {
+                ...detail,
+                lockType:
+                  detail.lockType === lockType
+                    ? detailLockTypes.unlock
+                    : lockType,
+              }
+            : detail,
+        ),
+      );
+      scheduleRecalculateFundedAmounts();
+    },
+    [detailLockTypes.unlock, form, scheduleRecalculateFundedAmounts],
+  );
 
   useEffect(
     () => () => {
@@ -942,9 +1010,10 @@ const LedgerEntry: React.FC = () => {
         tags: sortTagIds(values.tagIds ?? [], tagSetOptions).map((tagId) => ({
           tagId,
         })),
-        details: (values.details ?? []).map(
-          ({ allocationLock: _, ...detail }) => detail,
-        ) as LibraFortune.Ledger.LedgerEntryDetailDTO[],
+        details: (values.details ?? []).map((detail) => ({
+          ...detail,
+          lockType: detail.lockType ?? detailLockTypes.unlock,
+        })) as LibraFortune.Ledger.LedgerEntryDetailDTO[],
       };
       const fn = record.id ? entryApi.update : entryApi.create;
       await fn(ledgerId, record);
@@ -1170,10 +1239,7 @@ const LedgerEntry: React.FC = () => {
                       render: (_, field) => (
                         <>
                           <Form.Item name={[field.name, 'id']} hidden />
-                          <Form.Item
-                            name={[field.name, 'allocationLock']}
-                            hidden
-                          />
+                          <Form.Item name={[field.name, 'lockType']} hidden />
                           <Form.Item
                             name={[field.name, 'username']}
                             rules={[{ required: true }]}
@@ -1203,119 +1269,147 @@ const LedgerEntry: React.FC = () => {
                     {
                       dataIndex: 'fundedRatio',
                       title: '承担比例',
-                      width: 140,
-                      render: (_, field) => (
-                        <Form.Item
-                          name={[field.name, 'fundedRatio']}
-                          rules={[{ required: true }]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <InputNumber
-                            addonAfter="%"
-                            max={100}
-                            min={0}
-                            onChange={(value) => {
-                              const details = (form.getFieldValue('details') ??
-                                []) as LedgerEntryDetailFormValues[];
-                              form.setFieldValue(
-                                'details',
-                                details.map((detail, index) =>
-                                  index === field.name
-                                    ? {
-                                        ...detail,
-                                        fundedRatio: value ?? '',
-                                        allocationLock: isEmptyFormValue(value)
-                                          ? undefined
-                                          : 'ratio',
-                                      }
-                                    : detail,
-                                ),
-                              );
-                              scheduleRecalculateFundedAmounts();
-                            }}
-                            precision={2}
-                            step="0.01"
-                            stringMode
-                            style={{ width: '100%' }}
-                          />
-                        </Form.Item>
-                      ),
+                      width: 160,
+                      render: (_, field) => {
+                        const isLocked =
+                          detailValues[field.name]?.lockType ===
+                          detailLockTypes.ratio;
+                        const lockLabel =
+                          detailLockTypeLabelMap.get(detailLockTypes.ratio) ??
+                          '锁比例';
+                        return (
+                          <Form.Item
+                            name={[field.name, 'fundedRatio']}
+                            rules={[{ required: true }]}
+                            style={{ marginBottom: 0 }}
+                          >
+                            <InputNumber
+                              addonAfter={
+                                <Space size={0}>
+                                  <span>%</span>
+                                  <Button
+                                    aria-label={lockLabel}
+                                    icon={
+                                      isLocked ? (
+                                        <LockOutlined />
+                                      ) : (
+                                        <UnlockOutlined />
+                                      )
+                                    }
+                                    size="small"
+                                    title={
+                                      isLocked ? `解除${lockLabel}` : lockLabel
+                                    }
+                                    type={isLocked ? 'primary' : 'text'}
+                                    onClick={() =>
+                                      toggleDetailLockType(
+                                        field.name,
+                                        detailLockTypes.ratio,
+                                      )
+                                    }
+                                  />
+                                </Space>
+                              }
+                              max={100}
+                              min={0}
+                              onChange={(value) => {
+                                const details = (form.getFieldValue(
+                                  'details',
+                                ) ?? []) as LedgerEntryDetailFormValues[];
+                                form.setFieldValue(
+                                  'details',
+                                  details.map((detail, index) =>
+                                    index === field.name
+                                      ? { ...detail, fundedRatio: value ?? '' }
+                                      : detail,
+                                  ),
+                                );
+                                scheduleRecalculateFundedAmounts();
+                              }}
+                              precision={2}
+                              step="0.01"
+                              stringMode
+                              style={{ width: '100%' }}
+                            />
+                          </Form.Item>
+                        );
+                      },
                     },
                     {
                       dataIndex: 'amount',
                       title: '承担金额',
                       width: 140,
-                      render: (_, field) => (
-                        <Form.Item
-                          name={[field.name, 'amount']}
-                          rules={[{ required: true }]}
-                          style={{ marginBottom: 0 }}
-                        >
-                          <InputNumber
-                            min={0}
-                            precision={2}
-                            step="0.01"
-                            stringMode
-                            style={{ width: '100%' }}
-                            onChange={(value) => {
-                              const details = (form.getFieldValue('details') ??
-                                []) as LedgerEntryDetailFormValues[];
-                              form.setFieldValue(
-                                'details',
-                                details.map((detail, index) =>
-                                  index === field.name
-                                    ? {
-                                        ...detail,
-                                        amount: value ?? '',
-                                        allocationLock: isEmptyFormValue(value)
-                                          ? undefined
-                                          : 'amount',
-                                      }
-                                    : detail,
-                                ),
-                              );
-                              scheduleRecalculateFundedAmounts();
-                            }}
-                          />
-                        </Form.Item>
-                      ),
+                      render: (_, field) => {
+                        const isLocked =
+                          detailValues[field.name]?.lockType ===
+                          detailLockTypes.amount;
+                        const lockLabel =
+                          detailLockTypeLabelMap.get(detailLockTypes.amount) ??
+                          '锁金额';
+                        return (
+                          <Form.Item
+                            name={[field.name, 'amount']}
+                            rules={[{ required: true }]}
+                            style={{ marginBottom: 0 }}
+                          >
+                            <InputNumber
+                              addonAfter={
+                                <Button
+                                  aria-label={lockLabel}
+                                  icon={
+                                    isLocked ? (
+                                      <LockOutlined />
+                                    ) : (
+                                      <UnlockOutlined />
+                                    )
+                                  }
+                                  size="small"
+                                  title={
+                                    isLocked ? `解除${lockLabel}` : lockLabel
+                                  }
+                                  type={isLocked ? 'primary' : 'text'}
+                                  onClick={() =>
+                                    toggleDetailLockType(
+                                      field.name,
+                                      detailLockTypes.amount,
+                                    )
+                                  }
+                                />
+                              }
+                              min={0}
+                              precision={2}
+                              step="0.01"
+                              stringMode
+                              style={{ width: '100%' }}
+                              onChange={(value) => {
+                                const details = (form.getFieldValue(
+                                  'details',
+                                ) ?? []) as LedgerEntryDetailFormValues[];
+                                form.setFieldValue(
+                                  'details',
+                                  details.map((detail, index) =>
+                                    index === field.name
+                                      ? { ...detail, amount: value ?? '' }
+                                      : detail,
+                                  ),
+                                );
+                                scheduleRecalculateFundedAmounts();
+                              }}
+                            />
+                          </Form.Item>
+                        );
+                      },
                     },
                     {
                       key: 'action',
                       title: '操作',
-                      width: 112,
+                      width: 48,
                       render: (_, field) => (
-                        <Space size={4}>
-                          <Switch
-                            checked={Boolean(
-                              detailValues[field.name]?.allocationLock,
-                            )}
-                            size="small"
-                            onChange={(locked) => {
-                              const details = (form.getFieldValue('details') ??
-                                []) as LedgerEntryDetailFormValues[];
-                              form.setFieldValue(
-                                'details',
-                                details.map((detail, index) =>
-                                  index === field.name
-                                    ? {
-                                        ...detail,
-                                        allocationLock: locked
-                                          ? 'amount'
-                                          : undefined,
-                                      }
-                                    : detail,
-                                ),
-                              );
-                              scheduleRecalculateFundedAmounts();
-                            }}
-                          />
-                          <Button
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() => remove(field.name)}
-                          />
-                        </Space>
+                        <Button
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() => remove(field.name)}
+                        />
                       ),
                     },
                   ]}
@@ -1327,7 +1421,11 @@ const LedgerEntry: React.FC = () => {
                 <Button
                   icon={<PlusOutlined />}
                   onClick={() => {
-                    add({ amount: '', fundedRatio: '0.00' });
+                    add({
+                      amount: '',
+                      fundedRatio: '0.00',
+                      lockType: detailLockTypes.unlock,
+                    });
                     scheduleRecalculateFundedAmounts();
                   }}
                 >
