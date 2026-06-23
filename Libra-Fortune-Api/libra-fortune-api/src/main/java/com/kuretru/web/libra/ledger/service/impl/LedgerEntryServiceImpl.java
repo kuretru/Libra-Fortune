@@ -9,7 +9,6 @@ import com.kuretru.web.libra.account.service.AccountService;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryEntityMapper;
 import com.kuretru.web.libra.ledger.entity.query.LedgerEntryQuery;
-import com.kuretru.web.libra.ledger.entity.query.LedgerEntryTagQuery;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryDTO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryDetailDTO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryTagDTO;
@@ -63,10 +62,19 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     protected QueryWrapper<LedgerEntryDO> buildQueryWrapper(LedgerEntryQuery query) {
         var queryWrapper = super.buildQueryWrapper(query);
         if (query.getTagIdIn() != null && !query.getTagIdIn().isEmpty()) {
-            var tagQuery = new LedgerEntryTagQuery();
-            tagQuery.setTagIdIn(query.getTagIdIn());
-            var tagIdList = tagService.listParentId(tagQuery);
-            queryWrapper.in("id", tagIdList);
+            var placeholders = new StringBuilder();
+            for (var index = 0; index < query.getTagIdIn().size(); index++) {
+                if (index > 0) {
+                    placeholders.append(", ");
+                }
+                placeholders.append("{").append(index).append("}");
+            }
+            queryWrapper.apply(
+                    "EXISTS (SELECT 1 FROM ledger_v2_entry_tag tag " +
+                            "WHERE ledger_v2_entry.id = tag.entry_id " +
+                            "AND tag.tag_id IN (" + placeholders + "))",
+                    query.getTagIdIn().toArray()
+            );
         }
         return queryWrapper;
     }
