@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.kuretru.microservices.web.entity.annotations.ChildrenParentId;
 import com.kuretru.microservices.web.entity.interfaces.Children;
 import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
+import com.kuretru.web.libra.ledger.entity.enums.DetailLockType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -27,6 +28,9 @@ public class LedgerEntryDetailDO extends BaseCreateUpdateDO implements Children<
     /** 归属用户名 */
     private String username;
 
+    /** 百分比或金额锁定方式 */
+    private DetailLockType lockType;
+
     /** 付款链，按顺序存储账户ID */
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Long> paymentChain;
@@ -40,6 +44,7 @@ public class LedgerEntryDetailDO extends BaseCreateUpdateDO implements Children<
     @Override
     public boolean bizEqual(LedgerEntryDetailDO newRecord) {
         return Objects.equals(username, newRecord.getUsername())
+                && Objects.equals(lockType, newRecord.getLockType())
                 && Objects.equals(paymentChain, newRecord.getPaymentChain())
                 && Objects.equals(fundedRatio, newRecord.getFundedRatio())
                 && Objects.equals(amount, newRecord.getAmount());
