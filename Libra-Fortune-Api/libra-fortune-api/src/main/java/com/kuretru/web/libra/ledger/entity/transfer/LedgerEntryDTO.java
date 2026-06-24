@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.ledger.entity.transfer;
 
 import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
+import com.kuretru.web.libra.ledger.entity.enums.EntryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,10 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     @Size(min = 1, max = 2)
     @Schema(description = "分类路径，按层级存储分类ID")
     private List<Long> category;
+
+    @NotNull
+    @Schema(description = "枚举值，条目类型")
+    private EntryType type;
 
     @NotNull
     @Schema(description = "交易日期")

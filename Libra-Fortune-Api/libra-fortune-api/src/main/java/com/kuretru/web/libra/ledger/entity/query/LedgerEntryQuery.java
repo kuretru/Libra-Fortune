@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.ledger.entity.query;
 
+import com.kuretru.web.libra.ledger.entity.enums.EntryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,6 +16,9 @@ public class LedgerEntryQuery {
 
     @Schema(description = "分类路径；一级分类传一级ID，二级分类传一级ID,二级ID")
     private String category;
+
+    @Schema(description = "条目类型")
+    private EntryType type;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Schema(description = "交易日期开始")

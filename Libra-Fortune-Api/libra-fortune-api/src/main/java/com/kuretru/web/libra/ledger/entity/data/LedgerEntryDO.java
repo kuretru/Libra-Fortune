@@ -2,6 +2,7 @@ package com.kuretru.web.libra.ledger.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
+import com.kuretru.web.libra.ledger.entity.enums.EntryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,6 +21,9 @@ public class LedgerEntryDO extends BaseCreateUpdateDO {
 
     /** 分类路径，按层级以逗号分隔分类ID */
     private String category;
+
+    /** 枚举值，条目类型 */
+    private EntryType type;
 
     /** 交易日期 */
     private LocalDate date;
