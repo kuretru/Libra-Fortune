@@ -429,6 +429,9 @@ const LedgerEntry: React.FC = () => {
   const [detailLockTypeOptions, setDetailLockTypeOptions] = useState<
     Option<string>[]
   >([]);
+  const [entryTypeOptions, setEntryTypeOptions] = useState<Option<string>[]>(
+    [],
+  );
   const [datePickerDefaultValue, setDatePickerDefaultValue] = useState<
     Dayjs | undefined
   >(undefined);
@@ -471,6 +474,19 @@ const LedgerEntry: React.FC = () => {
     };
   }, [detailLockTypeOptions]);
 
+  const defaultEntryType = useMemo(
+    () =>
+      entryTypeOptions.find((option) => option.value === 'expense')?.value ??
+      'expense',
+    [entryTypeOptions],
+  );
+
+  const entryTypeLabelMap = useMemo(
+    () =>
+      new Map(entryTypeOptions.map((option) => [option.value, option.label])),
+    [entryTypeOptions],
+  );
+
   const detailLockTypeLabelMap = useMemo(
     () =>
       new Map(
@@ -486,6 +502,7 @@ const LedgerEntry: React.FC = () => {
       form.setFieldsValue({
         originalCurrency: currencyOptions[0]?.value,
         settlementCurrency: currencyOptions[0]?.value,
+        type: defaultEntryType,
         tagIds: [],
         details: details.map(({ username, paymentChain, fundedRatio }) => ({
           username,
@@ -496,7 +513,13 @@ const LedgerEntry: React.FC = () => {
         })),
       });
     },
-    [currencyOptions, defaultDetails, detailLockTypes.unlock, form],
+    [
+      currencyOptions,
+      defaultDetails,
+      defaultEntryType,
+      detailLockTypes.unlock,
+      form,
+    ],
   );
 
   const tagNameMap = useMemo(() => {
@@ -569,6 +592,7 @@ const LedgerEntry: React.FC = () => {
             })),
           );
           setDetailLockTypeOptions(ledgerEnumResponse.data.detailLockTypes);
+          setEntryTypeOptions(ledgerEnumResponse.data.entryTypes);
         },
       )
       .catch(() => {
@@ -807,6 +831,16 @@ const LedgerEntry: React.FC = () => {
       search: false,
     },
     {
+      dataIndex: 'type',
+      title: '类型',
+      valueType: 'select',
+      fieldProps: {
+        options: entryTypeOptions,
+      },
+      width: 84,
+      renderText: (value: string) => entryTypeLabelMap.get(value) ?? value,
+    },
+    {
       dataIndex: 'dateRange',
       title: '日期',
       valueType: 'dateRange',
@@ -1000,6 +1034,7 @@ const LedgerEntry: React.FC = () => {
         id: values.id,
         ledgerId,
         category: values.category!,
+        type: values.type!,
         date: toDateString(values.date!),
         name: values.name!,
         originalAmount: values.originalAmount!,
@@ -1152,6 +1187,12 @@ const LedgerEntry: React.FC = () => {
       >
         <ProFormText name="id" label="ID" hidden />
         <Space align="baseline">
+          <ProFormSelect
+            name="type"
+            label="条目类型"
+            options={entryTypeOptions}
+            rules={[{ required: true }]}
+          />
           <ProFormDatePicker
             name="date"
             label="交易日期"
