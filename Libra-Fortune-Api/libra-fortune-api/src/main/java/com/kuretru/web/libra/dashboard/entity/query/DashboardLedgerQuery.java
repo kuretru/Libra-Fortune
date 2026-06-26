@@ -1,8 +1,8 @@
-package com.kuretru.web.libra.ledger.entity.query;
+package com.kuretru.web.libra.dashboard.entity.query;
 
+import com.kuretru.web.libra.ledger.entity.enums.EntryType;
 import com.kuretru.web.libra.ledger.entity.enums.LedgerGroupBy;
 import com.kuretru.web.libra.ledger.entity.enums.LedgerSumMode;
-import com.kuretru.web.libra.ledger.entity.enums.EntryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class DashboardQuery {
+public class DashboardLedgerQuery {
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kuretru.web.libra.ledger.mapper.DashboardMapper">
+<mapper namespace="com.kuretru.web.libra.dashboard.mapper.DashboardMapper">
 
-    <resultMap id="DashboardBO" type="com.kuretru.web.libra.ledger.entity.business.DashboardBO">
+    <resultMap id="DashboardLedgerBO" type="com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO">
         <result property="year" column="year"/>
         <result property="month" column="month"/>
         <result property="day" column="day"/>
@@ -17,7 +17,7 @@
         <result property="sum" column="sum"/>
     </resultMap>
 
-    <select id="sum" resultMap="DashboardBO">
+    <select id="sum" resultMap="DashboardLedgerBO">
         SELECT
         <foreach collection="selectColumns" item="column" separator="," close=",">
             ${column}

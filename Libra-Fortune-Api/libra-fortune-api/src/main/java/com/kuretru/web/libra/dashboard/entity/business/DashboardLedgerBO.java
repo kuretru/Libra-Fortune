@@ -1,4 +1,4 @@
-package com.kuretru.web.libra.ledger.entity.business;
+package com.kuretru.web.libra.dashboard.entity.business;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class DashboardBO {
+public class DashboardLedgerBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String year;

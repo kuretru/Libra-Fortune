@@ -1,12 +1,12 @@
-package com.kuretru.web.libra.ledger.service.impl;
+package com.kuretru.web.libra.dashboard.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.kuretru.web.libra.ledger.entity.business.DashboardBO;
+import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
+import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
+import com.kuretru.web.libra.dashboard.mapper.DashboardMapper;
+import com.kuretru.web.libra.dashboard.service.DashboardService;
 import com.kuretru.web.libra.ledger.entity.enums.LedgerGroupBy;
 import com.kuretru.web.libra.ledger.entity.enums.LedgerSumMode;
-import com.kuretru.web.libra.ledger.entity.query.DashboardQuery;
-import com.kuretru.web.libra.ledger.mapper.DashboardMapper;
-import com.kuretru.web.libra.ledger.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<DashboardBO> sum(DashboardQuery query) {
+    public List<DashboardLedgerBO> sum(DashboardLedgerQuery query) {
         var sumMode = query.getSumMode();
         String sum = sumMode.getSelect();
 
@@ -35,7 +35,7 @@ public class DashboardServiceImpl implements DashboardService {
             groupByColumns.add(groupBy.getGroupBy());
         }
 
-        var queryWrapper = new QueryWrapper<DashboardBO>();
+        var queryWrapper = new QueryWrapper<DashboardLedgerBO>();
         queryWrapper.ge("entry.`date`", query.getDateBegin());
         queryWrapper.le("entry.`date`", query.getDateEnd());
         var filter = query.getFilter();
