@@ -26,7 +26,7 @@ const LatestSavingsCard: React.FC = () => {
     <StatisticCard
       loading={loading}
       statistic={{
-        title: '最新储蓄总额',
+        title: <strong>最新储蓄总额</strong>,
         value: amount,
         prefix: '¥',
       }}

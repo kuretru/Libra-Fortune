@@ -46,7 +46,7 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
     <StatisticCard
       loading={loading}
       statistic={{
-        title: '本月支出',
+        title: <strong>本月支出</strong>,
         value: amount,
         prefix: '¥',
       }}
