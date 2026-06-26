@@ -36,11 +36,20 @@ public class DashboardServiceImpl implements DashboardService {
         queryWrapper.ge("entry.`date`", query.getDateBegin());
         queryWrapper.le("entry.`date`", query.getDateEnd());
         var filter = query.getFilter();
-        if (filter != null && filter.getLedgerId() != null && !filter.getLedgerId().isEmpty()) {
-            queryWrapper.in("entry.ledger_id", filter.getLedgerId());
+        if (filter != null) {
+            queryWrapper.in(hasItems(filter.getLedgerId()), "entry.ledger_id", filter.getLedgerId());
+            queryWrapper.in(hasItems(filter.getCategoryIdL1()), "entry.category_id_l1", filter.getCategoryIdL1());
+            queryWrapper.in(hasItems(filter.getCategoryIdL2()), "entry.category_id_l2", filter.getCategoryIdL2());
+            queryWrapper.in(hasItems(filter.getType()), "entry.`type`", filter.getType());
+            queryWrapper.in(hasItems(filter.getUsername()), "detail.username", filter.getUsername());
+            queryWrapper.in(hasItems(filter.getTagId()), "tag.tag_id", filter.getTagId());
         }
 
         return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns);
+    }
+
+    private boolean hasItems(List<?> values) {
+        return values != null && !values.isEmpty();
     }
 
 }
