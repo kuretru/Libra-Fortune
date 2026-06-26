@@ -1,5 +1,6 @@
-import { PageContainer } from '@ant-design/pro-components';
+import { PageContainer, StatisticCard } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
+import LatestSavingsCard from './components/LatestSavingsCard';
 import MonthlyUserExpenseCard from './components/MonthlyUserExpenseCard';
 
 const Dashboard: React.FC = () => {
@@ -9,7 +10,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <PageContainer title="账本面板">
-      <MonthlyUserExpenseCard username={currentUsername} />
+      <StatisticCard.Group>
+        <MonthlyUserExpenseCard username={currentUsername} />
+        <LatestSavingsCard />
+      </StatisticCard.Group>
     </PageContainer>
   );
 };

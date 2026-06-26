@@ -91,4 +91,9 @@ declare namespace LibraFortune.Ledger {
     username?: string[];
     tagId?: number[];
   }
+
+  type DashboardAccountBalanceBO = {
+    date?: string;
+    totalBalance?: string;
+  }
 }
