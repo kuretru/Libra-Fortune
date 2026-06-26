@@ -61,4 +61,34 @@ declare namespace LibraFortune.Ledger {
     settlementCurrency?: string;
     tagIdIn?: number[];
   }
+
+  type DashboardLedgerBO = {
+    year?: string;
+    month?: string;
+    day?: string;
+    ledgerId?: number;
+    categoryIdL1?: number;
+    categoryIdL2?: number;
+    type?: string;
+    username?: string;
+    tagId?: number;
+    sum: string;
+  }
+
+  type DashboardLedgerQuery = {
+    dateBegin: string;
+    dateEnd: string;
+    sumMode: string;
+    groupBy: string[];
+    filter?: DashboardFilter;
+  }
+
+  type DashboardFilter = {
+    ledgerId?: number[];
+    categoryIdL1?: number[];
+    categoryIdL2?: number[];
+    type?: string[];
+    username?: string[];
+    tagId?: number[];
+  }
 }

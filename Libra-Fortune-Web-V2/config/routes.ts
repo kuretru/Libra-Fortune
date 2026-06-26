@@ -1,5 +1,11 @@
 export default [
   {
+    name: '面板',
+    path: '/dashboard',
+    icon: 'dashboard',
+    component: './ledger/dashboard',
+  },
+  {
     path: '/user',
     layout: false,
     routes: [
