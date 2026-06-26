@@ -13,7 +13,8 @@ declare namespace LibraFortune.Ledger {
 
   type LedgerEntryDTO = GalaxyWeb.BaseCreateUpdateDTO & {
     ledgerId?: number;
-    category: number[];
+    categoryIdL1: number;
+    categoryIdL2: number;
     type: string;
     date: string;
     name: string;
@@ -50,7 +51,8 @@ declare namespace LibraFortune.Ledger {
   }
 
   type LedgerEntryQuery = {
-    category?: string;
+    categoryIdL1?: number;
+    categoryIdL2?: number;
     type?: string;
     dateBegin?: string;
     dateEnd?: string;

@@ -54,6 +54,7 @@ type LedgerEntryFormValues = Omit<
   Partial<LibraFortune.Ledger.LedgerEntryDTO>,
   'date' | 'details' | 'tags'
 > & {
+  categoryIds?: CategorySelectorValue;
   date?: string | Dayjs;
   details?: LedgerEntryDetailFormValues[];
   tagIds?: number[];
@@ -77,8 +78,8 @@ type GroupedTagOption = {
 
 type CategoryTagSelectorProps = {
   categories: GalaxyWeb.EnumDTO<number>[];
-  value?: number[];
-  onChange?: (value?: number[]) => void;
+  value?: CategorySelectorValue;
+  onChange?: (value?: CategorySelectorValue) => void;
 };
 
 type TagSetTagSelectorProps = {
@@ -94,12 +95,18 @@ type PaymentChainEditorProps = {
 };
 
 type LedgerEntrySearchParams = LibraFortune.Ledger.LedgerEntryQuery & {
+  categoryIds?: string;
   dateRange?: string[];
   name?: string;
   tagId?: number[];
 };
 
 type DecimalInputValue = string | null;
+
+type CategorySelectorValue = {
+  categoryIdL1?: number;
+  categoryIdL2?: number;
+};
 
 const toDateString = (value: string | Dayjs): string =>
   typeof value === 'string' ? value : value.format('YYYY-MM-DD');
@@ -146,21 +153,6 @@ const ratioToUnits = (value: string): bigint | undefined => {
   return BigInt(match[1]) * 100n + BigInt((match[2] ?? '').padEnd(2, '0'));
 };
 
-const flattenCategoryOptions = (
-  records: GalaxyWeb.EnumDTO<number>[],
-  prefix = '',
-): Option<number>[] =>
-  records.flatMap((record) => {
-    const label = `${prefix}${record.label}`;
-    return [
-      {
-        label,
-        value: record.value,
-      },
-      ...flattenCategoryOptions(record.children ?? [], `${label} / `),
-    ];
-  });
-
 const flattenCategoryQueryOptions = (
   records: GalaxyWeb.EnumDTO<number>[],
   prefix = '',
@@ -179,21 +171,31 @@ const flattenCategoryQueryOptions = (
     ];
   });
 
-const findParentCategoryId = (
+const buildCategoryNameMap = (
   categories: GalaxyWeb.EnumDTO<number>[],
-  value?: number[],
-): number | undefined => {
-  const leafCategoryId = value?.at(-1);
-  if (!leafCategoryId) return undefined;
-  for (const category of categories) {
-    if (category.value === leafCategoryId) {
-      return category.value;
-    }
-    if (category.children?.some((child) => child.value === leafCategoryId)) {
-      return category.value;
-    }
-  }
-  return undefined;
+): Map<number, string> =>
+  new Map(
+    categories.flatMap((category) =>
+      (category.children ?? []).map((child) => [
+        child.value,
+        `${category.label} / ${child.label}`,
+      ]),
+    ),
+  );
+
+const findParentCategory = (
+  categories: GalaxyWeb.EnumDTO<number>[],
+  categoryIdL1?: number,
+) => categories.find((category) => category.value === categoryIdL1);
+
+const parseCategoryQueryValue = (value?: string) => {
+  const [rawCategoryIdL1, rawCategoryIdL2] = (value ?? '').split(',');
+  const categoryIdL1 = rawCategoryIdL1 ? Number(rawCategoryIdL1) : undefined;
+  const categoryIdL2 = rawCategoryIdL2 ? Number(rawCategoryIdL2) : undefined;
+  return {
+    categoryIdL1: Number.isInteger(categoryIdL1) ? categoryIdL1 : undefined,
+    categoryIdL2: Number.isInteger(categoryIdL2) ? categoryIdL2 : undefined,
+  };
 };
 
 const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
@@ -202,13 +204,13 @@ const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
   onChange,
 }) => {
   const [selectedParentId, setSelectedParentId] = useState<number | undefined>(
-    () => findParentCategoryId(categories, value),
+    () => findParentCategory(categories, value?.categoryIdL1)?.value,
   );
 
   useEffect(() => {
-    const parentId = findParentCategoryId(categories, value);
-    if (parentId) {
-      setSelectedParentId(parentId);
+    const parent = findParentCategory(categories, value?.categoryIdL1);
+    if (parent) {
+      setSelectedParentId(parent.value);
       return;
     }
     setSelectedParentId((oldParentId) =>
@@ -219,18 +221,11 @@ const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
     );
   }, [categories, value]);
 
-  const selectedParent = categories.find(
-    (category) => category.value === selectedParentId,
-  );
+  const selectedParent = findParentCategory(categories, selectedParentId);
 
   const selectParent = (category: GalaxyWeb.EnumDTO<number>) => {
     setSelectedParentId(category.value);
-    if (!category.children?.length) {
-      onChange?.([category.value]);
-    } else if (
-      value?.[0] === category.value ||
-      !category.children.some((child) => child.value === value?.at(-1))
-    ) {
+    if (value?.categoryIdL1 !== category.value) {
       onChange?.(undefined);
     }
   };
@@ -253,9 +248,12 @@ const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
           {selectedParent.children.map((category) => (
             <Tag.CheckableTag
               key={category.value}
-              checked={value?.at(-1) === category.value}
+              checked={value?.categoryIdL2 === category.value}
               onChange={() =>
-                onChange?.([selectedParent.value, category.value])
+                onChange?.({
+                  categoryIdL1: selectedParent.value,
+                  categoryIdL2: category.value,
+                })
               }
             >
               {category.label}
@@ -419,7 +417,6 @@ const LedgerEntry: React.FC = () => {
     LibraFortune.Ledger.LedgerDTO | undefined
   >(undefined);
   const [categories, setCategories] = useState<GalaxyWeb.EnumDTO<number>[]>([]);
-  const [categoryOptions, setCategoryOptions] = useState<Option<number>[]>([]);
   const [categoryQueryOptions, setCategoryQueryOptions] = useState<
     Option<string>[]
   >([]);
@@ -538,9 +535,8 @@ const LedgerEntry: React.FC = () => {
   );
 
   const categoryNameMap = useMemo(
-    () =>
-      new Map(categoryOptions.map((option) => [option.value, option.label])),
-    [categoryOptions],
+    () => buildCategoryNameMap(categories),
+    [categories],
   );
 
   useEffect(() => {
@@ -568,7 +564,6 @@ const LedgerEntry: React.FC = () => {
         ]) => {
           setLedger(ledgerResponse.data);
           setCategories(categoryResponse.data);
-          setCategoryOptions(flattenCategoryOptions(categoryResponse.data));
           setCategoryQueryOptions(
             flattenCategoryQueryOptions(categoryResponse.data),
           );
@@ -607,6 +602,10 @@ const LedgerEntry: React.FC = () => {
       originalAmountAutoFilledRef.current = false;
       form.setFieldsValue({
         ...currentRecord,
+        categoryIds: {
+          categoryIdL1: currentRecord.categoryIdL1,
+          categoryIdL2: currentRecord.categoryIdL2,
+        },
         date: currentRecord.date ? dayjs(currentRecord.date) : undefined,
         tagIds: currentRecord.tags?.map((tag) => tag.tagId) ?? [],
         details: (currentRecord.details ?? []).map((detail) => ({
@@ -860,14 +859,17 @@ const LedgerEntry: React.FC = () => {
       copyable: true,
     },
     {
-      dataIndex: 'category',
+      dataIndex: 'categoryIds',
       title: '分类',
       valueType: 'select',
       fieldProps: {
         options: categoryQueryOptions,
       },
+      search: {
+        transform: (value: string) => parseCategoryQueryValue(value),
+      },
       renderText: (_, record) =>
-        categoryNameMap.get(record.category.at(-1)!) ?? record.category.at(-1),
+        categoryNameMap.get(record.categoryIdL2) ?? record.categoryIdL2,
       width: 100,
     },
     {
@@ -1007,7 +1009,15 @@ const LedgerEntry: React.FC = () => {
     if (!ledgerId) {
       return { data: [], success: false, total: 0 };
     }
-    const { pageSize, current, name, dateBegin, dateEnd, ...query } = params;
+    const {
+      pageSize,
+      current,
+      name,
+      dateBegin,
+      dateEnd,
+      categoryIds,
+      ...query
+    } = params;
     const response = await entryApi.list(ledgerId, {
       current: current!,
       pageSize: pageSize!,
@@ -1033,7 +1043,8 @@ const LedgerEntry: React.FC = () => {
       const record: LibraFortune.Ledger.LedgerEntryDTO = {
         id: values.id,
         ledgerId,
-        category: values.category!,
+        categoryIdL1: values.categoryIds!.categoryIdL1!,
+        categoryIdL2: values.categoryIds!.categoryIdL2!,
         type: values.type!,
         date: toDateString(values.date!),
         name: values.name!,
@@ -1215,9 +1226,18 @@ const LedgerEntry: React.FC = () => {
           />
         </Space>
         <Form.Item
-          name="category"
+          name="categoryIds"
           label="分类"
-          rules={[{ required: true, message: '请选择分类' }]}
+          rules={[
+            {
+              validator: async (_, value?: CategorySelectorValue) => {
+                if (value?.categoryIdL1 && value?.categoryIdL2) {
+                  return;
+                }
+                throw new Error('请选择分类');
+              },
+            },
+          ]}
         >
           <CategoryTagSelector categories={categories} />
         </Form.Item>
