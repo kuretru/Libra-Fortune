@@ -9,7 +9,7 @@ import lombok.Getter;
 public enum LedgerGroupBy implements BaseEnum<LedgerGroupBy> {
 
     YEAR("year", "年", "YEAR(entry.`date`) AS year", "YEAR(entry.`date`)"),
-    MONTH("month", "月", "MONTH(entry.`date`) AS month", "MONTH(entry.`date`)"),
+    MONTH("month", "月", "DATE_FORMAT(entry.`date`, '%Y-%m') AS month", "DATE_FORMAT(entry.`date`, '%Y-%m')"),
     DAY("day", "日", "entry.`date` AS day", "entry.`date`"),
     LEDGER_ID("ledgerId", "账本ID", "entry.ledger_id AS ledger_id", "entry.ledger_id"),
     CATEGORY_ID_L1("categoryIdL1", "一级分类ID", "entry.category_id_l1 AS category_id_l1", "entry.category_id_l1"),
