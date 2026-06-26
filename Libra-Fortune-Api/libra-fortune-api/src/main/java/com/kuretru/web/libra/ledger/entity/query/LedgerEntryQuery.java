@@ -14,8 +14,11 @@ public class LedgerEntryQuery {
     @Schema(description = "账本ID")
     private Long ledgerId;
 
-    @Schema(description = "分类路径；一级分类传一级ID，二级分类传一级ID,二级ID")
-    private String category;
+    @Schema(description = "一级分类ID")
+    private Long categoryIdL1;
+
+    @Schema(description = "二级分类ID")
+    private Long categoryIdL2;
 
     @Schema(description = "条目类型")
     private EntryType type;

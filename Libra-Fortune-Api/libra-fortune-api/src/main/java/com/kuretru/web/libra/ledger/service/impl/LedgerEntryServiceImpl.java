@@ -22,7 +22,6 @@ import com.kuretru.web.libra.metadata.service.MetadataCurrencyService;
 import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -134,20 +133,6 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     }
 
     @Override
-    protected QueryWrapper<LedgerEntryDO> beforeList(LedgerEntryQuery query) throws ServiceException {
-        var category = query.getCategory();
-        query.setCategory(null);
-        var queryWrapper = super.beforeList(query);
-        if (StringUtils.hasText(category)) {
-            if (!category.contains(",")) {
-                category += ",";
-            }
-            queryWrapper.likeRight("category", category);
-        }
-        return queryWrapper;
-    }
-
-    @Override
     protected LedgerEntryDTO afterUpdate(LedgerEntryDO record, LedgerEntryDTO raw) throws ServiceException {
         var result = super.afterUpdate(record, raw);
         result.setTags(tagService.syncByParentId(record.getId(), raw.getTags()));
@@ -170,7 +155,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 
     protected void verifyDTO(LedgerEntryDTO record) throws ServiceException {
         // 校验分类
-        verifyCategory(record.getCategory());
+        verifyCategory(record.getCategoryIdL1(), record.getCategoryIdL2());
 
         // 校验日期
         if (record.getDate().isAfter(LocalDate.now())) {
@@ -193,16 +178,12 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         verifyDetails(record, record.getDetails());
     }
 
-    private void verifyCategory(List<Long> categoryPath) throws ServiceException {
-        var category = categoryService.get(categoryPath.get(categoryPath.size() - 1));
+    private void verifyCategory(Long categoryIdL1, Long categoryIdL2) throws ServiceException {
+        var category = categoryService.get(categoryIdL2);
         if (category == null) {
             throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类不存在");
         }
-        if (categoryPath.size() == 1 && category.getParentId() == null) {
-            return;
-        }
-        if (categoryPath.size() == 2 && category.getParentId() != null
-                && category.getParentId().equals(categoryPath.getFirst())) {
+        if (category.getParentId() != null && category.getParentId().equals(categoryIdL1)) {
             var parent = categoryService.get(category.getParentId());
             if (parent != null && parent.getParentId() == null) {
                 return;

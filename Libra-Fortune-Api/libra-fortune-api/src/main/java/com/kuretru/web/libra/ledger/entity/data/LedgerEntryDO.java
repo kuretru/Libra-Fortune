@@ -19,8 +19,11 @@ public class LedgerEntryDO extends BaseCreateUpdateDO {
     /** 外键，账本ID */
     private Long ledgerId;
 
-    /** 分类路径，按层级以逗号分隔分类ID */
-    private String category;
+    /** 一级分类ID */
+    private Long categoryIdL1;
+
+    /** 二级分类ID */
+    private Long categoryIdL2;
 
     /** 枚举值，条目类型 */
     private EntryType type;

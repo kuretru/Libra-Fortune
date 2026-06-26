@@ -22,10 +22,13 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     @Schema(description = "账本ID")
     private Long ledgerId;
 
-    @NotEmpty
-    @Size(min = 1, max = 2)
-    @Schema(description = "分类路径，按层级存储分类ID")
-    private List<Long> category;
+    @NotNull
+    @Schema(description = "一级分类ID")
+    private Long categoryIdL1;
+
+    @NotNull
+    @Schema(description = "二级分类ID")
+    private Long categoryIdL2;
 
     @NotNull
     @Schema(description = "枚举值，条目类型")
