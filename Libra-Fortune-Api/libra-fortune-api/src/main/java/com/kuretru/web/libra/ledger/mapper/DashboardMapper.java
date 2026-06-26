@@ -16,6 +16,8 @@ public interface DashboardMapper {
     List<DashboardBO> sum(@Param(Constants.WRAPPER) QueryWrapper<DashboardBO> queryWrapper,
                           @Param("sum") String sum,
                           @Param("selectColumns") List<String> selectColumns,
-                          @Param("groupByColumns") List<String> groupByColumns);
+                          @Param("groupByColumns") List<String> groupByColumns,
+                          @Param("joinDetail") boolean joinDetail,
+                          @Param("joinTag") boolean joinTag);
 
 }

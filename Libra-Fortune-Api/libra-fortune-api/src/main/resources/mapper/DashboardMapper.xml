@@ -25,8 +25,12 @@
         ${sum}
         FROM
         ledger_v2_entry entry
+        <if test="joinDetail">
         LEFT JOIN ledger_v2_entry_detail detail ON entry.id = detail.entry_id
+        </if>
+        <if test="joinTag">
         LEFT JOIN ledger_v2_entry_tag tag ON entry.id = tag.entry_id
+        </if>
         ${ew.customSqlSegment}
         GROUP BY
         <foreach collection="groupByColumns" item="column" separator=",">

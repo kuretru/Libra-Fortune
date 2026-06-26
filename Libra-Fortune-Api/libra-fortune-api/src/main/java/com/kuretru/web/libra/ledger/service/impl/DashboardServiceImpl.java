@@ -2,6 +2,8 @@ package com.kuretru.web.libra.ledger.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.web.libra.ledger.entity.business.DashboardBO;
+import com.kuretru.web.libra.ledger.entity.enums.LedgerGroupBy;
+import com.kuretru.web.libra.ledger.entity.enums.LedgerSumMode;
 import com.kuretru.web.libra.ledger.entity.query.DashboardQuery;
 import com.kuretru.web.libra.ledger.mapper.DashboardMapper;
 import com.kuretru.web.libra.ledger.service.DashboardService;
@@ -23,7 +25,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DashboardBO> sum(DashboardQuery query) {
-        String sum = query.getSumMode().getSelect();
+        var sumMode = query.getSumMode();
+        String sum = sumMode.getSelect();
 
         var selectColumns = new ArrayList<String>();
         var groupByColumns = new ArrayList<String>();
@@ -45,7 +48,13 @@ public class DashboardServiceImpl implements DashboardService {
             queryWrapper.in(hasItems(filter.getTagId()), "tag.tag_id", filter.getTagId());
         }
 
-        return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns);
+        var joinDetail = sumMode == LedgerSumMode.FUNDED
+                || query.getGroupBy().contains(LedgerGroupBy.USERNAME)
+                || (filter != null && hasItems(filter.getUsername()));
+        var joinTag = query.getGroupBy().contains(LedgerGroupBy.TAG_ID)
+                || (filter != null && hasItems(filter.getTagId()));
+
+        return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns, joinDetail, joinTag);
     }
 
     private boolean hasItems(List<?> values) {
