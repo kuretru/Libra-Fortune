@@ -2,6 +2,9 @@ package com.kuretru.web.libra.dashboard.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.web.context.CurrentUserContext;
+import com.kuretru.web.libra.account.entity.query.AccountBalanceQuery;
+import com.kuretru.web.libra.account.service.AccountBalanceService;
+import com.kuretru.web.libra.dashboard.entity.business.DashboardAccountBalanceBO;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
 import com.kuretru.web.libra.dashboard.mapper.DashboardMapper;
@@ -18,10 +21,12 @@ import java.util.List;
 public class DashboardServiceImpl implements DashboardService {
 
     private final DashboardMapper mapper;
+    private final AccountBalanceService accountBalanceService;
 
     @Autowired
-    public DashboardServiceImpl(DashboardMapper mapper) {
+    public DashboardServiceImpl(DashboardMapper mapper, AccountBalanceService accountBalanceService) {
         this.mapper = mapper;
+        this.accountBalanceService = accountBalanceService;
     }
 
     @Override
@@ -56,6 +61,18 @@ public class DashboardServiceImpl implements DashboardService {
                 || (filter != null && hasItems(filter.getTagId()));
 
         return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns, joinDetail, joinTag, CurrentUserContext.getUsername());
+    }
+
+    @Override
+    public DashboardAccountBalanceBO latestAccountBalances() {
+        var result = accountBalanceService.list(new AccountBalanceQuery());
+        var dashboardResult = new DashboardAccountBalanceBO();
+        if (!result.getBalances().isEmpty()) {
+            var latestBalance = result.getBalances().getFirst();
+            dashboardResult.setDate(latestBalance.getDate());
+            dashboardResult.setTotalBalance(latestBalance.getTotalBalance());
+        }
+        return dashboardResult;
     }
 
     private boolean hasItems(List<?> values) {
