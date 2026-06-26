@@ -1,6 +1,7 @@
 package com.kuretru.web.libra.dashboard.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
 import com.kuretru.web.libra.dashboard.mapper.DashboardMapper;
@@ -54,7 +55,7 @@ public class DashboardServiceImpl implements DashboardService {
         var joinTag = query.getGroupBy().contains(LedgerGroupBy.TAG_ID)
                 || (filter != null && hasItems(filter.getTagId()));
 
-        return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns, joinDetail, joinTag);
+        return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns, joinDetail, joinTag, CurrentUserContext.getUsername());
     }
 
     private boolean hasItems(List<?> values) {

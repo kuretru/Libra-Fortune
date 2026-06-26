@@ -32,6 +32,12 @@
         LEFT JOIN ledger_v2_entry_tag tag ON entry.id = tag.entry_id
         </if>
         ${ew.customSqlSegment}
+        AND EXISTS (
+            SELECT 1
+            FROM ledger_v2_member member
+            WHERE member.ledger_id = entry.ledger_id
+            AND member.username = #{username}
+        )
         GROUP BY
         <foreach collection="groupByColumns" item="column" separator=",">
             ${column}
