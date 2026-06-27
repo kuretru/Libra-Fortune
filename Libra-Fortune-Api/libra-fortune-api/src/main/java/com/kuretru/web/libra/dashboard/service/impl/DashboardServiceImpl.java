@@ -52,15 +52,20 @@ public class DashboardServiceImpl implements DashboardService {
             queryWrapper.in(hasItems(filter.getType()), "entry.`type`", filter.getType());
             queryWrapper.in(hasItems(filter.getUsername()), "detail.username", filter.getUsername());
             queryWrapper.in(hasItems(filter.getTagId()), "tag.tag_id", filter.getTagId());
+            queryWrapper.in(hasItems(filter.getTagSetId()), "tag_item.set_id", filter.getTagSetId());
         }
 
+        var filterByTagSet = filter != null && hasItems(filter.getTagSetId());
         var joinDetail = sumMode == LedgerSumMode.FUNDED
                 || query.getGroupBy().contains(LedgerGroupBy.USERNAME)
                 || (filter != null && hasItems(filter.getUsername()));
         var joinTag = query.getGroupBy().contains(LedgerGroupBy.TAG_ID)
-                || (filter != null && hasItems(filter.getTagId()));
+                || (filter != null && hasItems(filter.getTagId()))
+                || filterByTagSet;
+        var joinTagItem = filterByTagSet;
 
-        return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns, joinDetail, joinTag, CurrentUserContext.getUsername());
+        return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns, joinDetail, joinTag, joinTagItem,
+                CurrentUserContext.getUsername());
     }
 
     @Override

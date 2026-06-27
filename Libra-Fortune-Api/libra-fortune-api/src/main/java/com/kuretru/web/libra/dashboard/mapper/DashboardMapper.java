@@ -19,6 +19,7 @@ public interface DashboardMapper {
                                 @Param("groupByColumns") List<String> groupByColumns,
                                 @Param("joinDetail") boolean joinDetail,
                                 @Param("joinTag") boolean joinTag,
+                                @Param("joinTagItem") boolean joinTagItem,
                                 @Param("username") String username);
 
 }

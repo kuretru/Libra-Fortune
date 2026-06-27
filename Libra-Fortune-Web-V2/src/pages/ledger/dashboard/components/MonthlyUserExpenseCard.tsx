@@ -14,6 +14,7 @@ const expenseTagIds = {
   reducible: 2,
   unnecessary: 3,
 };
+const expenseTagSetId = 1;
 
 const SubStatistic: React.FC<{ title: string; value: string }> = ({
   title,
@@ -65,31 +66,35 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
 
     let mounted = true;
     setLoading(true);
-    const sumByTagId = async (tagId: number) => {
-      const response = await dashboardApi.sum({
-        ...baseQuery,
-        filter: {
-          ...baseQuery.filter,
-          tagId: [tagId],
-        },
-      });
-      return formatAmount(response.data[0]?.sum);
-    };
     Promise.all([
       dashboardApi.sum(baseQuery),
-      sumByTagId(expenseTagIds.necessary),
-      sumByTagId(expenseTagIds.reducible),
-      sumByTagId(expenseTagIds.unnecessary),
+      dashboardApi.sum({
+        ...baseQuery,
+        groupBy: ['tagId'],
+        filter: {
+          ...baseQuery.filter,
+          tagSetId: [expenseTagSetId],
+        },
+      }),
     ])
-      .then(([expenseResponse, necessary, reducible, unnecessary]) => {
+      .then(([expenseResponse, tagSetItemResponse]) => {
         if (!mounted) {
           return;
         }
 
+        const sumByTagId = new Map(
+          tagSetItemResponse.data.map((item) => [
+            item.tagId,
+            formatAmount(item.sum),
+          ]),
+        );
+
         setAmount(formatAmount(expenseResponse.data[0]?.sum));
-        setNecessaryAmount(necessary);
-        setReducibleAmount(reducible);
-        setUnnecessaryAmount(unnecessary);
+        setNecessaryAmount(sumByTagId.get(expenseTagIds.necessary) ?? '0.00');
+        setReducibleAmount(sumByTagId.get(expenseTagIds.reducible) ?? '0.00');
+        setUnnecessaryAmount(
+          sumByTagId.get(expenseTagIds.unnecessary) ?? '0.00',
+        );
       })
       .finally(() => {
         if (mounted) {

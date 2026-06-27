@@ -57,6 +57,9 @@ public class DashboardLedgerQuery {
         @Schema(description = "标签ID")
         private List<Long> tagId;
 
+        @Schema(description = "标签组ID")
+        private List<Long> tagSetId;
+
     }
 
 }
