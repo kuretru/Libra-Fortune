@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.metadata.entity.transfer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
+import com.kuretru.microservices.web.entity.transfer.BaseCreateUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

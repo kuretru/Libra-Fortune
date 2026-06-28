@@ -2,8 +2,8 @@ package com.kuretru.web.libra.metadata.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
-import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
-import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
+import com.kuretru.microservices.web.entity.query.EmptyQuery;
+import com.kuretru.microservices.web.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataCurrencyDO;
 import com.kuretru.web.libra.metadata.entity.mapper.MetadataCurrencyEntityMapper;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataCurrencyDTO;

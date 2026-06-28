@@ -5,7 +5,7 @@ import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.microservices.web.entity.PaginationQuery;
 import com.kuretru.microservices.web.entity.PaginationResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.v2.controller.BaseRestController;
+import com.kuretru.microservices.web.controller.BaseRestController;
 import com.kuretru.web.libra.ledger.entity.query.LedgerEntryQuery;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryDTO;
 import com.kuretru.web.libra.ledger.service.LedgerEntryService;

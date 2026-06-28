@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.ledger.entity.mapper;
 
-import com.kuretru.microservices.web.v2.entity.mapper.BaseSequencedEntityMapper;
+import com.kuretru.microservices.web.entity.mapper.BaseSequencedEntityMapper;
 import com.kuretru.web.libra.ledger.entity.data.LedgerDO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerDTO;
 import org.mapstruct.Mapper;

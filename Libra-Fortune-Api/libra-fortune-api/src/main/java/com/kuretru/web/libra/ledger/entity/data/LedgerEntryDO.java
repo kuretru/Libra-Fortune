@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.ledger.entity.data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.kuretru.microservices.web.v2.entity.data.BaseCreateUpdateDO;
+import com.kuretru.microservices.web.entity.data.BaseCreateUpdateDO;
 import com.kuretru.web.libra.ledger.entity.enums.EntryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,8 +1,8 @@
 package com.kuretru.web.libra.metadata.service.impl;
 
-import com.kuretru.microservices.web.v2.service.ability.children.ChildrenOperator;
-import com.kuretru.microservices.web.v2.service.ability.children.DefaultChildrenOperator;
-import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
+import com.kuretru.microservices.web.service.children.ChildrenOperator;
+import com.kuretru.microservices.web.service.children.DefaultChildrenOperator;
+import com.kuretru.microservices.web.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetItemDO;
 import com.kuretru.web.libra.metadata.entity.mapper.MetadataTagSetItemEntityMapper;
 import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetItemQuery;
