@@ -87,6 +87,7 @@ public class MetadataCategoryServiceImpl
     protected MetadataCategoryDTO afterGet(MetadataCategoryDO record) throws ServiceException {
         var queryWrapper = new QueryWrapper<MetadataCategoryDO>();
         queryWrapper.eq("parent_id", record.getId());
+        queryWrapper.orderByAsc("sequence");
         var children = mapper.selectList(queryWrapper);
         var result = super.afterGet(record);
         result.setChildren(entityMapper.doToDto(children));
@@ -110,6 +111,7 @@ public class MetadataCategoryServiceImpl
 
         var queryWrapper = new QueryWrapper<MetadataCategoryDO>();
         queryWrapper.in("parent_id", idList);
+        queryWrapper.orderByAsc("sequence");
         var children = mapper.selectList(queryWrapper);
         var childrenMap = entityMapper.doToDto(children).stream().collect(Collectors.groupingBy(MetadataCategoryDTO::getParentId));
         result.forEach(record -> record.setChildren(childrenMap.getOrDefault(record.getId(), Collections.emptyList())));

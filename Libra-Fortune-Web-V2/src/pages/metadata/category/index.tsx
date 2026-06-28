@@ -7,18 +7,19 @@ import {
   ProFormItem,
   ProFormSelect,
   ProFormText,
-  ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
+import { DragSortTable } from '@ant-design/pro-components/es/table';
 import { Button, Form, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import IconPicker, { getAntIcon } from '@/components/IconPicker';
 import {
   create,
   list,
   remove,
+  reorder,
   update,
 } from '@/services/libra-fortune/metadata/category';
-import IconPicker, { getAntIcon } from '@/components/IconPicker';
 
 const collectExpandableRowKeys = (
   records: LibraFortune.Metadata.CategoryDTO[],
@@ -76,6 +77,12 @@ const MetadataCategory: React.FC = () => {
   }, [modalVisible, isChildCategory, form]);
 
   const columns: ProColumns<LibraFortune.Metadata.CategoryDTO>[] = [
+    {
+      dataIndex: 'sort',
+      title: '排序',
+      search: false,
+      width: 64,
+    },
     {
       dataIndex: 'id',
       title: 'ID',
@@ -164,9 +171,9 @@ const MetadataCategory: React.FC = () => {
   > = async (params) => {
     const { pageSize, current } = params;
     const response = await list({
-      current: current!,
-      pageSize: pageSize!,
-      noPage: false,
+      current: current ?? 1,
+      pageSize: pageSize ?? 1000,
+      noPage: true,
     });
     const data = response.data.list;
     setTopLevelCategories(data);
@@ -238,21 +245,56 @@ const MetadataCategory: React.FC = () => {
     });
   };
 
+  const onDragSortEnd = async (
+    _beforeIndex: number,
+    _afterIndex: number,
+    newDataSource: LibraFortune.Metadata.CategoryDTO[],
+  ) => {
+    await reorder(newDataSource.map((record) => record.id!));
+    actionRef.current?.reload();
+    messageApi.open({
+      type: 'success',
+      content: '排序已保存',
+    });
+  };
+
+  const renderChildrenTable = (record: LibraFortune.Metadata.CategoryDTO) => (
+    <DragSortTable<LibraFortune.Metadata.CategoryDTO, GalaxyWeb.EmptyQuery>
+      columns={columns}
+      dataSource={record.children ?? []}
+      defaultSize="small"
+      dragSortKey="sort"
+      onDragSortEnd={onDragSortEnd}
+      options={false}
+      pagination={false}
+      rowKey="id"
+      search={false}
+      showHeader={false}
+      toolBarRender={false}
+    />
+  );
+
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<LibraFortune.Metadata.CategoryDTO, GalaxyWeb.EmptyQuery>
+      <DragSortTable<LibraFortune.Metadata.CategoryDTO, GalaxyWeb.EmptyQuery>
         actionRef={actionRef}
         columns={columns}
         defaultSize="small"
+        dragSortKey="sort"
         expandable={{
+          childrenColumnName: '__children',
           expandedRowKeys,
+          expandedRowRender: renderChildrenTable,
           onExpandedRowsChange: (keys) => setExpandedRowKeys([...keys]),
+          rowExpandable: (record) => !!record.children?.length,
         }}
+        onDragSortEnd={onDragSortEnd}
+        pagination={false}
         rowKey="id"
         request={onRequest}
         search={false}
-        scroll={{ x: 920 }}
+        scroll={{ x: 984 }}
         toolBarRender={() => [
           <Button
             key="create"
