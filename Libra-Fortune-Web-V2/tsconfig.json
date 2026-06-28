@@ -18,6 +18,5 @@
       "@root/*": ["./*"]
     }
   },
-  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"],
-  "exclude": ["cloudflare-worker"]
+  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx"]
 }
