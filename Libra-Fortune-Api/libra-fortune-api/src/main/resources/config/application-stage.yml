@@ -5,17 +5,3 @@ spring:
   web:
     resources:
       static-locations: file:/web
-logging:
-  level:
-    com:
-      kuretru:
-        web:
-          libra:
-            mapper: debug
-galaxy:
-  oauth2:
-    client:
-      galaxy:
-        server-url: https://oauth2.i5zhen.com
-        application-id: ${GEMINI_APPLICATION_ID:}
-        application-secret: ${GEMINI_APPLICATION_SECRET:}

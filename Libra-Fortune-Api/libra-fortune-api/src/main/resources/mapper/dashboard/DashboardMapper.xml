@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kuretru.web.libra.dashboard.mapper.DashboardMapper">
+
+    <resultMap id="DashboardLedgerBO" type="com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO">
+        <result property="year" column="year"/>
+        <result property="month" column="month"/>
+        <result property="day" column="day"/>
+        <result property="ledgerId" column="ledger_id"/>
+        <result property="categoryIdL1" column="category_id_l1"/>
+        <result property="categoryIdL2" column="category_id_l2"/>
+        <result property="type" column="type"/>
+        <result property="username" column="username"/>
+        <result property="tagId" column="tag_id"/>
+        <result property="sum" column="sum"/>
+    </resultMap>
+
+    <select id="sum" resultMap="DashboardLedgerBO">
+        SELECT
+        <foreach collection="selectColumns" item="column" separator="," close=",">
+            ${column}
+        </foreach>
+        ${sum}
+        FROM
+        ledger_v2_entry entry
+        <if test="joinDetail">
+        LEFT JOIN ledger_v2_entry_detail detail ON entry.id = detail.entry_id
+        </if>
+        <if test="joinTag">
+        LEFT JOIN ledger_v2_entry_tag tag ON entry.id = tag.entry_id
+        </if>
+        <if test="joinTagItem">
+        LEFT JOIN metadata_tag_set_item tag_item ON tag.tag_id = tag_item.id
+        </if>
+        ${ew.customSqlSegment}
+        AND EXISTS (
+            SELECT 1
+            FROM ledger_v2_member member
+            WHERE member.ledger_id = entry.ledger_id
+            AND member.username = #{username}
+        )
+        GROUP BY
+        <foreach collection="groupByColumns" item="column" separator=",">
+            ${column}
+        </foreach>
+    </select>
+
+</mapper>

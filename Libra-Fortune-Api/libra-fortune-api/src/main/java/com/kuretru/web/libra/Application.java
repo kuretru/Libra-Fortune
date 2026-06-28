@@ -1,6 +1,5 @@
 package com.kuretru.web.libra;
 
-import com.kuretru.microservices.oauth2.client.system.EnableOAuth2System;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,8 +10,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableTransactionManagement
-@EnableOAuth2System
-@MapperScan("com.kuretru.web.libra.mapper")
+@MapperScan({
+        "com.kuretru.web.libra.account.mapper",
+        "com.kuretru.web.libra.dashboard.mapper",
+        "com.kuretru.web.libra.ledger.mapper",
+        "com.kuretru.web.libra.metadata.mapper"
+})
 public class Application {
 
     public static void main(String[] args) {
