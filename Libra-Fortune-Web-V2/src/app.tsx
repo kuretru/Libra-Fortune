@@ -17,7 +17,6 @@ import {
   Footer,
   LangDropdown,
   OfflineBanner,
-  VersionDropdown,
 } from '@/components';
 import { currentUser } from '@/services/cloud-sso';
 import defaultSettings from '../config/defaultSettings';
@@ -92,7 +91,6 @@ export const layout: RunTimeLayoutConfig = ({
     },
     actionsRender: () => [
       <DocLink key="doc" />,
-      <VersionDropdown key="version" />,
       <LangDropdown key="lang" />,
     ],
     avatarProps: {
