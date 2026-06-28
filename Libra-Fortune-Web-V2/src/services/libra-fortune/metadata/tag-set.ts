@@ -50,6 +50,13 @@ export async function remove(id: number) {
     });
 }
 
+export async function reorder(idList: number[]) {
+  return request<GalaxyWeb.ApiResponse<string>>(`${endpointPrefix}/reorder`, {
+    method: 'PUT',
+    data: idList,
+  });
+}
+
 export async function createItem(
   setId: number,
   record: LibraFortune.Metadata.TagSetItemDTO,
@@ -81,6 +88,15 @@ export async function removeItem(setId: number, id: number) {
   return request<GalaxyWeb.ApiResponse<string>>(
     `${endpointPrefix}/${setId}/items/${id}`, {
       method: 'DELETE',
+    },
+  );
+}
+
+export async function reorderItems(setId: number, idList: number[]) {
+  return request<GalaxyWeb.ApiResponse<string>>(
+    `${endpointPrefix}/${setId}/items/reorder`, {
+      method: 'PUT',
+      data: idList,
     },
   );
 }

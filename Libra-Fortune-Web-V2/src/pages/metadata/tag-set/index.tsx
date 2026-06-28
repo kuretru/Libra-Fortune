@@ -6,9 +6,9 @@ import {
   type ProColumns,
   ProFormSwitch,
   ProFormText,
-  ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
+import { DragSortTable } from '@ant-design/pro-components/es/table';
 import { Button, Form, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -17,6 +17,8 @@ import {
   list,
   remove,
   removeItem,
+  reorder,
+  reorderItems,
   update,
   updateItem,
 } from '@/services/libra-fortune/metadata/tag-set';
@@ -52,7 +54,7 @@ const appendChildren = (
 const collectExpandableRowKeys = (records: TagTableRecord[]): Set<React.Key> =>
   records.reduce<Set<React.Key>>((keys, record) => {
     if (record.recordType === 'set' && record.id && record.children?.length) {
-      keys.add(`${record.recordType}-${record.id}`);
+      keys.add(record.id);
     }
 
     return keys;
@@ -62,9 +64,9 @@ const MetadataTagSet: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'set' | 'item'>('set');
-  const [currentRecord, setCurrentRecord] = useState<TagTableRecord | undefined>(
-    undefined,
-  );
+  const [currentRecord, setCurrentRecord] = useState<
+    TagTableRecord | undefined
+  >(undefined);
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
   const [form] = Form.useForm<TagFormValues>();
   const actionRef = useRef<ActionType | null>(null);
@@ -80,6 +82,12 @@ const MetadataTagSet: React.FC = () => {
   }, [modalVisible, currentRecord, form]);
 
   const columns: ProColumns<TagTableRecord>[] = [
+    {
+      dataIndex: 'sort',
+      title: '排序',
+      search: false,
+      width: 64,
+    },
     {
       dataIndex: 'id',
       title: 'ID',
@@ -131,7 +139,7 @@ const MetadataTagSet: React.FC = () => {
           </Tag>
         ) : (
           <span>-</span>
-      ),
+        ),
     },
     {
       dataIndex: 'setName',
@@ -192,16 +200,13 @@ const MetadataTagSet: React.FC = () => {
   ];
 
   const onRequest: NonNullable<
-    ProTableProps<
-      TagTableRecord,
-      LibraFortune.Metadata.TagSetQuery
-    >['request']
+    ProTableProps<TagTableRecord, LibraFortune.Metadata.TagSetQuery>['request']
   > = async (params) => {
     const response = await list({
       ...params,
-      current: params.current!,
-      pageSize: params.pageSize!,
-      noPage: false,
+      current: params.current ?? 1,
+      pageSize: params.pageSize ?? 1000,
+      noPage: true,
     });
     const data = appendChildren(response.data.list);
     const expandableRowKeys = collectExpandableRowKeys(data);
@@ -284,23 +289,84 @@ const MetadataTagSet: React.FC = () => {
     });
   };
 
+  const onSetDragSortEnd = async (
+    _beforeIndex: number,
+    _afterIndex: number,
+    newDataSource: TagTableRecord[],
+  ) => {
+    await reorder(newDataSource.map((record) => record.id!));
+    actionRef.current?.reload();
+    messageApi.open({
+      type: 'success',
+      content: '排序已保存',
+    });
+  };
+
+  const onItemDragSortEnd = async (
+    setId: number,
+    _beforeIndex: number,
+    _afterIndex: number,
+    newDataSource: TagTableRecord[],
+  ) => {
+    await reorderItems(
+      setId,
+      newDataSource.map((record) => record.id!),
+    );
+    actionRef.current?.reload();
+    messageApi.open({
+      type: 'success',
+      content: '排序已保存',
+    });
+  };
+
+  const renderItemsTable = (record: TagTableRecord) => {
+    if (record.recordType !== 'set') {
+      return null;
+    }
+
+    return (
+      <DragSortTable<TagTableRecord, LibraFortune.Metadata.TagSetQuery>
+        columns={columns}
+        dataSource={record.children ?? []}
+        defaultSize="small"
+        dragSortKey="sort"
+        onDragSortEnd={(beforeIndex, afterIndex, newDataSource) =>
+          onItemDragSortEnd(record.id!, beforeIndex, afterIndex, newDataSource)
+        }
+        options={false}
+        pagination={false}
+        rowKey="id"
+        search={false}
+        showHeader={false}
+        toolBarRender={false}
+      />
+    );
+  };
+
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<TagTableRecord, LibraFortune.Metadata.TagSetQuery>
+      <DragSortTable<TagTableRecord, LibraFortune.Metadata.TagSetQuery>
         actionRef={actionRef}
         columns={columns}
         defaultSize="small"
+        dragSortKey="sort"
         expandable={{
+          childrenColumnName: '__children',
           expandedRowKeys,
+          expandedRowRender: renderItemsTable,
           onExpandedRowsChange: (keys) => setExpandedRowKeys([...keys]),
+          rowExpandable: (record) =>
+            record.recordType === 'set' && !!record.children?.length,
         }}
-        rowKey={(record) => `${record.recordType}-${record.id}`}
+        onDragSortEnd={onSetDragSortEnd}
+        pagination={false}
+        rowKey="id"
         request={onRequest}
         search={{
           labelWidth: 'auto',
         }}
-        scroll={{ x: 860 }}
+        scroll={{ x: 924 }}
         toolBarRender={() => [
           <Button
             key="create"
