@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.ledger.controller;
 
 import com.kuretru.microservices.web.entity.ApiResponse;
-import com.kuretru.microservices.web.v2.controller.BaseRestController;
+import com.kuretru.microservices.web.v2.controller.BaseSequencedRestController;
 import com.kuretru.web.libra.ledger.entity.query.LedgerQuery;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEnumDTO;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/ledgers")
 @Tag(name = "账本")
-public class LedgerController extends BaseRestController<LedgerService, LedgerDTO, LedgerQuery> {
+public class LedgerController extends BaseSequencedRestController<LedgerService, LedgerDTO, LedgerQuery> {
 
     private final LedgerEnumService enumService;
 

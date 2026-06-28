@@ -48,3 +48,10 @@ export async function remove(id: number) {
       method: 'DELETE',
     })
 }
+
+export async function reorder(idList: number[]) {
+  return request<GalaxyWeb.ApiResponse<string>>(`${endpointPrefix}/reorder`, {
+    method: 'PUT',
+    data: idList,
+  })
+}

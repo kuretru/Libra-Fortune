@@ -3,6 +3,7 @@ package com.kuretru.web.libra.metadata.controller;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.microservices.web.v2.controller.BaseRestController;
+import com.kuretru.microservices.web.v2.controller.BaseSequencedRestController;
 import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataCategoryDTO;
 import com.kuretru.web.libra.metadata.service.MetadataCategoryService;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/metadata/categories")
 @Tag(name = "元数据-账本分类")
 public class MetadataCategoryController
-        extends BaseRestController<MetadataCategoryService, MetadataCategoryDTO, EmptyQuery> {
+        extends BaseSequencedRestController<MetadataCategoryService, MetadataCategoryDTO, EmptyQuery> {
 
     @Autowired
     public MetadataCategoryController(MetadataCategoryService service) {

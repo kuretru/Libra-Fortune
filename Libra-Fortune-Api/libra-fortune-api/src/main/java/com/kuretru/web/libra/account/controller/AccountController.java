@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.account.controller;
 
-import com.kuretru.microservices.web.v2.controller.BaseRestController;
+import com.kuretru.microservices.web.v2.controller.BaseSequencedRestController;
 import com.kuretru.web.libra.account.entity.query.AccountQuery;
 import com.kuretru.web.libra.account.entity.transfer.AccountDTO;
 import com.kuretru.web.libra.account.service.AccountService;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/accounts")
 @Tag(name = "账户")
-public class AccountController extends BaseRestController<AccountService, AccountDTO, AccountQuery> {
+public class AccountController extends BaseSequencedRestController<AccountService, AccountDTO, AccountQuery> {
 
     @Autowired
     public AccountController(AccountService service) {

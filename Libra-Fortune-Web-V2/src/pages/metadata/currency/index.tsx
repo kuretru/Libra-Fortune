@@ -1,19 +1,20 @@
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   type ActionType,
   ModalForm,
   PageContainer,
   type ProColumns,
   ProFormText,
-  ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DragSortTable } from '@ant-design/pro-components/es/table';
 import { Button, Form, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   create,
   list,
   remove,
+  reorder,
   update,
 } from '@/services/libra-fortune/metadata/currency';
 
@@ -37,6 +38,12 @@ const MetadataCurrency: React.FC = () => {
   }, [modalVisible, currentRecord, form]);
 
   const columns: ProColumns<LibraFortune.Metadata.CurrencyDTO>[] = [
+    {
+      dataIndex: 'sort',
+      title: '排序',
+      search: false,
+      width: 64,
+    },
     {
       dataIndex: 'id',
       title: 'ID',
@@ -99,9 +106,9 @@ const MetadataCurrency: React.FC = () => {
   > = async (params) => {
     const { pageSize, current } = params;
     const response = await list({
-      current: current!,
-      pageSize: pageSize!,
-      noPage: false,
+      current: current ?? 1,
+      pageSize: pageSize ?? 1000,
+      noPage: true,
     });
 
     return {
@@ -148,16 +155,32 @@ const MetadataCurrency: React.FC = () => {
     });
   };
 
+  const onDragSortEnd = async (
+    _beforeIndex: number,
+    _afterIndex: number,
+    newDataSource: LibraFortune.Metadata.CurrencyDTO[],
+  ) => {
+    await reorder(newDataSource.map((record) => record.id!));
+    actionRef.current?.reload();
+    messageApi.open({
+      type: 'success',
+      content: '排序已保存',
+    });
+  };
+
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<LibraFortune.Metadata.CurrencyDTO, GalaxyWeb.EmptyQuery>
+      <DragSortTable<LibraFortune.Metadata.CurrencyDTO, GalaxyWeb.EmptyQuery>
         actionRef={actionRef}
         columns={columns}
+        dragSortKey="sort"
+        onDragSortEnd={onDragSortEnd}
+        pagination={false}
         rowKey="id"
         request={onRequest}
         search={false}
-        scroll={{ x: 640 }}
+        scroll={{ x: 704 }}
         toolBarRender={() => [
           <Button
             key="create"

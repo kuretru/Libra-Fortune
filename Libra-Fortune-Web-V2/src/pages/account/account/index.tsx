@@ -7,9 +7,9 @@ import {
   ProFormItem,
   ProFormSwitch,
   ProFormText,
-  ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
+import { DragSortTable } from '@ant-design/pro-components/es/table';
 import { Button, Form, message, Popconfirm, Space, Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import IconPicker, { getAntIcon } from '@/components/IconPicker';
@@ -17,6 +17,7 @@ import {
   create,
   list,
   remove,
+  reorder,
   update,
 } from '@/services/libra-fortune/account/account';
 
@@ -46,6 +47,12 @@ const Account: React.FC = () => {
   }, [modalVisible, currentRecord, form]);
 
   const columns: ProColumns<LibraFortune.Account.AccountDTO>[] = [
+    {
+      dataIndex: 'sort',
+      title: '排序',
+      search: false,
+      width: 64,
+    },
     {
       dataIndex: 'id',
       title: 'ID',
@@ -127,13 +134,11 @@ const Account: React.FC = () => {
   > = async (params) => {
     const { pageSize, current, name, canHoldFunds } = params;
     const canHoldFundsQuery =
-      typeof canHoldFunds === 'string'
-        ? canHoldFunds === 'true'
-        : canHoldFunds;
+      typeof canHoldFunds === 'string' ? canHoldFunds === 'true' : canHoldFunds;
     const response = await list({
-      current: current!,
-      pageSize: pageSize!,
-      noPage: false,
+      current: current ?? 1,
+      pageSize: pageSize ?? 1000,
+      noPage: true,
       nameLike: name,
       canHoldFunds: canHoldFundsQuery,
     });
@@ -182,19 +187,35 @@ const Account: React.FC = () => {
     });
   };
 
+  const onDragSortEnd = async (
+    _beforeIndex: number,
+    _afterIndex: number,
+    newDataSource: LibraFortune.Account.AccountDTO[],
+  ) => {
+    await reorder(newDataSource.map((record) => record.id!));
+    actionRef.current?.reload();
+    messageApi.open({
+      type: 'success',
+      content: '排序已保存',
+    });
+  };
+
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<LibraFortune.Account.AccountDTO, AccountSearchParams>
+      <DragSortTable<LibraFortune.Account.AccountDTO, AccountSearchParams>
         actionRef={actionRef}
         columns={columns}
         defaultSize="small"
+        dragSortKey="sort"
+        onDragSortEnd={onDragSortEnd}
+        pagination={false}
         rowKey="id"
         request={onRequest}
         search={{
           labelWidth: 'auto',
         }}
-        scroll={{ x: 760 }}
+        scroll={{ x: 824 }}
         toolBarRender={() => [
           <Button
             key="create"

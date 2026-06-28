@@ -4,6 +4,7 @@ import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.v2.controller.BaseRestController;
+import com.kuretru.microservices.web.v2.controller.BaseSequencedRestController;
 import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetQuery;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataTagSetDTO;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataTagSetItemDTO;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/metadata/tag_sets")
 @Tag(name = "元数据-账本标签组")
-public class MetadataTagSetController extends BaseRestController<MetadataTagSetService, MetadataTagSetDTO, MetadataTagSetQuery> {
+public class MetadataTagSetController extends BaseSequencedRestController<MetadataTagSetService, MetadataTagSetDTO, MetadataTagSetQuery> {
 
     private final MetadataTagSetItemService itemService;
 

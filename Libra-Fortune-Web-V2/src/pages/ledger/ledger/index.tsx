@@ -10,9 +10,9 @@ import {
   PageContainer,
   type ProColumns,
   ProFormText,
-  ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
+import { DragSortTable } from '@ant-design/pro-components/es/table';
 import { history, useModel } from '@umijs/max';
 import {
   Button,
@@ -31,6 +31,7 @@ import {
   get,
   list,
   remove,
+  reorder,
   update,
 } from '@/services/libra-fortune/ledger/ledger';
 
@@ -97,6 +98,12 @@ const Ledger: React.FC = () => {
   }, [modalVisible, currentRecord, defaultMembers, form]);
 
   const columns: ProColumns<LibraFortune.Ledger.LedgerDTO>[] = [
+    {
+      dataIndex: 'sort',
+      title: '排序',
+      search: false,
+      width: 64,
+    },
     {
       dataIndex: 'id',
       title: 'ID',
@@ -178,9 +185,9 @@ const Ledger: React.FC = () => {
   > = async (params) => {
     const { pageSize, current, name } = params;
     const response = await list({
-      current: current!,
-      pageSize: pageSize!,
-      noPage: false,
+      current: current ?? 1,
+      pageSize: pageSize ?? 1000,
+      noPage: true,
       nameLike: name,
     });
 
@@ -238,16 +245,32 @@ const Ledger: React.FC = () => {
     });
   };
 
+  const onDragSortEnd = async (
+    _beforeIndex: number,
+    _afterIndex: number,
+    newDataSource: LibraFortune.Ledger.LedgerDTO[],
+  ) => {
+    await reorder(newDataSource.map((record) => record.id!));
+    actionRef.current?.reload();
+    messageApi.open({
+      type: 'success',
+      content: '排序已保存',
+    });
+  };
+
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<LibraFortune.Ledger.LedgerDTO, LedgerSearchParams>
+      <DragSortTable<LibraFortune.Ledger.LedgerDTO, LedgerSearchParams>
         actionRef={actionRef}
         columns={columns}
         defaultSize="small"
+        dragSortKey="sort"
+        onDragSortEnd={onDragSortEnd}
+        pagination={false}
         rowKey="id"
         request={onRequest}
-        scroll={{ x: 800 }}
+        scroll={{ x: 864 }}
         toolBarRender={() => [
           <Button
             key="create"
