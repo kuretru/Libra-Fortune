@@ -203,8 +203,8 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             if (entry.getId() != null && detail.getEntryId() != null && !detail.getEntryId().equals(entry.getId())) {
                 throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目详情不属于该条目");
             }
-            var deviation = entry.getSettlementAmount().divide(HUNDRED, 4, RoundingMode.HALF_DOWN).multiply(detail.getFundedRatio()).subtract(detail.getAmount()).abs();
-            if (deviation.compareTo(new BigDecimal("0.01")) > 0) {
+            var percent = detail.getAmount().divide(entry.getSettlementAmount(), 4, RoundingMode.HALF_DOWN).multiply(HUNDRED).setScale(2, RoundingMode.HALF_DOWN);
+            if (!percent.equals(detail.getFundedRatio())) {
                 throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担金额与分担比例对不上");
             }
             if (fundedUsernameSet.contains(detail.getUsername())) {
