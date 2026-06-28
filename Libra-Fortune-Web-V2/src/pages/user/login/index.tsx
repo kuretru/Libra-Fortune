@@ -7,6 +7,21 @@ import { Footer } from '@/components';
 import { accessToken, authorization } from '@/services/cloud-sso';
 import Settings from '../../../../config/defaultSettings';
 
+const getLocationSearchParams = () => {
+  const url = new URL(window.location.href);
+  if (url.search) {
+    return url.searchParams;
+  }
+
+  const hashSearch = window.location.hash.split('?')[1] || '';
+  return new URLSearchParams(hashSearch);
+};
+
+const getHashRouteUrl = (route: string) => {
+  const normalizedRoute = route.startsWith('/') ? route : '/welcome';
+  return `${window.location.origin}/#${normalizedRoute}`;
+};
+
 const useStyles = createStyles(({ token }) => {
   return {
     action: {
@@ -62,7 +77,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     const completeSsoLogin = async () => {
-      const searchParams = new URL(window.location.href).searchParams;
+      const searchParams = getLocationSearchParams();
       const code = searchParams.get('code');
       const state = searchParams.get('state');
 
@@ -71,9 +86,9 @@ const Login: React.FC = () => {
       try {
         const redirect = await accessToken(code, state);
         await fetchUserInfo();
-        window.location.replace(redirect);
+        window.location.replace(getHashRouteUrl(redirect));
       } catch (error) {
-        window.history.replaceState(null, '', '/user/login');
+        window.history.replaceState(null, '', getHashRouteUrl('/user/login'));
         message.error(error instanceof Error ? error.message : 'SSO 登录失败');
       }
     };
@@ -82,7 +97,7 @@ const Login: React.FC = () => {
   }, [message]);
 
   const handleSubmit = async () => {
-    const searchParams = new URL(window.location.href).searchParams;
+    const searchParams = getLocationSearchParams();
     const redirect = searchParams.get('redirect') || '';
     authorization(redirect);
   };

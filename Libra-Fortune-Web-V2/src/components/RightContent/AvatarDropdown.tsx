@@ -19,13 +19,13 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
 }) => {
   const loginOut = async () => {
     await outLogin();
-    const { search, pathname } = window.location;
+    const { pathname, search, hash } = history.location;
     const urlParams = new URL(window.location.href).searchParams;
     const searchParams = new URLSearchParams({
-      redirect: pathname + search,
+      redirect: pathname + search + hash,
     });
     const redirect = urlParams.get('redirect');
-    if (window.location.pathname !== '/user/login' && !redirect) {
+    if (pathname !== '/user/login' && !redirect) {
       history.replace({
         pathname: '/user/login',
         search: searchParams.toString(),

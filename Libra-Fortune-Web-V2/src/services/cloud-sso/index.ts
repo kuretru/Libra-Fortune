@@ -7,7 +7,7 @@ const SSO_CLIENT_ID = 'U9XLAUhQIiyfwscUfdQwRmnBJvfTIbcAxXuMZJYa';
 const SSO_AUTHORIZE_URL = 'https://sso.i5zhen.com/application/o/authorize/';
 const SSO_TOKEN_URL = 'https://sso.i5zhen.com/application/o/token/';
 
-const getRedirectUri = () => `${window.location.origin}/user/login`;
+const getRedirectUri = () => `${window.location.origin}/#/user/login`;
 
 export async function currentUser(): Promise<API.CurrentUser> {
   const token = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
