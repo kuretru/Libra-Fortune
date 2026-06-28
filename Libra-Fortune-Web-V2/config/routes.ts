@@ -5,12 +5,12 @@ export default [
     icon: 'dashboard',
     routes: [
       {
-        name: '统计页',
+        name: '统计',
         path: '/dashboard/statistics',
         component: './ledger/dashboard',
       },
       {
-        name: '分析页',
+        name: '分析',
         path: '/dashboard/analysis',
         component: './ledger/dashboard/analysis',
       },

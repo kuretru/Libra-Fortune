@@ -275,7 +275,7 @@ const DashboardAnalysis: React.FC = () => {
   };
 
   return (
-    <PageContainer title="分析页">
+    <PageContainer title="分析">
       {contextHolder}
       <Card style={{ marginBottom: 16 }}>
         <Form<AnalysisFormValues>

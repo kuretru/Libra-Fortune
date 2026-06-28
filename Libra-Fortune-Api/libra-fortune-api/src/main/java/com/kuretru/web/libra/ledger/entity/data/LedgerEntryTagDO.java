@@ -3,7 +3,7 @@ package com.kuretru.web.libra.ledger.entity.data;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.kuretru.microservices.web.entity.annotations.ChildrenParentId;
 import com.kuretru.microservices.web.entity.interfaces.Children;
-import com.kuretru.microservices.web.v2.entity.data.BaseCreateDO;
+import com.kuretru.microservices.web.entity.data.BaseCreateDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.ledger.controller;
 
 import com.kuretru.microservices.web.entity.ApiResponse;
-import com.kuretru.microservices.web.v2.controller.BaseSequencedRestController;
+import com.kuretru.microservices.web.controller.BaseSequencedRestController;
 import com.kuretru.web.libra.ledger.entity.query.LedgerQuery;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerDTO;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEnumDTO;

@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.ledger.entity.transfer;
 
-import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
+import com.kuretru.microservices.web.entity.transfer.BaseCreateUpdateDTO;
 import com.kuretru.web.libra.ledger.entity.enums.EntryType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;

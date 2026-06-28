@@ -1,7 +1,7 @@
 package com.kuretru.web.libra.ledger.entity.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateDTO;
+import com.kuretru.microservices.web.entity.transfer.BaseCreateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

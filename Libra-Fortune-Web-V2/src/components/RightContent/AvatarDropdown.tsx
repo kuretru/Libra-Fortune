@@ -7,7 +7,7 @@ import { history, useModel } from '@umijs/max';
 import type { MenuProps } from 'antd';
 import { Spin } from 'antd';
 import React, { startTransition } from 'react';
-import { outLogin } from '@/services/ant-design-pro/api';
+import { ACCESS_TOKEN_STORAGE_KEY } from '@/services/cloud-sso';
 import HeaderDropdown from '../HeaderDropdown';
 
 type GlobalHeaderRightProps = {
@@ -17,8 +17,9 @@ type GlobalHeaderRightProps = {
 export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
   children,
 }) => {
-  const loginOut = async () => {
-    await outLogin();
+  const loginOut = () => {
+    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+
     const { pathname, search, hash } = history.location;
     const urlParams = new URL(window.location.href).searchParams;
     const searchParams = new URLSearchParams({

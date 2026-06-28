@@ -73,7 +73,6 @@
     "jest": "^30.4.1",
     "jest-environment-jsdom": "^30.4.1",
     "lint-staged": "^17.0.5",
-    "mockjs": "^1.1.0",
     "react-doctor": "^0.1.6",
     "swagger-ui-dist": "^5.32.6",
     "tailwindcss": "^4.2.4",

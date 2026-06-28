@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.metadata.entity.mapper;
 
-import com.kuretru.microservices.web.v2.entity.mapper.BaseSequencedEntityMapper;
+import com.kuretru.microservices.web.entity.mapper.BaseSequencedEntityMapper;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetDO;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataTagSetDTO;
 import org.mapstruct.Mapper;

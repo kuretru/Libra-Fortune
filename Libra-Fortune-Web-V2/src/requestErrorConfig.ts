@@ -1,8 +1,7 @@
 ﻿import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message } from 'antd';
-
-const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
+import { ACCESS_TOKEN_STORAGE_KEY } from '@/services/cloud-sso';
 
 // 错误处理方案： 错误类型
 // enum ErrorShowType {

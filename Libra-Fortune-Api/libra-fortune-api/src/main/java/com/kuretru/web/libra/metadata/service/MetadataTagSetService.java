@@ -2,8 +2,8 @@ package com.kuretru.web.libra.metadata.service;
 
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.v2.service.BaseService;
-import com.kuretru.microservices.web.v2.service.SequencedService;
+import com.kuretru.microservices.web.service.BaseService;
+import com.kuretru.microservices.web.service.SequencedService;
 import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetQuery;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataTagSetDTO;
 

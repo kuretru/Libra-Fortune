@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.metadata.mapper;
 
-import com.kuretru.microservices.web.v2.mapper.BaseSequencedMapper;
+import com.kuretru.microservices.web.mapper.BaseSequencedMapper;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetItemDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;

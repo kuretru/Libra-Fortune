@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.v2.service.impl.BaseServiceImpl;
+import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.account.service.AccountService;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryEntityMapper;

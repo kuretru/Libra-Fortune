@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.account.entity.transfer;
 
-import com.kuretru.microservices.web.v2.entity.transfer.BaseCreateUpdateDTO;
+import com.kuretru.microservices.web.entity.transfer.BaseCreateUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

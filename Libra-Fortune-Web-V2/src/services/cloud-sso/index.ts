@@ -2,7 +2,7 @@ import {jwtDecode} from 'jwt-decode';
 
 const OAUTH_STATE_STORAGE_KEY = 'cloudSso.state';
 const OAUTH_REDIRECT_STORAGE_KEY = 'cloudSso.redirect';
-const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
+export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
 const SSO_CLIENT_ID = 'U9XLAUhQIiyfwscUfdQwRmnBJvfTIbcAxXuMZJYa';
 const SSO_AUTHORIZE_URL = 'https://sso.i5zhen.com/application/o/authorize/';
 const SSO_TOKEN_URL = 'https://sso.i5zhen.com/application/o/token/';

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
+import com.kuretru.microservices.web.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.account.entity.data.AccountDO;
 import com.kuretru.web.libra.account.entity.mapper.AccountEntityMapper;
 import com.kuretru.web.libra.account.entity.query.AccountQuery;

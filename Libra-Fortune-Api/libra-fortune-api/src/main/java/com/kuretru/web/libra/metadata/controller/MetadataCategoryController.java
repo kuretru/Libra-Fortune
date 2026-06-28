@@ -2,9 +2,8 @@ package com.kuretru.web.libra.metadata.controller;
 
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.entity.ApiResponse;
-import com.kuretru.microservices.web.v2.controller.BaseRestController;
-import com.kuretru.microservices.web.v2.controller.BaseSequencedRestController;
-import com.kuretru.microservices.web.v2.entity.query.EmptyQuery;
+import com.kuretru.microservices.web.controller.BaseSequencedRestController;
+import com.kuretru.microservices.web.entity.query.EmptyQuery;
 import com.kuretru.web.libra.metadata.entity.transfer.MetadataCategoryDTO;
 import com.kuretru.web.libra.metadata.service.MetadataCategoryService;
 import io.swagger.v3.oas.annotations.Operation;

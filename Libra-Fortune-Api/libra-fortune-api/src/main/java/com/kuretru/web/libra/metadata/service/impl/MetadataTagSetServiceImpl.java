@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.v2.service.impl.BaseSequencedServiceImpl;
+import com.kuretru.microservices.web.service.impl.BaseSequencedServiceImpl;
 import com.kuretru.web.libra.metadata.entity.data.MetadataTagSetDO;
 import com.kuretru.web.libra.metadata.entity.mapper.MetadataTagSetEntityMapper;
 import com.kuretru.web.libra.metadata.entity.query.MetadataTagSetItemQuery;
