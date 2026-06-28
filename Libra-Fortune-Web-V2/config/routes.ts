@@ -3,7 +3,18 @@ export default [
     name: '面板',
     path: '/dashboard',
     icon: 'dashboard',
-    component: './ledger/dashboard',
+    routes: [
+      {
+        name: '统计页',
+        path: '/dashboard/statistics',
+        component: './ledger/dashboard',
+      },
+      {
+        name: '分析页',
+        path: '/dashboard/analysis',
+        component: './ledger/dashboard/analysis',
+      },
+    ],
   },
   {
     path: '/user',
