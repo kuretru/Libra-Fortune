@@ -117,7 +117,7 @@ export default defineConfig({
    * @name layout 插件
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: 'Ant Design Pro',
+  title: '天秤·财富',
   layout: {
     ...defaultSettings,
   },
