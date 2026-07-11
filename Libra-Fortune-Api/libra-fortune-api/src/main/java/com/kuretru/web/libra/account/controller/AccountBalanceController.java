@@ -3,6 +3,7 @@ package com.kuretru.web.libra.account.controller;
 import com.kuretru.microservices.web.controller.BaseController;
 import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
+import com.kuretru.web.libra.account.entity.business.AccountBalanceRequest;
 import com.kuretru.web.libra.account.entity.business.AccountBalanceResultBO;
 import com.kuretru.web.libra.account.entity.query.AccountBalanceQuery;
 import com.kuretru.web.libra.account.service.AccountBalanceService;
@@ -12,6 +13,8 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +35,13 @@ public class AccountBalanceController extends BaseController {
     public ApiResponse<AccountBalanceResultBO> list(@ParameterObject @Validated AccountBalanceQuery query)
             throws ServiceException {
         return ApiResponse.success(service.list(query));
+    }
+
+    @PutMapping("/balances")
+    @Operation(summary = "幂等修改账户余额记录")
+    public ApiResponse<?> save(@RequestBody AccountBalanceRequest request) throws ServiceException {
+        service.save(request);
+        return ApiResponse.success(null);
     }
 
 }

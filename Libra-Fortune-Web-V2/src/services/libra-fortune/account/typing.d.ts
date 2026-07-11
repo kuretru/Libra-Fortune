@@ -22,6 +22,11 @@ declare namespace LibraFortune.Account {
     balance: string;
   }
 
+  type AccountBalanceRequest = {
+    date: string;
+    balances: AccountBalanceItemDTO[];
+  }
+
   type AccountBalanceDateDTO = {
     date: string;
     totalBalance: string;

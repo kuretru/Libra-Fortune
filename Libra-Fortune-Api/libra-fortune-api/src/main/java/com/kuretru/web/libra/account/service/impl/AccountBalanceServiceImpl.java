@@ -6,6 +6,7 @@ import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.web.libra.account.entity.business.AccountBalanceBO;
 import com.kuretru.web.libra.account.entity.business.AccountBalanceDateBO;
+import com.kuretru.web.libra.account.entity.business.AccountBalanceRequest;
 import com.kuretru.web.libra.account.entity.business.AccountBalanceResultBO;
 import com.kuretru.web.libra.account.entity.data.AccountBalanceDO;
 import com.kuretru.web.libra.account.entity.mapper.AccountBalanceEntityMapper;
@@ -22,6 +23,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountBalanceServiceImpl implements AccountBalanceService {
@@ -38,23 +42,9 @@ public class AccountBalanceServiceImpl implements AccountBalanceService {
 
     @Override
     public AccountBalanceResultBO list(AccountBalanceQuery query) {
-        var accountQuery = new AccountQuery();
-        accountQuery.setOwner(CurrentUserContext.getUsername());
-        accountQuery.setCanHoldFunds(true);
-        var accountList = accountService.list(accountQuery);
+        var accountList = listAccount();
         var accountIdList = accountList.stream().map(AccountDTO::getId).toList();
-
-        var queryWrapper = new QueryWrapper<AccountBalanceDO>();
-        queryWrapper.in("account_id", accountIdList);
-        if (query.getDateBegin() != null) {
-            queryWrapper.ge("date", query.getDateBegin());
-        }
-        if (query.getDateEnd() != null) {
-            queryWrapper.le("date", query.getDateEnd());
-        }
-        queryWrapper.orderByDesc("date");
-        queryWrapper.orderByAsc("account_id");
-        var records = mapper.selectList(queryWrapper);
+        var records = listBalance(accountIdList, query);
 
         var result = new AccountBalanceResultBO();
         result.setAccounts(accountList);
@@ -80,11 +70,69 @@ public class AccountBalanceServiceImpl implements AccountBalanceService {
         return result;
     }
 
-    private void verifyOwnerAndCanHoldFunds(Long accountId) throws ServiceException {
-        var account = accountService.get(accountId);
-        accountService.verifyOwner(accountId);
-        if (!account.getCanHoldFunds()) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "该账户不允许储蓄");
+    private List<AccountDTO> listAccount() {
+        var accountQuery = new AccountQuery();
+        accountQuery.setOwner(CurrentUserContext.getUsername());
+        accountQuery.setCanHoldFunds(true);
+        return accountService.list(accountQuery);
+    }
+
+    private List<AccountBalanceDO> listBalance(List<Long> accountIdList, AccountBalanceQuery query) {
+        var queryWrapper = new QueryWrapper<AccountBalanceDO>();
+        queryWrapper.in("account_id", accountIdList);
+        if (query.getDateBegin() != null) {
+            queryWrapper.ge("date", query.getDateBegin());
+        }
+        if (query.getDateEnd() != null) {
+            queryWrapper.le("date", query.getDateEnd());
+        }
+        queryWrapper.orderByDesc("date");
+        queryWrapper.orderByAsc("account_id");
+        return mapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public void save(AccountBalanceRequest request) throws ServiceException {
+        var accountList = listAccount();
+        var accountIdList = accountList.stream().map(AccountDTO::getId).toList();
+        for (var balance : request.getBalances()) {
+            if (!accountIdList.contains(balance.getAccountId())) {
+                throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("你不是账户[%d]的Owner", balance.getAccountId()));
+            }
+        }
+
+        var query = new AccountBalanceQuery();
+        query.setDateBegin(request.getDate());
+        query.setDateEnd(request.getDate());
+        var records = listBalance(accountIdList, query);
+        var recordsMap = records.stream().collect(Collectors.toMap(AccountBalanceDO::getAccountId, Function.identity()));
+
+        var createRecords = new ArrayList<AccountBalanceDO>();
+        var updateRecords = new ArrayList<AccountBalanceDO>();
+        for (var balance : request.getBalances()) {
+            if (recordsMap.containsKey(balance.getAccountId())) {
+                var record = recordsMap.get(balance.getAccountId());
+                record.setBalance(balance.getBalance());
+                recordsMap.remove(balance.getAccountId());
+                updateRecords.add(record);
+            } else {
+                var record = new AccountBalanceDO();
+                record.setAccountId(balance.getAccountId());
+                record.setDate(request.getDate());
+                record.setBalance(balance.getBalance());
+                createRecords.add(record);
+            }
+        }
+        var removeRecords = recordsMap.values().stream().map(AccountBalanceDO::getId).toList();
+
+        if (!createRecords.isEmpty()) {
+            mapper.insert(createRecords);
+        }
+        if (!updateRecords.isEmpty()) {
+            mapper.updateById(updateRecords);
+        }
+        if (!removeRecords.isEmpty()) {
+            mapper.deleteByIds(removeRecords);
         }
     }
 
