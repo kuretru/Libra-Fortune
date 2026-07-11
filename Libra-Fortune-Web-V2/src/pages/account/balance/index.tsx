@@ -8,7 +8,7 @@ import {
   ProTable,
   type ProTableProps,
 } from '@ant-design/pro-components';
-import { Button, Form, InputNumber, message, Popconfirm, Space } from 'antd';
+import { Button, Form, Input, message, Popconfirm, Space } from 'antd';
 import dayjs, { type Dayjs } from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { list, save } from '@/services/libra-fortune/account/balance';
@@ -37,6 +37,34 @@ const formatBalance = (value?: string) =>
 const formatDate = (value: Dayjs | string) =>
   dayjs.isDayjs(value) ? value.format('YYYY-MM-DD') : value;
 
+const buildBalanceValues = (
+  items?: LibraFortune.Account.AccountBalanceItemDTO[],
+) =>
+  Object.fromEntries(
+    (items ?? []).map((item) => [item.accountId.toString(), item.balance]),
+  );
+
+const buildLatestBalanceValues = (
+  balances: LibraFortune.Account.AccountBalanceDateDTO[],
+) => {
+  const latestBalance = balances.reduce<
+    LibraFortune.Account.AccountBalanceDateDTO | undefined
+  >(
+    (latest, balance) =>
+      latest === undefined || balance.date > latest.date ? balance : latest,
+    undefined,
+  );
+
+  return buildBalanceValues(latestBalance?.items);
+};
+
+const balanceRules = [
+  {
+    pattern: /^\d+(\.\d{1,2})?$/,
+    message: '请输入非负金额，最多两位小数',
+  },
+];
+
 const AccountBalance: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const actionRef = useRef<ActionType | null>(null);
@@ -48,6 +76,9 @@ const AccountBalance: React.FC = () => {
   const [accounts, setAccounts] = useState<LibraFortune.Account.AccountDTO[]>(
     [],
   );
+  const [latestBalanceValues, setLatestBalanceValues] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     if (!modalVisible) return;
@@ -55,18 +86,13 @@ const AccountBalance: React.FC = () => {
     if (currentRecord) {
       form.setFieldsValue({
         date: dayjs(currentRecord.date),
-        balances: Object.fromEntries(
-          currentRecord.items.map((item) => [
-            item.accountId.toString(),
-            item.balance,
-          ]),
-        ),
+        balances: buildBalanceValues(currentRecord.items),
       });
     } else {
       form.resetFields();
-      form.setFieldsValue({ date: dayjs(), balances: {} });
+      form.setFieldsValue({ date: dayjs(), balances: latestBalanceValues });
     }
-  }, [modalVisible, currentRecord, form]);
+  }, [modalVisible, currentRecord, form, latestBalanceValues]);
 
   const columns = useMemo<ProColumns<AccountBalanceTableRecord>[]>(
     () => [
@@ -150,6 +176,7 @@ const AccountBalance: React.FC = () => {
     });
     const result = response.data;
     setAccounts(result.accounts);
+    setLatestBalanceValues(buildLatestBalanceValues(result.balances));
 
     return {
       data: result.balances.map((balance) => ({
@@ -204,8 +231,15 @@ const AccountBalance: React.FC = () => {
     }
   };
 
-  const onCreateButtonClick = () => {
+  const onCreateButtonClick = async () => {
     setCurrentRecord(undefined);
+    try {
+      const response = await list({});
+      setAccounts(response.data.accounts);
+      setLatestBalanceValues(buildLatestBalanceValues(response.data.balances));
+    } catch {
+      // The modal can still open with the balances already loaded in the table.
+    }
     setModalVisible(true);
   };
 
@@ -256,6 +290,7 @@ const AccountBalance: React.FC = () => {
         title={currentRecord ? '编辑余额快照' : '新增余额快照'}
         open={modalVisible}
         layout="horizontal"
+        labelAlign="left"
         labelCol={{ flex: '120px' }}
         wrapperCol={{ flex: 1 }}
         onOpenChange={(open) => {
@@ -267,7 +302,7 @@ const AccountBalance: React.FC = () => {
         onFinish={onFinish}
         modalProps={{
           destroyOnHidden: true,
-          width: 960,
+          width: 560,
         }}
       >
         <ProFormDatePicker
@@ -285,15 +320,10 @@ const AccountBalance: React.FC = () => {
             name={['balances', account.id!.toString()]}
             label={account.name}
             labelAlign="left"
+            rules={balanceRules}
             style={{ marginBottom: 12 }}
           >
-            <InputNumber
-              min={0}
-              precision={2}
-              step="0.01"
-              stringMode
-              style={{ width: '100%' }}
-            />
+            <Input allowClear inputMode="decimal" />
           </Form.Item>
         ))}
       </ModalForm>
