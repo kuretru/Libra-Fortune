@@ -1,14 +1,14 @@
 import { StatisticCard } from '@ant-design/pro-components';
-import { Space, theme, Typography } from 'antd';
+import { Space, Typography, theme } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import * as dashboardApi from '@/services/libra-fortune/ledger/dashboard';
+import { formatAmount } from '@/utils/format';
 
 type MonthlyUserExpenseCardProps = {
   username?: string;
 };
 
-const formatAmount = (value?: string) => Number(value ?? 0).toFixed(2);
 const expenseTagIds = {
   necessary: 1,
   reducible: 2,

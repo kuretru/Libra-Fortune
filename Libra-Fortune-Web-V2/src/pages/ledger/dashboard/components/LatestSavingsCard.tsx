@@ -1,8 +1,7 @@
 import { StatisticCard } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import * as dashboardApi from '@/services/libra-fortune/ledger/dashboard';
-
-const formatAmount = (value?: string) => Number(value ?? 0).toFixed(2);
+import { formatAmount } from '@/utils/format';
 
 const LatestSavingsCard: React.FC = () => {
   const [loading, setLoading] = useState(false);
