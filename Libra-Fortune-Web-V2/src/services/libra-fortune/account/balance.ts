@@ -8,3 +8,10 @@ export async function list(query: LibraFortune.Account.AccountBalanceQuery) {
     params: query,
   });
 }
+
+export async function save(record: LibraFortune.Account.AccountBalanceRequest) {
+  return request<GalaxyWeb.ApiResponse<null>>('/api/accounts/balances', {
+    method: 'PUT',
+    data: record,
+  });
+}
