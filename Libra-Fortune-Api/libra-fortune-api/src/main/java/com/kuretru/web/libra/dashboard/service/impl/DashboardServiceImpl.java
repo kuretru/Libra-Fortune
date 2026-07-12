@@ -6,7 +6,11 @@ import com.kuretru.web.libra.account.entity.query.AccountBalanceQuery;
 import com.kuretru.web.libra.account.service.AccountBalanceService;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardAccountBalanceBO;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeGroupBy;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
+import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
 import com.kuretru.web.libra.dashboard.mapper.DashboardMapper;
 import com.kuretru.web.libra.dashboard.service.DashboardService;
 import com.kuretru.web.libra.ledger.entity.enums.LedgerGroupBy;
@@ -27,6 +31,11 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardServiceImpl(DashboardMapper mapper, AccountBalanceService accountBalanceService) {
         this.mapper = mapper;
         this.accountBalanceService = accountBalanceService;
+    }
+
+    @Override
+    public List<DashboardLedgerBO> ledger(DashboardQuery<LedgerTimeGroupBy, LedgerMetrics, LedgerDimensions> query) {
+        return mapper.query(query);
     }
 
     @Override

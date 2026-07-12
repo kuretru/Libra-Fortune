@@ -3,8 +3,14 @@ package com.kuretru.web.libra.dashboard.mapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeGroupBy;
+import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
+import com.kuretru.web.libra.dashboard.service.impl.DashboardLedgerSqlProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.SelectProvider;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,5 +27,8 @@ public interface DashboardMapper {
                                 @Param("joinTag") boolean joinTag,
                                 @Param("joinTagItem") boolean joinTagItem,
                                 @Param("username") String username);
+
+    @SelectProvider(type = DashboardLedgerSqlProvider.class, method = "buildQuery")
+    List<DashboardLedgerBO> query(DashboardQuery<LedgerTimeGroupBy, LedgerMetrics, LedgerDimensions> query);
 
 }

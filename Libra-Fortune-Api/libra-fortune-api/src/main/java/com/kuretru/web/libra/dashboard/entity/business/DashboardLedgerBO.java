@@ -35,6 +35,13 @@ public class DashboardLedgerBO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long tagId;
 
-    private BigDecimal sum;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BigDecimal originalSum;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BigDecimal settlementSum;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BigDecimal fundedSum;
 
 }
