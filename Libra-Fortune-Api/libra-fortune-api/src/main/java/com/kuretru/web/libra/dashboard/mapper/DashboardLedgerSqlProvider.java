@@ -1,4 +1,4 @@
-package com.kuretru.web.libra.dashboard.service.impl;
+package com.kuretru.web.libra.dashboard.mapper;
 
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
@@ -18,17 +18,17 @@ public class DashboardLedgerSqlProvider {
 
         var sql = new StringBuilder();
         sql.append("SELECT ");
-        columns.add(query.getTime().getGroupBy().getSelect());
-        groupBys.add(query.getTime().getGroupBy().getGroupBy());
+        columns.add(query.getTime().getGroupBy().getColumn() + " AS " + query.getTime().getGroupBy().getValue());
+        groupBys.add(query.getTime().getGroupBy().getColumn());
         for (var groupBy : query.getDimensions()) {
-            columns.add(groupBy.getSelect());
-            groupBys.add(groupBy.getGroupBy());
+            columns.add(groupBy.getColumn() + " AS " + groupBy.getValue());
+            groupBys.add(groupBy.getColumn());
             if (groupBy.getJoin() != null) {
                 joins.add(groupBy.getJoin());
             }
         }
         for (var metric : query.getMetrics()) {
-            columns.add(metric.getSelect());
+            columns.add(metric.getColumn() + " AS " + metric.getValue());
             if (metric.getJoin() != null) {
                 joins.add(metric.getJoin());
             }

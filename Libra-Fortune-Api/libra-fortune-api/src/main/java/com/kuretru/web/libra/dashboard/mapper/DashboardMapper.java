@@ -7,7 +7,6 @@ import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeGroupBy;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
-import com.kuretru.web.libra.dashboard.service.impl.DashboardLedgerSqlProvider;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;

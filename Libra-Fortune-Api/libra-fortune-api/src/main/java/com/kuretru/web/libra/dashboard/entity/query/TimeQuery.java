@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.dashboard.entity.query;
 
-import com.kuretru.web.libra.dashboard.entity.interfaces.Dimension;
+import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 @Data
-public class TimeQuery<T extends Dimension> {
+public class TimeQuery<T extends Field> {
 
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

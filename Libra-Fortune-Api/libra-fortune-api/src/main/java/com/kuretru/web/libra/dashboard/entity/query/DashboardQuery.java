@@ -1,8 +1,7 @@
 package com.kuretru.web.libra.dashboard.entity.query;
 
-import com.kuretru.web.libra.dashboard.entity.interfaces.Dimension;
+import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Filter;
-import com.kuretru.web.libra.dashboard.entity.interfaces.Metric;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -12,7 +11,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DashboardQuery<T extends Dimension, M extends Metric & Filter<Long>, D extends Dimension & Filter<String>> {
+public class DashboardQuery<T extends Field, M extends Field & Filter<Long>, D extends Field & Filter<String>> {
 
     @Valid
     @NotNull

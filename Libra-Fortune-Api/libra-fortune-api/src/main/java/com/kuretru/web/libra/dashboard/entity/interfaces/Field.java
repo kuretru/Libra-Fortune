@@ -1,8 +1,8 @@
 package com.kuretru.web.libra.dashboard.entity.interfaces;
 
-public interface Metric {
+public interface Field {
 
-    String getSelect();
+    String getColumn();
 
     Join getJoin();
 
