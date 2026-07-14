@@ -1,8 +1,5 @@
 package com.kuretru.web.libra.dashboard.mapper;
 
-import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
-import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
-import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeGroupBy;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Join;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
 
@@ -11,7 +8,7 @@ import java.util.HashSet;
 
 public class DashboardLedgerSqlProvider {
 
-    public String buildQuery(DashboardQuery<LedgerTimeGroupBy, LedgerMetrics, LedgerDimensions> query) {
+    public String buildQuery(DashboardQuery query) {
         var columns = new ArrayList<String>();
         var groupBys = new ArrayList<String>();
         var joins = new HashSet<Join>();
@@ -35,13 +32,13 @@ public class DashboardLedgerSqlProvider {
         }
         sql.append(String.join(",", columns));
 
-        sql.append(" FROM ledger_v2_entry entry");
+        sql.append(" FROM ").append(query.getTableName());
         for (var join : joins) {
             sql.append(" ").append(join.getSql());
         }
 
-        sql.append(" WHERE entry.`date` >= #{time.dateBegin}");
-        sql.append(" AND entry.`date` <= #{time.dateEnd}");
+        sql.append(" WHERE ").append(query.getTimeColumnName()).append(" >= #{time.dateBegin}");
+        sql.append(" AND ").append(query.getTimeColumnName()).append(" <= #{time.dateEnd}");
 
         sql.append(" GROUP BY ");
         sql.append(String.join(",", groupBys));

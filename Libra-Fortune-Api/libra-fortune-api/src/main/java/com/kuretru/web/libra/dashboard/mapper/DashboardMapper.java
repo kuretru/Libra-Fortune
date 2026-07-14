@@ -3,9 +3,6 @@ package com.kuretru.web.libra.dashboard.mapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
-import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
-import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
-import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeGroupBy;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,6 +25,6 @@ public interface DashboardMapper {
                                 @Param("username") String username);
 
     @SelectProvider(type = DashboardLedgerSqlProvider.class, method = "buildQuery")
-    List<DashboardLedgerBO> query(DashboardQuery<LedgerTimeGroupBy, LedgerMetrics, LedgerDimensions> query);
+    List<DashboardLedgerBO> query(DashboardQuery query);
 
 }

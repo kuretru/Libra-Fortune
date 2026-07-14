@@ -1,41 +1,19 @@
 package com.kuretru.web.libra.dashboard.entity.query;
 
-import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
-import com.kuretru.web.libra.dashboard.entity.interfaces.Filter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
+import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeGroupBy;
 import lombok.Data;
-
-import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
-public class DashboardQuery<T extends Field, M extends Field & Filter<Long>, D extends Field & Filter<String>> {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class DashboardQuery extends BaseDashboardQuery<LedgerTimeGroupBy, LedgerMetrics, LedgerDimensions> {
 
-    @Valid
-    @NotNull
-    @Schema(description = "时间范围和分组")
-    private TimeQuery<T> time;
+    private String tableName = "ledger_v2_entry entry";
 
-    @NotEmpty
-    @Schema(description = "指标列表")
-    private List<M> metrics;
-
-    @Schema(description = "维度列表")
-    private List<D> dimensions;
-
-    @Schema(description = "指标过滤条件")
-    private List<FilterQuery<M, Long>> metricsFilter;
-
-    @Schema(description = "维度过滤条件")
-    private List<FilterQuery<D, String>> dimensionsFilter;
-
-    @Valid
-    @Schema(description = "排序条件")
-    private List<OrderByQuery> orderBy;
-
-    @Schema(description = "最大返回行数")
-    private Integer limit;
+    private String timeColumnName = "entry.`date`";
 
 }
