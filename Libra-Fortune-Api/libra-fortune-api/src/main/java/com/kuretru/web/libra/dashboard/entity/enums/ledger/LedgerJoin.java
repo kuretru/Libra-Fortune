@@ -10,7 +10,8 @@ import lombok.Getter;
 public enum LedgerJoin implements BaseEnum<LedgerJoin>, Join {
 
     DETAIL("detail", "账本详情表", "LEFT JOIN ledger_v2_entry_detail detail ON entry.id = detail.entry_id"),
-    TAG("tag", "账本标签关联标", "LEFT JOIN ledger_v2_entry_tag tag ON entry.id = tag.entry_id");
+    TAG("tag", "账本标签关联标", "LEFT JOIN ledger_v2_entry_tag tag ON entry.id = tag.entry_id"),
+    TAG_ITEM("tagItem", "标签项表", "LEFT JOIN metadata_tag_set_item tag_item ON tag.tag_id = tag_item.id");
 
     @EnumValue
     @JsonValue

@@ -36,6 +36,9 @@ public class DashboardLedgerBO {
     private String username;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long tagSetId;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long tagItemId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

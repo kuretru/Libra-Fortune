@@ -9,7 +9,7 @@ import com.kuretru.web.libra.dashboard.entity.query.FilterQuery;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,24 +18,21 @@ public class DashboardLedgerSqlProvider {
     public String buildQuery(DashboardLedgerQuery query) {
         var columns = new ArrayList<String>();
         var groupBys = new ArrayList<String>();
-        var joins = new HashSet<Join>();
+        var joins = new LinkedHashSet<Join>();
 
         var sql = new StringBuilder();
         sql.append("SELECT ");
         columns.add(query.getTime().getDimension().getColumn() + " AS " + query.getTime().getDimension().getValue());
         groupBys.add(query.getTime().getDimension().getColumn());
+        joins.addAll(query.getTime().getDimension().getJoins());
         for (var groupBy : emptyIfNull(query.getDimensions())) {
             columns.add(groupBy.getColumn() + " AS " + groupBy.getValue());
             groupBys.add(groupBy.getColumn());
-            if (groupBy.getJoin() != null) {
-                joins.add(groupBy.getJoin());
-            }
+            joins.addAll(groupBy.getJoins());
         }
         for (var metric : query.getMetrics()) {
             columns.add(metric.getColumn() + " AS " + metric.getValue());
-            if (metric.getJoin() != null) {
-                joins.add(metric.getJoin());
-            }
+            joins.addAll(metric.getJoins());
         }
         collectFilterJoins(query.getDimensionsFilter(), joins);
         collectFilterJoins(query.getMetricsFilter(), joins);
@@ -87,8 +84,8 @@ public class DashboardLedgerSqlProvider {
             }
             return;
         }
-        if (filter.getName() != null && filter.getName().getJoin() != null) {
-            joins.add(filter.getName().getJoin());
+        if (filter.getName() != null) {
+            joins.addAll(filter.getName().getJoins());
         }
     }
 
