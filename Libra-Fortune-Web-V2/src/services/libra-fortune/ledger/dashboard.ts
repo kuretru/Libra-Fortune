@@ -2,9 +2,10 @@ import {request} from '@umijs/max';
 
 const endpointPrefix = '/api/dashboards';
 
-export async function sum(query: LibraFortune.Ledger.DashboardLedgerQuery) {
+export async function ledger(query: LibraFortune.Ledger.DashboardQuery) {
   return request<GalaxyWeb.ApiResponse<LibraFortune.Ledger.DashboardLedgerBO[]>>(
-    `${endpointPrefix}/ledgers/sum`, {
+    `${endpointPrefix}/ledgers`,
+    {
       method: 'POST',
       data: query,
     },

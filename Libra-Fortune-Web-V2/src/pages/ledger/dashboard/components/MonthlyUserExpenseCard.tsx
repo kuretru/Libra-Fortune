@@ -14,7 +14,11 @@ const expenseTagIds = {
   reducible: 2,
   unnecessary: 3,
 };
-const expenseTagSetId = 1;
+
+const buildAndFilter = (
+  children: LibraFortune.Ledger.DashboardFilterQuery<LibraFortune.Ledger.DashboardDimension>[],
+): LibraFortune.Ledger.DashboardFilterQuery<LibraFortune.Ledger.DashboardDimension> =>
+  children.length === 1 ? children[0] : { logic: 'and', children };
 
 const SubStatistic: React.FC<{ title: string; value: string }> = ({
   title,
@@ -54,27 +58,37 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
 
     const now = dayjs();
     const baseQuery = {
-      dateBegin: now.startOf('month').format('YYYY-MM-DD'),
-      dateEnd: now.endOf('month').format('YYYY-MM-DD'),
-      sumMode: 'funded',
-      groupBy: ['username'],
-      filter: {
-        type: ['expense'],
-        username: [username],
+      time: {
+        dateBegin: now.startOf('month').format('YYYY-MM-DD'),
+        dateEnd: now.endOf('month').format('YYYY-MM-DD'),
+        dimension: 'month' as const,
       },
+      metrics: ['fundedSum'] as LibraFortune.Ledger.DashboardMetric[],
     };
 
     let mounted = true;
     setLoading(true);
     Promise.all([
-      dashboardApi.sum(baseQuery),
-      dashboardApi.sum({
+      dashboardApi.ledger({
         ...baseQuery,
-        groupBy: ['tagId'],
-        filter: {
-          ...baseQuery.filter,
-          tagSetId: [expenseTagSetId],
-        },
+        dimensions: ['username'],
+        dimensionsFilter: buildAndFilter([
+          { name: 'type', operator: 'in', values: ['expense'] },
+          { name: 'username', operator: 'in', values: [username] },
+        ]),
+      }),
+      dashboardApi.ledger({
+        ...baseQuery,
+        dimensions: ['tagId'],
+        dimensionsFilter: buildAndFilter([
+          { name: 'type', operator: 'in', values: ['expense'] },
+          { name: 'username', operator: 'in', values: [username] },
+          {
+            name: 'tagId',
+            operator: 'in',
+            values: Object.values(expenseTagIds).map(String),
+          },
+        ]),
       }),
     ])
       .then(([expenseResponse, tagSetItemResponse]) => {
@@ -85,11 +99,11 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
         const sumByTagId = new Map(
           tagSetItemResponse.data.map((item) => [
             item.tagId,
-            formatAmount(item.sum),
+            formatAmount(item.fundedSum),
           ]),
         );
 
-        setAmount(formatAmount(expenseResponse.data[0]?.sum));
+        setAmount(formatAmount(expenseResponse.data[0]?.fundedSum));
         setNecessaryAmount(sumByTagId.get(expenseTagIds.necessary) ?? '0.00');
         setReducibleAmount(sumByTagId.get(expenseTagIds.reducible) ?? '0.00');
         setUnnecessaryAmount(
