@@ -38,8 +38,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<DashboardLedgerBO> ledger(DashboardQuery query) {
-        verifyFilter(query.getMetricsFilter(), new HashSet<>(query.getMetrics()), "指标过滤字段");
-        verifyFilter(query.getDimensionsFilter(), new HashSet<>(emptyIfNull(query.getDimensions())), "维度过滤字段");
+        verifyFilter(query.getMetricsFilter(), new HashSet<>(query.getMetrics()), true, "指标过滤字段");
+        verifyFilter(query.getDimensionsFilter(), null, false, "维度过滤字段");
         return mapper.query(query);
     }
 
@@ -98,22 +98,19 @@ public class DashboardServiceImpl implements DashboardService {
         return values != null && !values.isEmpty();
     }
 
-    private <T> List<T> emptyIfNull(List<T> values) {
-        return values == null ? List.of() : values;
-    }
-
-    private <T extends Field> void verifyFilter(FilterQuery<T> filter, Set<T> selectedFields, String fieldLabel) {
+    private <T extends Field> void verifyFilter(FilterQuery<T> filter, Set<T> selectedFields,
+                                                boolean requireSelectedField, String fieldLabel) {
         if (filter == null) {
             return;
         }
         if (hasItems(filter.getChildren())) {
             verifyFilterGroup(filter, fieldLabel);
             for (var child : filter.getChildren()) {
-                verifyFilter(child, selectedFields, fieldLabel);
+                verifyFilter(child, selectedFields, requireSelectedField, fieldLabel);
             }
             return;
         }
-        verifyFilterLeaf(filter, selectedFields, fieldLabel);
+        verifyFilterLeaf(filter, selectedFields, requireSelectedField, fieldLabel);
     }
 
     private <T extends Field> void verifyFilterGroup(FilterQuery<T> filter, String fieldLabel) {
@@ -125,7 +122,8 @@ public class DashboardServiceImpl implements DashboardService {
         }
     }
 
-    private <T extends Field> void verifyFilterLeaf(FilterQuery<T> filter, Set<T> selectedFields, String fieldLabel) {
+    private <T extends Field> void verifyFilterLeaf(FilterQuery<T> filter, Set<T> selectedFields,
+                                                    boolean requireSelectedField, String fieldLabel) {
         if (filter.getLogic() != null) {
             throw requestParameterError(fieldLabel + "叶子节点不能指定logic");
         }
@@ -135,7 +133,7 @@ public class DashboardServiceImpl implements DashboardService {
         if (filter.getOperator() == null) {
             throw requestParameterError(fieldLabel + "缺少operator");
         }
-        if (!selectedFields.contains(filter.getName())) {
+        if (requireSelectedField && !selectedFields.contains(filter.getName())) {
             throw requestParameterError(fieldLabel + "不在本次查询字段中: " + filter.getName().getValue());
         }
         if (!hasItems(filter.getValues())) {
