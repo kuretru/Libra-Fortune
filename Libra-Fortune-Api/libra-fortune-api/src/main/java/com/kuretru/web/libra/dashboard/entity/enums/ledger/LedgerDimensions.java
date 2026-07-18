@@ -15,7 +15,7 @@ public enum LedgerDimensions implements BaseEnum<LedgerDimensions>, Field {
     CATEGORY_ID_L2("categoryIdL2", "二级分类", "entry.category_id_l2", null),
     TYPE("type", "条目类型", "entry.`type`", null),
     USERNAME("username", "用户名", "detail.username", LedgerJoin.DETAIL),
-    TAG_ID("tagId", "标签ID", "tag.tag_id", LedgerJoin.TAG);
+    TAG_ITEM_ID("tagItemId", "标签项ID", "tag.tag_id", LedgerJoin.TAG);
 
     @EnumValue
     @JsonValue

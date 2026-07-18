@@ -7,7 +7,7 @@ import com.kuretru.web.libra.account.service.AccountBalanceService;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardAccountBalanceBO;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
-import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
+import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
 import com.kuretru.web.libra.dashboard.entity.query.FilterQuery;
 import com.kuretru.web.libra.dashboard.mapper.DashboardMapper;
 import com.kuretru.web.libra.dashboard.service.DashboardService;
@@ -31,7 +31,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<DashboardLedgerBO> ledger(DashboardQuery query) {
+    public List<DashboardLedgerBO> ledger(DashboardLedgerQuery query) {
         verifyFilter(query.getMetricsFilter(), new HashSet<>(query.getMetrics()), true, "指标过滤字段");
         verifyFilter(query.getDimensionsFilter(), null, false, "维度过滤字段");
         return mapper.query(query);

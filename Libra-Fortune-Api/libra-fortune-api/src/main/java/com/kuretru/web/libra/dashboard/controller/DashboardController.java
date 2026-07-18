@@ -4,7 +4,7 @@ import com.kuretru.microservices.web.controller.BaseController;
 import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardAccountBalanceBO;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
-import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
+import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
 import com.kuretru.web.libra.dashboard.entity.transfer.DashboardEnumDTO;
 import com.kuretru.web.libra.dashboard.service.DashboardEnumService;
 import com.kuretru.web.libra.dashboard.service.DashboardService;
@@ -38,7 +38,7 @@ public class DashboardController extends BaseController {
 
     @PostMapping("/ledgers")
     @Operation(summary = "账本条目看板")
-    public ApiResponse<List<DashboardLedgerBO>> ledger(@RequestBody @Validated DashboardQuery query) {
+    public ApiResponse<List<DashboardLedgerBO>> ledger(@RequestBody @Validated DashboardLedgerQuery query) {
         return ApiResponse.success(service.ledger(query));
     }
 

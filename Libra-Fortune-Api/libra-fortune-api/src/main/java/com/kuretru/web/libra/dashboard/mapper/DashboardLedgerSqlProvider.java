@@ -1,11 +1,10 @@
 package com.kuretru.web.libra.dashboard.mapper;
 
 import com.kuretru.web.libra.dashboard.entity.enums.FilterLogic;
-import com.kuretru.web.libra.dashboard.entity.enums.FilterOperator;
 import com.kuretru.web.libra.dashboard.entity.enums.OrderByType;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Join;
-import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
+import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
 import com.kuretru.web.libra.dashboard.entity.query.FilterQuery;
 import org.springframework.util.CollectionUtils;
 
@@ -16,7 +15,7 @@ import java.util.Set;
 
 public class DashboardLedgerSqlProvider {
 
-    public String buildQuery(DashboardQuery query) {
+    public String buildQuery(DashboardLedgerQuery query) {
         var columns = new ArrayList<String>();
         var groupBys = new ArrayList<String>();
         var joins = new HashSet<Join>();
@@ -184,7 +183,7 @@ public class DashboardLedgerSqlProvider {
         return "#{" + parameterPath + ".values[" + index + "]}";
     }
 
-    private String buildOrderBy(DashboardQuery query) {
+    private String buildOrderBy(DashboardLedgerQuery query) {
         if (CollectionUtils.isEmpty(query.getOrderBy())) {
             return "";
         }
@@ -196,7 +195,7 @@ public class DashboardLedgerSqlProvider {
         return String.join(", ", orderBySql);
     }
 
-    private String resolveOrderByAlias(DashboardQuery query, OrderByType type, String name) {
+    private String resolveOrderByAlias(DashboardLedgerQuery query, OrderByType type, String name) {
         return switch (type) {
             case TIME -> {
                 var dimension = query.getTime().getDimension();
