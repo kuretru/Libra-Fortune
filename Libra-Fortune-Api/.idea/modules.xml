@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-1566479452/galaxy-common.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1368427579/galaxy-web.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1368427579/galaxy-web.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1368427579/galaxy-web.test.iml" filepath="$PROJECT_DIR$/.idea/modules/1368427579/galaxy-web.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.test.iml" filepath="$PROJECT_DIR$/.idea/modules/libra-fortune-api/libra-fortune-parent.libra-fortune-api.test.iml" />
     </modules>

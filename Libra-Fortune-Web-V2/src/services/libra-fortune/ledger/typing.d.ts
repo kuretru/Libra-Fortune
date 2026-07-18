@@ -65,32 +65,83 @@ declare namespace LibraFortune.Ledger {
   type DashboardLedgerBO = {
     year?: string;
     month?: string;
+    week?: string;
     day?: string;
     ledgerId?: number;
     categoryIdL1?: number;
     categoryIdL2?: number;
     type?: string;
     username?: string;
-    tagId?: number;
-    sum: string;
+    tagItemId?: number;
+    tagSetId?: number;
+    originalSum?: string;
+    settlementSum?: string;
+    fundedSum?: string;
   }
 
-  type DashboardLedgerQuery = {
-    dateBegin: string;
-    dateEnd: string;
-    sumMode: string;
-    groupBy: string[];
-    filter?: DashboardFilter;
+  type DashboardTimeDimension = 'year' | 'month' | 'week' | 'day';
+
+  type DashboardMetric = 'originalSum' | 'settlementSum' | 'fundedSum';
+
+  type DashboardDimension =
+    | 'ledgerId'
+    | 'categoryIdL1'
+    | 'categoryIdL2'
+    | 'type'
+    | 'username'
+    | 'tagItemId'
+    | 'tagSetId';
+
+  type DashboardFilterLogic = 'and' | 'or';
+
+  type DashboardFilterOperator =
+    | 'equal'
+    | 'not_equal'
+    | 'in'
+    | 'not_in'
+    | 'like'
+    | 'not_like'
+    | 'gt'
+    | 'gte'
+    | 'lt'
+    | 'lte';
+
+  type DashboardFilterQuery<T extends string> = {
+    logic?: DashboardFilterLogic;
+    children?: DashboardFilterQuery<T>[];
+    name?: T;
+    operator?: DashboardFilterOperator;
+    values?: string[];
   }
 
-  type DashboardFilter = {
-    ledgerId?: number[];
-    categoryIdL1?: number[];
-    categoryIdL2?: number[];
-    type?: string[];
-    username?: string[];
-    tagId?: number[];
-    tagSetId?: number[];
+  type DashboardOrderBy = {
+    type: 'time' | 'metric' | 'dimension';
+    name: string;
+    mode: 'asc' | 'desc';
+  }
+
+  type DashboardQuery = {
+    time: {
+      dateBegin: string;
+      dateEnd: string;
+      dimension: DashboardTimeDimension;
+    };
+    metrics: DashboardMetric[];
+    dimensions?: DashboardDimension[];
+    metricsFilter?: DashboardFilterQuery<DashboardMetric>;
+    dimensionsFilter?: DashboardFilterQuery<DashboardDimension>;
+    orderBy?: DashboardOrderBy[];
+    limit?: number;
+  }
+
+  type DashboardEnumDTO = {
+    timeDimensions: GalaxyWeb.EnumDTO<DashboardTimeDimension>[];
+    metrics: GalaxyWeb.EnumDTO<DashboardMetric>[];
+    dimensions: GalaxyWeb.EnumDTO<DashboardDimension>[];
+    filterLogics: GalaxyWeb.EnumDTO<DashboardFilterLogic>[];
+    filterOperators: GalaxyWeb.EnumDTO<DashboardFilterOperator>[];
+    orderByTypes: GalaxyWeb.EnumDTO<DashboardOrderBy['type']>[];
+    orderByModes: GalaxyWeb.EnumDTO<DashboardOrderBy['mode']>[];
   }
 
   type DashboardAccountBalanceBO = {

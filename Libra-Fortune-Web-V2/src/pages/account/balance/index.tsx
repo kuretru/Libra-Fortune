@@ -12,7 +12,7 @@ import { Button, Form, Input, message, Popconfirm, Space } from 'antd';
 import dayjs, { type Dayjs } from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { list, save } from '@/services/libra-fortune/account/balance';
-import { formatNumber } from '@/utils/format';
+import { formatAmount } from '@/utils/format';
 
 type AccountBalanceSearchParams = LibraFortune.Account.AccountBalanceQuery & {
   dateRange?: string[];
@@ -32,7 +32,7 @@ type AccountBalanceTableRecord = {
 };
 
 const formatBalance = (value?: string) =>
-  value === undefined ? '-' : formatNumber(value);
+  value === undefined ? '-' : formatAmount(value);
 
 const formatDate = (value: Dayjs | string) =>
   dayjs.isDayjs(value) ? value.format('YYYY-MM-DD') : value;
@@ -123,16 +123,19 @@ const AccountBalance: React.FC = () => {
         fixed: 'left',
         width: 120,
         search: false,
-        renderText: formatBalance,
+        render: (_, record) => formatBalance(record.totalBalance),
       },
-      ...accounts.map<ProColumns<AccountBalanceTableRecord>>((account) => ({
-        dataIndex: `account-${account.id}`,
-        title: account.name,
-        align: 'right',
-        search: false,
-        width: 140,
-        renderText: formatBalance,
-      })),
+      ...accounts.map<ProColumns<AccountBalanceTableRecord>>((account) => {
+        const dataIndex = `account-${account.id!}` as const;
+        return {
+          dataIndex,
+          title: account.name,
+          align: 'right',
+          search: false,
+          width: 140,
+          render: (_, record) => formatBalance(record[dataIndex]),
+        };
+      }),
       {
         key: 'action',
         title: '操作',

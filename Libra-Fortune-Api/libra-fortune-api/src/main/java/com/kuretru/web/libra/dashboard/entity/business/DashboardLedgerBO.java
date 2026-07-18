@@ -15,6 +15,9 @@ public class DashboardLedgerBO {
     private String month;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String week;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String day;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,8 +36,18 @@ public class DashboardLedgerBO {
     private String username;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long tagId;
+    private Long tagSetId;
 
-    private BigDecimal sum;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long tagItemId;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BigDecimal originalSum;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BigDecimal settlementSum;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BigDecimal fundedSum;
 
 }

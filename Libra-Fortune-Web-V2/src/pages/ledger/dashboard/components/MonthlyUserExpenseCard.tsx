@@ -1,20 +1,27 @@
 import { StatisticCard } from '@ant-design/pro-components';
-import { Space, theme, Typography } from 'antd';
+import { Space, Typography, theme } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import * as dashboardApi from '@/services/libra-fortune/ledger/dashboard';
+import { formatAmount } from '@/utils/format';
 
 type MonthlyUserExpenseCardProps = {
   username?: string;
 };
 
-const formatAmount = (value?: string) => Number(value ?? 0).toFixed(2);
+type DashboardQuery = LibraFortune.Ledger.DashboardQuery;
+type DashboardDimension = LibraFortune.Ledger.DashboardDimension;
+type DimensionFilter =
+  LibraFortune.Ledger.DashboardFilterQuery<DashboardDimension>;
+
 const expenseTagIds = {
   necessary: 1,
   reducible: 2,
   unnecessary: 3,
 };
-const expenseTagSetId = 1;
+
+const buildAndFilter = (children: DimensionFilter[]): DimensionFilter =>
+  children.length === 1 ? children[0] : { logic: 'and', children };
 
 const SubStatistic: React.FC<{ title: string; value: string }> = ({
   title,
@@ -53,28 +60,35 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
     }
 
     const now = dayjs();
-    const baseQuery = {
-      dateBegin: now.startOf('month').format('YYYY-MM-DD'),
-      dateEnd: now.endOf('month').format('YYYY-MM-DD'),
-      sumMode: 'funded',
-      groupBy: ['username'],
-      filter: {
-        type: ['expense'],
-        username: [username],
+    const baseDimensionsFilter: DimensionFilter[] = [
+      { name: 'type', operator: 'in', values: ['expense'] },
+      { name: 'username', operator: 'in', values: [username] },
+    ];
+    const baseQuery: DashboardQuery = {
+      time: {
+        dateBegin: now.startOf('month').format('YYYY-MM-DD'),
+        dateEnd: now.endOf('month').format('YYYY-MM-DD'),
+        dimension: 'month' as const,
       },
+      metrics: ['fundedSum'] as LibraFortune.Ledger.DashboardMetric[],
+      dimensionsFilter: buildAndFilter(baseDimensionsFilter),
     };
 
     let mounted = true;
     setLoading(true);
     Promise.all([
-      dashboardApi.sum(baseQuery),
-      dashboardApi.sum({
+      dashboardApi.ledger(baseQuery),
+      dashboardApi.ledger({
         ...baseQuery,
-        groupBy: ['tagId'],
-        filter: {
-          ...baseQuery.filter,
-          tagSetId: [expenseTagSetId],
-        },
+        dimensions: ['tagItemId'],
+        dimensionsFilter: buildAndFilter([
+          ...baseDimensionsFilter,
+          {
+            name: 'tagItemId',
+            operator: 'in',
+            values: Object.values(expenseTagIds).map(String),
+          },
+        ]),
       }),
     ])
       .then(([expenseResponse, tagSetItemResponse]) => {
@@ -84,12 +98,12 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
 
         const sumByTagId = new Map(
           tagSetItemResponse.data.map((item) => [
-            item.tagId,
-            formatAmount(item.sum),
+            item.tagItemId,
+            formatAmount(item.fundedSum),
           ]),
         );
 
-        setAmount(formatAmount(expenseResponse.data[0]?.sum));
+        setAmount(formatAmount(expenseResponse.data[0]?.fundedSum));
         setNecessaryAmount(sumByTagId.get(expenseTagIds.necessary) ?? '0.00');
         setReducibleAmount(sumByTagId.get(expenseTagIds.reducible) ?? '0.00');
         setUnnecessaryAmount(

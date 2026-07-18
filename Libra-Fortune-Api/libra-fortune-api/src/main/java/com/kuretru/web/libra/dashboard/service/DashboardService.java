@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DashboardService {
 
-    List<DashboardLedgerBO> sum(DashboardLedgerQuery query);
+    List<DashboardLedgerBO> ledger(DashboardLedgerQuery query);
 
     DashboardAccountBalanceBO latestAccountBalances();
 
