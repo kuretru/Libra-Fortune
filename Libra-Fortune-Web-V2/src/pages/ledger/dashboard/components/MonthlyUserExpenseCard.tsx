@@ -9,15 +9,18 @@ type MonthlyUserExpenseCardProps = {
   username?: string;
 };
 
+type DashboardQuery = LibraFortune.Ledger.DashboardQuery;
+type DashboardDimension = LibraFortune.Ledger.DashboardDimension;
+type DimensionFilter =
+  LibraFortune.Ledger.DashboardFilterQuery<DashboardDimension>;
+
 const expenseTagIds = {
   necessary: 1,
   reducible: 2,
   unnecessary: 3,
 };
 
-const buildAndFilter = (
-  children: LibraFortune.Ledger.DashboardFilterQuery<LibraFortune.Ledger.DashboardDimension>[],
-): LibraFortune.Ledger.DashboardFilterQuery<LibraFortune.Ledger.DashboardDimension> =>
+const buildAndFilter = (children: DimensionFilter[]): DimensionFilter =>
   children.length === 1 ? children[0] : { logic: 'and', children };
 
 const SubStatistic: React.FC<{ title: string; value: string }> = ({
@@ -57,32 +60,29 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
     }
 
     const now = dayjs();
-    const baseQuery = {
+    const baseDimensionsFilter: DimensionFilter[] = [
+      { name: 'type', operator: 'in', values: ['expense'] },
+      { name: 'username', operator: 'in', values: [username] },
+    ];
+    const baseQuery: DashboardQuery = {
       time: {
         dateBegin: now.startOf('month').format('YYYY-MM-DD'),
         dateEnd: now.endOf('month').format('YYYY-MM-DD'),
         dimension: 'month' as const,
       },
       metrics: ['fundedSum'] as LibraFortune.Ledger.DashboardMetric[],
+      dimensionsFilter: buildAndFilter(baseDimensionsFilter),
     };
 
     let mounted = true;
     setLoading(true);
     Promise.all([
-      dashboardApi.ledger({
-        ...baseQuery,
-        dimensions: ['username'],
-        dimensionsFilter: buildAndFilter([
-          { name: 'type', operator: 'in', values: ['expense'] },
-          { name: 'username', operator: 'in', values: [username] },
-        ]),
-      }),
+      dashboardApi.ledger(baseQuery),
       dashboardApi.ledger({
         ...baseQuery,
         dimensions: ['tagItemId'],
         dimensionsFilter: buildAndFilter([
-          { name: 'type', operator: 'in', values: ['expense'] },
-          { name: 'username', operator: 'in', values: [username] },
+          ...baseDimensionsFilter,
           {
             name: 'tagItemId',
             operator: 'in',
