@@ -73,6 +73,7 @@ declare namespace LibraFortune.Ledger {
     type?: string;
     username?: string;
     tagItemId?: number;
+    tagSetId?: number;
     originalSum?: string;
     settlementSum?: string;
     fundedSum?: string;
@@ -88,7 +89,8 @@ declare namespace LibraFortune.Ledger {
     | 'categoryIdL2'
     | 'type'
     | 'username'
-    | 'tagItemId';
+    | 'tagItemId'
+    | 'tagSetId';
 
   type DashboardFilterLogic = 'and' | 'or';
 

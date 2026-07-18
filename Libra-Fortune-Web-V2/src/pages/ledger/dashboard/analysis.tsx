@@ -458,6 +458,7 @@ const DashboardAnalysis: React.FC = () => {
   );
   const [usernameOptions, setUsernameOptions] = useState<Option<string>[]>([]);
   const [tagOptions, setTagOptions] = useState<Option<number>[]>([]);
+  const [tagSetOptions, setTagSetOptions] = useState<Option<number>[]>([]);
   const watchedTimeDimension = Form.useWatch('timeDimension', form) ?? 'month';
   const selectedMetrics =
     (Form.useWatch('metrics', form) as DashboardMetric[] | undefined) ?? [];
@@ -559,6 +560,11 @@ const DashboardAnalysis: React.FC = () => {
           setUsernameOptions(
             usernames.map((username) => ({ label: username, value: username })),
           );
+          setTagSetOptions(
+            tagSets.flatMap((tagSet) =>
+              tagSet.id ? [{ label: tagSet.name, value: tagSet.id }] : [],
+            ),
+          );
           setTagOptions(
             tagSets.flatMap((tagSet) =>
               (tagSet.items ?? []).flatMap((tag) =>
@@ -611,11 +617,13 @@ const DashboardAnalysis: React.FC = () => {
         usernameOptions.map((item) => [item.value, item.label]),
       ),
       tagItemId: new Map(tagOptions.map((item) => [item.value, item.label])),
+      tagSetId: new Map(tagSetOptions.map((item) => [item.value, item.label])),
     }),
     [
       categoryOptions,
       entryTypeOptions,
       ledgerOptions,
+      tagSetOptions,
       tagOptions,
       usernameOptions,
     ],
@@ -681,6 +689,8 @@ const DashboardAnalysis: React.FC = () => {
         return usernameOptions;
       case 'tagItemId':
         return mapNumberOptions(tagOptions);
+      case 'tagSetId':
+        return mapNumberOptions(tagSetOptions);
       default:
         return [];
     }
