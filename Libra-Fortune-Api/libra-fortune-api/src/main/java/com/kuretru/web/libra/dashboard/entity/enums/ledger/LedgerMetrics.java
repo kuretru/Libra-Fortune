@@ -4,12 +4,11 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.kuretru.microservices.common.entity.enums.BaseEnum;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
-import com.kuretru.web.libra.dashboard.entity.interfaces.Filter;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Join;
 import lombok.Getter;
 
 @Getter
-public enum LedgerMetrics implements BaseEnum<LedgerMetrics>, Field, Filter<Long> {
+public enum LedgerMetrics implements BaseEnum<LedgerMetrics>, Field {
 
     ORIGINAL_SUM("originalSum", "原始金额合计", "SUM(entry.original_amount)", null),
     SETTLEMENT_SUM("settlementSum", "结算金额合计", "SUM(entry.settlement_amount)", null),
