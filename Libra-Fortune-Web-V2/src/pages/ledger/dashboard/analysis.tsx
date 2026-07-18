@@ -1,4 +1,4 @@
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, RedoOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import {
@@ -10,11 +10,13 @@ import {
   InputNumber,
   message,
   Row,
+  Segmented,
   Select,
   Space,
   Table,
   type TableColumnsType,
   Tag,
+  Typography,
 } from 'antd';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
@@ -33,29 +35,20 @@ type DimensionFilter =
   LibraFortune.Ledger.DashboardFilterQuery<DashboardDimension>;
 type MetricFilter = LibraFortune.Ledger.DashboardFilterQuery<DashboardMetric>;
 
-type MetricFilterFormValue = {
-  name?: DashboardMetric;
-  operator?: DashboardFilterOperator;
-  value?: number | string | null;
-};
-
 type OrderByFormValue = {
   field?: string;
   mode?: DashboardOrderBy['mode'];
 };
+
+type FilterTreeNode<T extends string> =
+  LibraFortune.Ledger.DashboardFilterQuery<T>;
 
 type AnalysisFormValues = {
   dateRange: [Dayjs, Dayjs];
   timeDimension: DashboardTimeDimension;
   metrics: DashboardMetric[];
   dimensions?: DashboardDimension[];
-  metricFilters?: MetricFilterFormValue[];
   orderBy?: OrderByFormValue[];
-  ledgerId?: number[];
-  category?: string[];
-  type?: string[];
-  username?: string[];
-  tagId?: number[];
 };
 
 type SelectedFields = {
@@ -86,6 +79,79 @@ const toOptions = <T extends string>(
     value: item.value,
   }));
 
+const createFilterGroup = <T extends string>(): FilterTreeNode<T> => ({
+  logic: 'and',
+  children: [],
+});
+
+const createFilterLeaf = <T extends string>(
+  operator: DashboardFilterOperator,
+): FilterTreeNode<T> => ({
+  operator,
+  values: [],
+});
+
+const isFilterGroup = <T extends string>(node: FilterTreeNode<T>) =>
+  node.children !== undefined || node.logic !== undefined;
+
+const isMultiValueOperator = (operator?: DashboardFilterOperator) =>
+  operator === 'in' || operator === 'not_in';
+
+const cloneFilterNode = <T extends string>(
+  node: FilterTreeNode<T>,
+): FilterTreeNode<T> => ({
+  ...node,
+  children: node.children?.map(cloneFilterNode),
+  values: node.values ? [...node.values] : undefined,
+});
+
+const updateFilterNodeAtPath = <T extends string>(
+  root: FilterTreeNode<T>,
+  path: number[],
+  updater: (node: FilterTreeNode<T>) => FilterTreeNode<T>,
+): FilterTreeNode<T> => {
+  if (!path.length) {
+    return updater(cloneFilterNode(root));
+  }
+  const [index, ...rest] = path;
+  const nextRoot = cloneFilterNode(root);
+  nextRoot.children = [...(nextRoot.children ?? [])];
+  nextRoot.children[index] = updateFilterNodeAtPath(
+    nextRoot.children[index],
+    rest,
+    updater,
+  );
+  return nextRoot;
+};
+
+const removeFilterNodeAtPath = <T extends string>(
+  root: FilterTreeNode<T>,
+  path: number[],
+): FilterTreeNode<T> => {
+  if (!path.length) {
+    return root;
+  }
+  const parentPath = path.slice(0, -1);
+  const index = path[path.length - 1];
+  return updateFilterNodeAtPath(root, parentPath, (node) => ({
+    ...node,
+    children: (node.children ?? []).filter(
+      (_, childIndex) => childIndex !== index,
+    ),
+  }));
+};
+
+const addFilterChildAtPath = <T extends string>(
+  root: FilterTreeNode<T>,
+  path: number[],
+  child: FilterTreeNode<T>,
+): FilterTreeNode<T> =>
+  updateFilterNodeAtPath(root, path, (node) => ({
+    ...node,
+    logic: node.logic ?? 'and',
+    children: [...(node.children ?? []), child],
+  }));
+
 const flattenCategories = (
   categories: LibraFortune.Metadata.CategoryDTO[],
 ): LibraFortune.Metadata.CategoryDTO[] =>
@@ -94,48 +160,230 @@ const flattenCategories = (
     ...flattenCategories(category.children ?? []),
   ]);
 
-const buildCategoryFilterOptions = (
-  categories: LibraFortune.Metadata.CategoryDTO[],
-  parentName?: string,
-): Option<string>[] =>
-  categories.flatMap((category) => {
-    if (!category.id) {
-      return buildCategoryFilterOptions(
-        category.children ?? [],
-        parentName ? `${parentName} / ${category.name}` : category.name,
+type FilterTreeEditorProps<T extends string> = {
+  value: FilterTreeNode<T>;
+  onChange: (value: FilterTreeNode<T>) => void;
+  fieldOptions: Option<T>[];
+  operatorOptions: Option<DashboardFilterOperator>[];
+  logicOptions: Option<LibraFortune.Ledger.DashboardFilterLogic>[];
+  defaultLeafOperator: DashboardFilterOperator;
+  renderValueControl: (
+    node: FilterTreeNode<T>,
+    path: number[],
+    updateNode: (
+      path: number[],
+      updater: (node: FilterTreeNode<T>) => FilterTreeNode<T>,
+    ) => void,
+  ) => React.ReactNode;
+};
+
+const FilterTreeEditor = <T extends string>({
+  value,
+  onChange,
+  fieldOptions,
+  operatorOptions,
+  logicOptions,
+  defaultLeafOperator,
+  renderValueControl,
+}: FilterTreeEditorProps<T>) => {
+  const updateNode = (
+    path: number[],
+    updater: (node: FilterTreeNode<T>) => FilterTreeNode<T>,
+  ) => {
+    onChange(updateFilterNodeAtPath(value, path, updater));
+  };
+
+  const renderNode = (node: FilterTreeNode<T>, path: number[]) => {
+    if (isFilterGroup(node)) {
+      return (
+        <div
+          key={path.join('-') || 'root'}
+          style={{
+            border: '1px solid #f0f0f0',
+            borderRadius: 6,
+            marginTop: path.length ? 8 : 0,
+            padding: 8,
+          }}
+        >
+          <Row align="middle" gutter={8}>
+            <Col flex="none">
+              <Typography.Text type="secondary">
+                {path.length ? '分组' : '根分组'}
+              </Typography.Text>
+            </Col>
+            <Col flex="none">
+              <Segmented
+                options={(logicOptions.length
+                  ? logicOptions
+                  : [
+                      { label: '并且', value: 'and' },
+                      { label: '或者', value: 'or' },
+                    ]
+                ).map((item) => ({ label: item.label, value: item.value }))}
+                value={node.logic ?? 'and'}
+                onChange={(nextLogic) =>
+                  updateNode(path, (current) => ({
+                    ...current,
+                    logic:
+                      nextLogic as LibraFortune.Ledger.DashboardFilterLogic,
+                    children: current.children ?? [],
+                  }))
+                }
+              />
+            </Col>
+            <Col flex="auto">
+              <Space wrap>
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={() =>
+                    onChange(
+                      addFilterChildAtPath(
+                        value,
+                        path,
+                        createFilterLeaf<T>(defaultLeafOperator),
+                      ),
+                    )
+                  }
+                  size="small"
+                >
+                  条件
+                </Button>
+                <Button
+                  icon={<PlusOutlined />}
+                  onClick={() =>
+                    onChange(
+                      addFilterChildAtPath(value, path, createFilterGroup<T>()),
+                    )
+                  }
+                  size="small"
+                >
+                  分组
+                </Button>
+                {path.length > 0 && (
+                  <Button
+                    icon={<DeleteOutlined />}
+                    onClick={() =>
+                      onChange(removeFilterNodeAtPath(value, path))
+                    }
+                    size="small"
+                  />
+                )}
+              </Space>
+            </Col>
+          </Row>
+          <div style={{ marginTop: 8, paddingLeft: path.length ? 12 : 0 }}>
+            {(node.children ?? []).map((child, index) =>
+              renderNode(child, [...path, index]),
+            )}
+            {!node.children?.length && (
+              <Typography.Text type="secondary">暂无过滤条件</Typography.Text>
+            )}
+          </div>
+        </div>
       );
     }
 
-    const isRoot = !parentName;
-    const label = parentName
-      ? `${parentName} / ${category.name}`
-      : category.name;
+    return (
+      <Row
+        align="middle"
+        gutter={8}
+        key={path.join('-')}
+        style={{ marginTop: 8 }}
+      >
+        <Col xs={24} md={7}>
+          <Select
+            placeholder="字段"
+            value={node.name}
+            options={fieldOptions}
+            onChange={(name) =>
+              updateNode(path, (current) => ({
+                ...current,
+                name,
+                values: [],
+              }))
+            }
+          />
+        </Col>
+        <Col xs={24} md={6}>
+          <Select
+            placeholder="条件"
+            value={node.operator}
+            options={operatorOptions}
+            onChange={(operator) =>
+              updateNode(path, (current) => ({
+                ...current,
+                operator,
+                values: [],
+              }))
+            }
+          />
+        </Col>
+        <Col xs={20} md={9}>
+          {renderValueControl(node, path, updateNode)}
+        </Col>
+        <Col xs={4} md={2}>
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => onChange(removeFilterNodeAtPath(value, path))}
+          />
+        </Col>
+      </Row>
+    );
+  };
 
-    return [
-      {
-        label,
-        value: `${isRoot ? 'categoryIdL1' : 'categoryIdL2'}:${category.id}`,
-      },
-      ...buildCategoryFilterOptions(category.children ?? [], label),
-    ];
-  });
-
-const buildAndFilter = <T extends string>(
-  children: LibraFortune.Ledger.DashboardFilterQuery<T>[],
-): LibraFortune.Ledger.DashboardFilterQuery<T> | undefined => {
-  if (!children.length) {
-    return undefined;
-  }
-  return children.length === 1 ? children[0] : { logic: 'and', children };
+  return renderNode(value, []);
 };
 
-const buildInFilter = <T extends string>(
-  name: T,
-  values?: Array<number | string>,
-): LibraFortune.Ledger.DashboardFilterQuery<T> | undefined =>
-  values?.length
-    ? { name, operator: 'in', values: values.map((value) => String(value)) }
-    : undefined;
+const normalizeFilterTree = <T extends string>(
+  node: FilterTreeNode<T>,
+  fieldLabel: string,
+  selectedFields?: Set<T>,
+  isRoot = true,
+): LibraFortune.Ledger.DashboardFilterQuery<T> | undefined => {
+  if (isFilterGroup(node)) {
+    if (!node.logic) {
+      throw new Error(`${fieldLabel}分组缺少逻辑`);
+    }
+    const children = (node.children ?? []).flatMap((child) => {
+      const normalized = normalizeFilterTree(
+        child,
+        fieldLabel,
+        selectedFields,
+        false,
+      );
+      return normalized ? [normalized] : [];
+    });
+    if (!children.length) {
+      if (isRoot) {
+        return undefined;
+      }
+      throw new Error(`${fieldLabel}分组至少需要一个条件`);
+    }
+    return { logic: node.logic, children };
+  }
+
+  if (!node.name) {
+    throw new Error(`${fieldLabel}条件缺少字段`);
+  }
+  if (selectedFields && !selectedFields.has(node.name)) {
+    throw new Error(`${fieldLabel}字段必须在已选字段中`);
+  }
+  if (!node.operator) {
+    throw new Error(`${fieldLabel}条件缺少操作符`);
+  }
+  const values = (node.values ?? []).filter((value) => value !== '');
+  if (!values.length) {
+    throw new Error(`${fieldLabel}条件缺少值`);
+  }
+  if (!isMultiValueOperator(node.operator) && values.length !== 1) {
+    throw new Error(`${fieldLabel}当前操作符只能指定一个值`);
+  }
+  return {
+    name: node.name,
+    operator: node.operator,
+    values,
+  };
+};
 
 const DashboardAnalysis: React.FC = () => {
   const [form] = Form.useForm<AnalysisFormValues>();
@@ -143,12 +391,17 @@ const DashboardAnalysis: React.FC = () => {
   const currentUsername =
     initialState?.currentUser?.userid ?? initialState?.currentUser?.name;
   const [messageApi, contextHolder] = message.useMessage();
-  const [loadingOptions, setLoadingOptions] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [queryDrawerOpen, setQueryDrawerOpen] = useState(true);
   const [result, setResult] = useState<LibraFortune.Ledger.DashboardLedgerBO[]>(
     [],
   );
+  const [dimensionFilterTree, setDimensionFilterTree] = useState<
+    FilterTreeNode<DashboardDimension>
+  >(createFilterGroup<DashboardDimension>());
+  const [metricFilterTree, setMetricFilterTree] = useState<
+    FilterTreeNode<DashboardMetric>
+  >(createFilterGroup<DashboardMetric>());
   const [selectedFields, setSelectedFields] = useState<SelectedFields>({
     timeDimension: 'month',
     dimensions: [],
@@ -163,6 +416,11 @@ const DashboardAnalysis: React.FC = () => {
   const [dimensionOptions, setDimensionOptions] = useState<
     Option<DashboardDimension>[]
   >([]);
+  const [filterLogicOptions, setFilterLogicOptions] = useState<
+    Option<LibraFortune.Ledger.DashboardFilterLogic>[]
+  >([]);
+  const [dimensionFilterOperatorOptions, setDimensionFilterOperatorOptions] =
+    useState<Option<DashboardFilterOperator>[]>([]);
   const [metricFilterOperatorOptions, setMetricFilterOperatorOptions] =
     useState<Option<DashboardFilterOperator>[]>([]);
   const [orderByModeOptions, setOrderByModeOptions] = useState<
@@ -170,9 +428,6 @@ const DashboardAnalysis: React.FC = () => {
   >([]);
   const [ledgerOptions, setLedgerOptions] = useState<Option<number>[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<Option<number>[]>([]);
-  const [categoryFilterOptions, setCategoryFilterOptions] = useState<
-    Option<string>[]
-  >([]);
   const [entryTypeOptions, setEntryTypeOptions] = useState<Option<string>[]>(
     [],
   );
@@ -219,7 +474,6 @@ const DashboardAnalysis: React.FC = () => {
   );
 
   useEffect(() => {
-    setLoadingOptions(true);
     Promise.all([
       dashboardApi.enums(),
       ledgerApi.list({ current: 1, pageSize: 1000, noPage: true }),
@@ -251,6 +505,10 @@ const DashboardAnalysis: React.FC = () => {
           setTimeDimensionOptions(toOptions(dashboardEnums.timeDimensions));
           setMetricOptions(toOptions(dashboardEnums.metrics));
           setDimensionOptions(toOptions(dashboardEnums.dimensions));
+          setFilterLogicOptions(toOptions(dashboardEnums.filterLogics));
+          setDimensionFilterOperatorOptions(
+            toOptions(dashboardEnums.filterOperators),
+          );
           setMetricFilterOperatorOptions(
             toOptions(dashboardEnums.filterOperators).filter((item) =>
               metricFilterOperatorValues.has(item.value),
@@ -267,7 +525,6 @@ const DashboardAnalysis: React.FC = () => {
               category.id ? [{ label: category.name, value: category.id }] : [],
             ),
           );
-          setCategoryFilterOptions(buildCategoryFilterOptions(categoryTree));
           setEntryTypeOptions(
             enumResponse.data.entryTypes.map((item) => ({
               label: item.label,
@@ -287,23 +544,31 @@ const DashboardAnalysis: React.FC = () => {
             ),
           );
 
-          const defaultValues: Partial<AnalysisFormValues> = {};
-          if (!form.getFieldValue('ledgerId')?.length && nextLedgerOptions[0]) {
-            defaultValues.ledgerId = [nextLedgerOptions[0].value];
-          }
-          if (!form.getFieldValue('username')?.length && currentUsername) {
-            defaultValues.username = [currentUsername];
-          }
-          if (Object.keys(defaultValues).length) {
-            form.setFieldsValue(defaultValues);
-          }
+          setDimensionFilterTree((current) => {
+            if (current.children?.length) {
+              return current;
+            }
+            const children: FilterTreeNode<DashboardDimension>[] = [];
+            if (nextLedgerOptions[0]) {
+              children.push({
+                name: 'ledgerId',
+                operator: 'in',
+                values: [String(nextLedgerOptions[0].value)],
+              });
+            }
+            if (currentUsername) {
+              children.push({
+                name: 'username',
+                operator: 'in',
+                values: [currentUsername],
+              });
+            }
+            return { logic: 'and', children };
+          });
         },
       )
       .catch((error) => {
         messageApi.error(error?.message ?? '加载筛选项失败');
-      })
-      .finally(() => {
-        setLoadingOptions(false);
       });
   }, [currentUsername, form, messageApi]);
 
@@ -369,83 +634,85 @@ const DashboardAnalysis: React.FC = () => {
     [labelMaps, selectedFields, titleMap],
   );
 
-  const buildDimensionFilter = (
-    values: AnalysisFormValues,
-  ): DimensionFilter | undefined => {
-    const filters: DimensionFilter[] = [];
-    const ledgerIdFilter = buildInFilter('ledgerId', values.ledgerId);
-    const typeFilter = buildInFilter('type', values.type);
-    const usernameFilter = buildInFilter('username', values.username);
-    const tagIdFilter = buildInFilter('tagId', values.tagId);
-
-    if (ledgerIdFilter) {
-      filters.push(ledgerIdFilter);
-    }
-    if (typeFilter) {
-      filters.push(typeFilter);
-    }
-    if (usernameFilter) {
-      filters.push(usernameFilter);
-    }
-    if (tagIdFilter) {
-      filters.push(tagIdFilter);
-    }
-
-    const categoryFilterValues: Record<
-      'categoryIdL1' | 'categoryIdL2',
-      number[]
-    > = {
-      categoryIdL1: [],
-      categoryIdL2: [],
-    };
-    for (const category of values.category ?? []) {
-      const [key, id] = category.split(':');
-      if (key === 'categoryIdL1' || key === 'categoryIdL2') {
-        categoryFilterValues[key].push(Number(id));
-      }
-    }
-    const categoryIdL1Filter = buildInFilter(
-      'categoryIdL1',
-      categoryFilterValues.categoryIdL1,
-    );
-    const categoryIdL2Filter = buildInFilter(
-      'categoryIdL2',
-      categoryFilterValues.categoryIdL2,
-    );
-    if (categoryIdL1Filter) {
-      filters.push(categoryIdL1Filter);
-    }
-    if (categoryIdL2Filter) {
-      filters.push(categoryIdL2Filter);
-    }
-
-    return buildAndFilter(filters);
-  };
-
-  const buildMetricFilter = (
-    values: AnalysisFormValues,
-  ): MetricFilter | undefined => {
-    const filters = (values.metricFilters ?? []).flatMap((filter) => {
-      if (
-        !filter.name ||
-        !filter.operator ||
-        filter.value === undefined ||
-        filter.value === null ||
-        filter.value === ''
-      ) {
+  const getDimensionValueOptions = (
+    name?: DashboardDimension,
+  ): Option<string>[] => {
+    const mapNumberOptions = (options: Option<number>[]) =>
+      options.map((item) => ({
+        label: item.label,
+        value: String(item.value),
+      }));
+    switch (name) {
+      case 'ledgerId':
+        return mapNumberOptions(ledgerOptions);
+      case 'categoryIdL1':
+      case 'categoryIdL2':
+        return mapNumberOptions(categoryOptions);
+      case 'type':
+        return entryTypeOptions;
+      case 'username':
+        return usernameOptions;
+      case 'tagId':
+        return mapNumberOptions(tagOptions);
+      default:
         return [];
-      }
-      return [
-        {
-          name: filter.name,
-          operator: filter.operator,
-          values: [String(filter.value)],
-        },
-      ];
-    });
-
-    return buildAndFilter(filters);
+    }
   };
+
+  const renderDimensionValueControl = (
+    node: FilterTreeNode<DashboardDimension>,
+    path: number[],
+    updateNode: (
+      path: number[],
+      updater: (
+        node: FilterTreeNode<DashboardDimension>,
+      ) => FilterTreeNode<DashboardDimension>,
+    ) => void,
+  ) => {
+    const multiple = isMultiValueOperator(node.operator);
+    return (
+      <Select
+        allowClear
+        mode={multiple ? 'multiple' : undefined}
+        options={getDimensionValueOptions(node.name)}
+        placeholder="值"
+        showSearch
+        value={multiple ? (node.values ?? []) : node.values?.[0]}
+        onChange={(value) =>
+          updateNode(path, (current) => ({
+            ...current,
+            values: Array.isArray(value) ? value : value ? [value] : [],
+          }))
+        }
+      />
+    );
+  };
+
+  const renderMetricValueControl = (
+    node: FilterTreeNode<DashboardMetric>,
+    path: number[],
+    updateNode: (
+      path: number[],
+      updater: (
+        node: FilterTreeNode<DashboardMetric>,
+      ) => FilterTreeNode<DashboardMetric>,
+    ) => void,
+  ) => (
+    <InputNumber
+      placeholder="金额"
+      style={{ width: '100%' }}
+      value={node.values?.[0]}
+      onChange={(value) =>
+        updateNode(path, (current) => ({
+          ...current,
+          values:
+            value === undefined || value === null || value === ''
+              ? []
+              : [String(value)],
+        }))
+      }
+    />
+  );
 
   const buildOrderBy = (values: AnalysisFormValues): DashboardOrderBy[] => {
     const dimensions = new Set(values.dimensions ?? []);
@@ -478,11 +745,17 @@ const DashboardAnalysis: React.FC = () => {
   };
 
   const onFinish = async (values: AnalysisFormValues) => {
-    const invalidMetricFilter = values.metricFilters?.find(
-      (filter) => filter.name && !values.metrics.includes(filter.name),
-    );
-    if (invalidMetricFilter?.name) {
-      messageApi.error('指标过滤字段必须在已选指标中');
+    let dimensionsFilter: DimensionFilter | undefined;
+    let metricsFilter: MetricFilter | undefined;
+    try {
+      dimensionsFilter = normalizeFilterTree(dimensionFilterTree, '维度过滤');
+      metricsFilter = normalizeFilterTree(
+        metricFilterTree,
+        '指标过滤',
+        new Set(values.metrics),
+      );
+    } catch (error: any) {
+      messageApi.error(error?.message ?? '过滤条件不合法');
       return;
     }
 
@@ -496,8 +769,8 @@ const DashboardAnalysis: React.FC = () => {
         },
         metrics: values.metrics,
         dimensions: values.dimensions ?? [],
-        dimensionsFilter: buildDimensionFilter(values),
-        metricsFilter: buildMetricFilter(values),
+        dimensionsFilter,
+        metricsFilter,
         orderBy: buildOrderBy(values),
       });
       setSelectedFields({
@@ -517,9 +790,16 @@ const DashboardAnalysis: React.FC = () => {
   return (
     <PageContainer
       extra={
-        <Button type="primary" onClick={() => setQueryDrawerOpen(true)}>
-          查询条件
-        </Button>
+        <Space>
+          <Button
+            icon={<RedoOutlined />}
+            loading={submitting}
+            onClick={() => form.submit()}
+          />
+          <Button type="primary" onClick={() => setQueryDrawerOpen(true)}>
+            查询条件
+          </Button>
+        </Space>
       }
       title="分析"
     >
@@ -553,7 +833,6 @@ const DashboardAnalysis: React.FC = () => {
             timeDimension: 'month',
             metrics: ['fundedSum'],
             dimensions: [],
-            metricFilters: [],
             orderBy: [{ field: 'time:month', mode: 'asc' }],
           }}
           onFinish={onFinish}
@@ -596,120 +875,29 @@ const DashboardAnalysis: React.FC = () => {
 
             <Col xs={24}>
               <Form.Item label="维度过滤">
-                <Row gutter={[8, 8]}>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="ledgerId" noStyle>
-                      <Select
-                        allowClear
-                        loading={loadingOptions}
-                        mode="multiple"
-                        options={ledgerOptions}
-                        placeholder="账本"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="category" noStyle>
-                      <Select
-                        allowClear
-                        loading={loadingOptions}
-                        mode="multiple"
-                        options={categoryFilterOptions}
-                        placeholder="分类"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="type" noStyle>
-                      <Select
-                        allowClear
-                        loading={loadingOptions}
-                        mode="multiple"
-                        options={entryTypeOptions}
-                        placeholder="条目类型"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="username" noStyle>
-                      <Select
-                        allowClear
-                        loading={loadingOptions}
-                        mode="multiple"
-                        options={usernameOptions}
-                        placeholder="用户"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <Form.Item name="tagId" noStyle>
-                      <Select
-                        allowClear
-                        loading={loadingOptions}
-                        mode="multiple"
-                        options={tagOptions}
-                        placeholder="标签项"
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
+                <FilterTreeEditor<DashboardDimension>
+                  value={dimensionFilterTree}
+                  onChange={setDimensionFilterTree}
+                  fieldOptions={dimensionOptions}
+                  operatorOptions={dimensionFilterOperatorOptions}
+                  logicOptions={filterLogicOptions}
+                  defaultLeafOperator="in"
+                  renderValueControl={renderDimensionValueControl}
+                />
               </Form.Item>
             </Col>
 
             <Col xs={24}>
               <Form.Item label="指标过滤">
-                <Form.List name="metricFilters">
-                  {(fields, { add, remove }) => (
-                    <>
-                      {fields.map((field) => (
-                        <Row
-                          align="middle"
-                          gutter={8}
-                          key={field.key}
-                          style={{ marginBottom: 8 }}
-                        >
-                          <Col xs={24} md={8}>
-                            <Form.Item name={[field.name, 'name']} noStyle>
-                              <Select
-                                placeholder="指标"
-                                options={selectedMetricOptions}
-                              />
-                            </Form.Item>
-                          </Col>
-                          <Col xs={24} md={7}>
-                            <Form.Item name={[field.name, 'operator']} noStyle>
-                              <Select
-                                placeholder="条件"
-                                options={metricFilterOperatorOptions}
-                              />
-                            </Form.Item>
-                          </Col>
-                          <Col xs={20} md={7}>
-                            <Form.Item name={[field.name, 'value']} noStyle>
-                              <InputNumber
-                                placeholder="金额"
-                                style={{ width: '100%' }}
-                              />
-                            </Form.Item>
-                          </Col>
-                          <Col xs={4} md={2}>
-                            <Button
-                              icon={<DeleteOutlined />}
-                              onClick={() => remove(field.name)}
-                            />
-                          </Col>
-                        </Row>
-                      ))}
-                      <Button
-                        icon={<PlusOutlined />}
-                        onClick={() => add({ operator: 'gte' })}
-                        type="dashed"
-                      >
-                        添加指标过滤
-                      </Button>
-                    </>
-                  )}
-                </Form.List>
+                <FilterTreeEditor<DashboardMetric>
+                  value={metricFilterTree}
+                  onChange={setMetricFilterTree}
+                  fieldOptions={selectedMetricOptions}
+                  operatorOptions={metricFilterOperatorOptions}
+                  logicOptions={filterLogicOptions}
+                  defaultLeafOperator="gte"
+                  renderValueControl={renderMetricValueControl}
+                />
               </Form.Item>
             </Col>
 
