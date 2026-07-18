@@ -1,25 +1,19 @@
 package com.kuretru.web.libra.dashboard.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
-import com.kuretru.microservices.web.context.CurrentUserContext;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.web.libra.account.entity.query.AccountBalanceQuery;
 import com.kuretru.web.libra.account.service.AccountBalanceService;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardAccountBalanceBO;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
 import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
-import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
 import com.kuretru.web.libra.dashboard.entity.query.FilterQuery;
 import com.kuretru.web.libra.dashboard.mapper.DashboardMapper;
 import com.kuretru.web.libra.dashboard.service.DashboardService;
-import com.kuretru.web.libra.ledger.entity.enums.LedgerGroupBy;
-import com.kuretru.web.libra.ledger.entity.enums.LedgerSumMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,45 +35,6 @@ public class DashboardServiceImpl implements DashboardService {
         verifyFilter(query.getMetricsFilter(), new HashSet<>(query.getMetrics()), true, "指标过滤字段");
         verifyFilter(query.getDimensionsFilter(), null, false, "维度过滤字段");
         return mapper.query(query);
-    }
-
-    @Override
-    public List<DashboardLedgerBO> sum(DashboardLedgerQuery query) {
-        var sumMode = query.getSumMode();
-        String sum = sumMode.getSelect();
-
-        var selectColumns = new ArrayList<String>();
-        var groupByColumns = new ArrayList<String>();
-        for (var groupBy : query.getGroupBy()) {
-            selectColumns.add(groupBy.getSelect());
-            groupByColumns.add(groupBy.getGroupBy());
-        }
-
-        var queryWrapper = new QueryWrapper<DashboardLedgerBO>();
-        queryWrapper.ge("entry.`date`", query.getDateBegin());
-        queryWrapper.le("entry.`date`", query.getDateEnd());
-        var filter = query.getFilter();
-        if (filter != null) {
-            queryWrapper.in(hasItems(filter.getLedgerId()), "entry.ledger_id", filter.getLedgerId());
-            queryWrapper.in(hasItems(filter.getCategoryIdL1()), "entry.category_id_l1", filter.getCategoryIdL1());
-            queryWrapper.in(hasItems(filter.getCategoryIdL2()), "entry.category_id_l2", filter.getCategoryIdL2());
-            queryWrapper.in(hasItems(filter.getType()), "entry.`type`", filter.getType());
-            queryWrapper.in(hasItems(filter.getUsername()), "detail.username", filter.getUsername());
-            queryWrapper.in(hasItems(filter.getTagId()), "tag.tag_id", filter.getTagId());
-            queryWrapper.in(hasItems(filter.getTagSetId()), "tag_item.set_id", filter.getTagSetId());
-        }
-
-        var filterByTagSet = filter != null && hasItems(filter.getTagSetId());
-        var joinDetail = sumMode == LedgerSumMode.FUNDED
-                || query.getGroupBy().contains(LedgerGroupBy.USERNAME)
-                || (filter != null && hasItems(filter.getUsername()));
-        var joinTag = query.getGroupBy().contains(LedgerGroupBy.TAG_ID)
-                || (filter != null && hasItems(filter.getTagId()))
-                || filterByTagSet;
-        var joinTagItem = filterByTagSet;
-
-        return mapper.sum(queryWrapper, sum, selectColumns, groupByColumns, joinDetail, joinTag, joinTagItem,
-                CurrentUserContext.getUsername());
     }
 
     @Override
