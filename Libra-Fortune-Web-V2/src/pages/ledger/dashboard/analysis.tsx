@@ -69,46 +69,22 @@ type Option<Value extends string | number = string | number> = {
   value: Value;
 };
 
-const timeDimensionOptions: Option<DashboardTimeDimension>[] = [
-  { label: '年', value: 'year' },
-  { label: '月', value: 'month' },
-  { label: '日', value: 'day' },
-];
-
-const metricOptions: Option<DashboardMetric>[] = [
-  { label: '原始金额', value: 'originalSum' },
-  { label: '结算金额', value: 'settlementSum' },
-  { label: '分担金额', value: 'fundedSum' },
-];
-
-const dimensionOptions: Option<DashboardDimension>[] = [
-  { label: '账本', value: 'ledgerId' },
-  { label: '一级分类', value: 'categoryIdL1' },
-  { label: '二级分类', value: 'categoryIdL2' },
-  { label: '条目类型', value: 'type' },
-  { label: '用户', value: 'username' },
-  { label: '标签项', value: 'tagId' },
-];
-
-const metricFilterOperatorOptions: Option<DashboardFilterOperator>[] = [
-  { label: '等于', value: 'equal' },
-  { label: '不等于', value: 'not_equal' },
-  { label: '大于', value: 'gt' },
-  { label: '大于等于', value: 'gte' },
-  { label: '小于', value: 'lt' },
-  { label: '小于等于', value: 'lte' },
-];
-
-const orderByModeOptions: Option<DashboardOrderBy['mode']>[] = [
-  { label: '升序', value: 'asc' },
-  { label: '降序', value: 'desc' },
-];
-
-const titleMap = new Map<string, string>([
-  ...timeDimensionOptions.map((item) => [item.value, item.label] as const),
-  ...metricOptions.map((item) => [item.value, item.label] as const),
-  ...dimensionOptions.map((item) => [item.value, item.label] as const),
+const metricFilterOperatorValues = new Set<DashboardFilterOperator>([
+  'equal',
+  'not_equal',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
 ]);
+
+const toOptions = <T extends string>(
+  values: GalaxyWeb.EnumDTO<T>[] = [],
+): Option<T>[] =>
+  values.map((item) => ({
+    label: item.label,
+    value: item.value,
+  }));
 
 const flattenCategories = (
   categories: LibraFortune.Metadata.CategoryDTO[],
@@ -178,6 +154,20 @@ const DashboardAnalysis: React.FC = () => {
     dimensions: [],
     metrics: ['fundedSum'],
   });
+  const [timeDimensionOptions, setTimeDimensionOptions] = useState<
+    Option<DashboardTimeDimension>[]
+  >([]);
+  const [metricOptions, setMetricOptions] = useState<Option<DashboardMetric>[]>(
+    [],
+  );
+  const [dimensionOptions, setDimensionOptions] = useState<
+    Option<DashboardDimension>[]
+  >([]);
+  const [metricFilterOperatorOptions, setMetricFilterOperatorOptions] =
+    useState<Option<DashboardFilterOperator>[]>([]);
+  const [orderByModeOptions, setOrderByModeOptions] = useState<
+    Option<DashboardOrderBy['mode']>[]
+  >([]);
   const [ledgerOptions, setLedgerOptions] = useState<Option<number>[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<Option<number>[]>([]);
   const [categoryFilterOptions, setCategoryFilterOptions] = useState<
@@ -194,6 +184,17 @@ const DashboardAnalysis: React.FC = () => {
   const selectedDimensions =
     (Form.useWatch('dimensions', form) as DashboardDimension[] | undefined) ??
     [];
+  const titleMap = useMemo(
+    () =>
+      new Map<string, string>([
+        ...timeDimensionOptions.map(
+          (item) => [item.value, item.label] as const,
+        ),
+        ...metricOptions.map((item) => [item.value, item.label] as const),
+        ...dimensionOptions.map((item) => [item.value, item.label] as const),
+      ]),
+    [dimensionOptions, metricOptions, timeDimensionOptions],
+  );
   const selectedMetricOptions = useMemo(
     () =>
       metricOptions.filter((option) => selectedMetrics.includes(option.value)),
@@ -214,19 +215,27 @@ const DashboardAnalysis: React.FC = () => {
         value: `metric:${metric}`,
       })),
     ],
-    [selectedDimensions, selectedMetrics, watchedTimeDimension],
+    [selectedDimensions, selectedMetrics, titleMap, watchedTimeDimension],
   );
 
   useEffect(() => {
     setLoadingOptions(true);
     Promise.all([
+      dashboardApi.enums(),
       ledgerApi.list({ current: 1, pageSize: 1000, noPage: true }),
       ledgerApi.enums(),
       categoryApi.list({ current: 1, pageSize: 1000, noPage: true }),
       tagSetApi.list({ current: 1, pageSize: 1000, noPage: true }),
     ])
       .then(
-        ([ledgerResponse, enumResponse, categoryResponse, tagSetResponse]) => {
+        ([
+          dashboardEnumResponse,
+          ledgerResponse,
+          enumResponse,
+          categoryResponse,
+          tagSetResponse,
+        ]) => {
+          const dashboardEnums = dashboardEnumResponse.data;
           const ledgers = ledgerResponse.data.list;
           const categoryTree = categoryResponse.data.list;
           const categories = flattenCategories(categoryTree);
@@ -238,6 +247,16 @@ const DashboardAnalysis: React.FC = () => {
               ),
             ),
           ).sort();
+
+          setTimeDimensionOptions(toOptions(dashboardEnums.timeDimensions));
+          setMetricOptions(toOptions(dashboardEnums.metrics));
+          setDimensionOptions(toOptions(dashboardEnums.dimensions));
+          setMetricFilterOperatorOptions(
+            toOptions(dashboardEnums.filterOperators).filter((item) =>
+              metricFilterOperatorValues.has(item.value),
+            ),
+          );
+          setOrderByModeOptions(toOptions(dashboardEnums.orderByModes));
 
           const nextLedgerOptions = ledgers.flatMap((ledger) =>
             ledger.id ? [{ label: ledger.name, value: ledger.id }] : [],
@@ -347,7 +366,7 @@ const DashboardAnalysis: React.FC = () => {
           `¥${formatAmount(value)}`,
       })),
     ],
-    [labelMaps, selectedFields],
+    [labelMaps, selectedFields, titleMap],
   );
 
   const buildDimensionFilter = (

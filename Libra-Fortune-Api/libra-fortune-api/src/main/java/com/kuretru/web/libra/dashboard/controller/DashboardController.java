@@ -5,6 +5,8 @@ import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardAccountBalanceBO;
 import com.kuretru.web.libra.dashboard.entity.business.DashboardLedgerBO;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardQuery;
+import com.kuretru.web.libra.dashboard.entity.transfer.DashboardEnumDTO;
+import com.kuretru.web.libra.dashboard.service.DashboardEnumService;
 import com.kuretru.web.libra.dashboard.service.DashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,10 +22,18 @@ import java.util.List;
 public class DashboardController extends BaseController {
 
     private final DashboardService service;
+    private final DashboardEnumService enumService;
 
     @Autowired
-    public DashboardController(DashboardService service) {
+    public DashboardController(DashboardService service, DashboardEnumService enumService) {
         this.service = service;
+        this.enumService = enumService;
+    }
+
+    @GetMapping("/enums")
+    @Operation(summary = "面板领域枚举")
+    public ApiResponse<DashboardEnumDTO> enums() {
+        return ApiResponse.success(enumService.enums());
     }
 
     @PostMapping("/ledgers")

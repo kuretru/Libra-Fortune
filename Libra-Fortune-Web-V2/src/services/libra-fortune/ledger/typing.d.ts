@@ -131,6 +131,16 @@ declare namespace LibraFortune.Ledger {
     limit?: number;
   }
 
+  type DashboardEnumDTO = {
+    timeDimensions: GalaxyWeb.EnumDTO<DashboardTimeDimension>[];
+    metrics: GalaxyWeb.EnumDTO<DashboardMetric>[];
+    dimensions: GalaxyWeb.EnumDTO<DashboardDimension>[];
+    filterLogics: GalaxyWeb.EnumDTO<DashboardFilterLogic>[];
+    filterOperators: GalaxyWeb.EnumDTO<DashboardFilterOperator>[];
+    orderByTypes: GalaxyWeb.EnumDTO<DashboardOrderBy['type']>[];
+    orderByModes: GalaxyWeb.EnumDTO<DashboardOrderBy['mode']>[];
+  }
+
   type DashboardAccountBalanceBO = {
     date?: string;
     totalBalance?: string;
