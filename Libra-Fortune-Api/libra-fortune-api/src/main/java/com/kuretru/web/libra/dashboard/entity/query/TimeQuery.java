@@ -22,7 +22,7 @@ public class TimeQuery<T extends Field> {
     private LocalDate dateEnd;
 
     @NotNull
-    @Schema(description = "时间分组")
-    private T groupBy;
+    @Schema(description = "时间维度")
+    private T dimension;
 
 }

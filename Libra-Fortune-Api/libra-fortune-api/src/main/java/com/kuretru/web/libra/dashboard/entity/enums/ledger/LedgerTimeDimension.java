@@ -8,7 +8,7 @@ import com.kuretru.web.libra.dashboard.entity.interfaces.Join;
 import lombok.Getter;
 
 @Getter
-public enum LedgerTimeGroupBy implements BaseEnum<LedgerTimeGroupBy>, Field {
+public enum LedgerTimeDimension implements BaseEnum<LedgerTimeDimension>, Field {
 
     DAILY("day", "按日", "entry.`date`", null),
     WEEKLY("week", "按周", "", null),
@@ -22,7 +22,7 @@ public enum LedgerTimeGroupBy implements BaseEnum<LedgerTimeGroupBy>, Field {
     private final String column;
     private final Join join;
 
-    LedgerTimeGroupBy(String value, String label, String column, Join join) {
+    LedgerTimeDimension(String value, String label, String column, Join join) {
         this.value = value;
         this.label = label;
         this.column = column;

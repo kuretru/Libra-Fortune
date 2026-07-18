@@ -23,8 +23,8 @@ public class DashboardLedgerSqlProvider {
 
         var sql = new StringBuilder();
         sql.append("SELECT ");
-        columns.add(query.getTime().getGroupBy().getColumn() + " AS " + query.getTime().getGroupBy().getValue());
-        groupBys.add(query.getTime().getGroupBy().getColumn());
+        columns.add(query.getTime().getDimension().getColumn() + " AS " + query.getTime().getDimension().getValue());
+        groupBys.add(query.getTime().getDimension().getColumn());
         for (var groupBy : emptyIfNull(query.getDimensions())) {
             columns.add(groupBy.getColumn() + " AS " + groupBy.getValue());
             groupBys.add(groupBy.getColumn());
@@ -199,9 +199,9 @@ public class DashboardLedgerSqlProvider {
     private String resolveOrderByAlias(DashboardQuery query, OrderByType type, String name) {
         return switch (type) {
             case TIME -> {
-                var groupBy = query.getTime().getGroupBy();
-                if (groupBy.getValue().equals(name)) {
-                    yield groupBy.getValue();
+                var dimension = query.getTime().getDimension();
+                if (dimension.getValue().equals(name)) {
+                    yield dimension.getValue();
                 }
                 throw new IllegalArgumentException("order by time field is not selected: " + name);
             }
