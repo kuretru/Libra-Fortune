@@ -610,7 +610,7 @@ const DashboardAnalysis: React.FC = () => {
       username: new Map(
         usernameOptions.map((item) => [item.value, item.label]),
       ),
-      tagId: new Map(tagOptions.map((item) => [item.value, item.label])),
+      tagItemId: new Map(tagOptions.map((item) => [item.value, item.label])),
     }),
     [
       categoryOptions,
@@ -679,7 +679,7 @@ const DashboardAnalysis: React.FC = () => {
         return entryTypeOptions;
       case 'username':
         return usernameOptions;
-      case 'tagId':
+      case 'tagItemId':
         return mapNumberOptions(tagOptions);
       default:
         return [];

@@ -79,12 +79,12 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
       }),
       dashboardApi.ledger({
         ...baseQuery,
-        dimensions: ['tagId'],
+        dimensions: ['tagItemId'],
         dimensionsFilter: buildAndFilter([
           { name: 'type', operator: 'in', values: ['expense'] },
           { name: 'username', operator: 'in', values: [username] },
           {
-            name: 'tagId',
+            name: 'tagItemId',
             operator: 'in',
             values: Object.values(expenseTagIds).map(String),
           },
@@ -98,7 +98,7 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
 
         const sumByTagId = new Map(
           tagSetItemResponse.data.map((item) => [
-            item.tagId,
+            item.tagItemId,
             formatAmount(item.fundedSum),
           ]),
         );
