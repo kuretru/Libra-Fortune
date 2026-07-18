@@ -15,6 +15,9 @@ public class DashboardLedgerBO {
     private String month;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String week;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String day;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

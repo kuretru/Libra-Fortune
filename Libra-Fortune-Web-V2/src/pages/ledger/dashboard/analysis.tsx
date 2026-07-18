@@ -62,6 +62,8 @@ type Option<Value extends string | number = string | number> = {
   value: Value;
 };
 
+const compactFormItemStyle = { marginBottom: 8 };
+
 const metricFilterOperatorValues = new Set<DashboardFilterOperator>([
   'equal',
   'not_equal',
@@ -78,6 +80,29 @@ const toOptions = <T extends string>(
     label: item.label,
     value: item.value,
   }));
+
+const formatTimeDimensionValue = (
+  dimension: DashboardTimeDimension,
+  value?: string | number,
+) => {
+  if (value === undefined) {
+    return '-';
+  }
+  if (dimension !== 'week') {
+    return value;
+  }
+  const weekBegin = dayjs(String(value));
+  if (!weekBegin.isValid()) {
+    return value;
+  }
+  const weekEnd = weekBegin.add(6, 'day');
+  const weekEndFormat = weekBegin.isSame(weekEnd, 'year')
+    ? weekBegin.isSame(weekEnd, 'month')
+      ? 'MM-DD'
+      : 'MM-DD'
+    : 'YYYY-MM-DD';
+  return `${weekBegin.format('YYYY-MM-DD')} ~ ${weekEnd.format(weekEndFormat)}`;
+};
 
 const createFilterGroup = <T extends string>(): FilterTreeNode<T> => ({
   logic: 'and',
@@ -201,11 +226,11 @@ const FilterTreeEditor = <T extends string>({
           style={{
             border: '1px solid #f0f0f0',
             borderRadius: 6,
-            marginTop: path.length ? 8 : 0,
-            padding: 8,
+            marginTop: path.length ? 4 : 0,
+            padding: 6,
           }}
         >
-          <Row align="middle" gutter={8}>
+          <Row align="middle" gutter={6}>
             <Col flex="none">
               <Typography.Text type="secondary">
                 {path.length ? '分组' : '根分组'}
@@ -271,7 +296,7 @@ const FilterTreeEditor = <T extends string>({
               </Space>
             </Col>
           </Row>
-          <div style={{ marginTop: 8, paddingLeft: path.length ? 12 : 0 }}>
+          <div style={{ marginTop: 4, paddingLeft: path.length ? 8 : 0 }}>
             {(node.children ?? []).map((child, index) =>
               renderNode(child, [...path, index]),
             )}
@@ -286,9 +311,9 @@ const FilterTreeEditor = <T extends string>({
     return (
       <Row
         align="middle"
-        gutter={8}
+        gutter={6}
         key={path.join('-')}
-        style={{ marginTop: 8 }}
+        style={{ marginTop: 4 }}
       >
         <Col xs={24} md={7}>
           <Select
@@ -605,6 +630,8 @@ const DashboardAnalysis: React.FC = () => {
         title:
           titleMap.get(selectedFields.timeDimension) ??
           selectedFields.timeDimension,
+        render: (value: string | number | undefined) =>
+          formatTimeDimensionValue(selectedFields.timeDimension, value),
       },
       ...selectedFields.dimensions.map((dimension) => ({
         dataIndex: dimension,
@@ -837,12 +864,13 @@ const DashboardAnalysis: React.FC = () => {
           }}
           onFinish={onFinish}
         >
-          <Row gutter={[16, 8]}>
+          <Row gutter={[12, 4]}>
             <Col xs={24} md={8}>
               <Form.Item
                 label="时间维度"
                 name="timeDimension"
                 rules={[{ required: true }]}
+                style={compactFormItemStyle}
               >
                 <Select options={timeDimensionOptions} />
               </Form.Item>
@@ -852,6 +880,7 @@ const DashboardAnalysis: React.FC = () => {
                 label="交易日期"
                 name="dateRange"
                 rules={[{ required: true }]}
+                style={compactFormItemStyle}
               >
                 <DatePicker.RangePicker style={{ width: '100%' }} />
               </Form.Item>
@@ -862,19 +891,24 @@ const DashboardAnalysis: React.FC = () => {
                 label="指标"
                 name="metrics"
                 rules={[{ required: true }]}
+                style={compactFormItemStyle}
               >
                 <Select mode="multiple" options={metricOptions} />
               </Form.Item>
             </Col>
 
             <Col xs={24}>
-              <Form.Item label="维度" name="dimensions">
+              <Form.Item
+                label="维度"
+                name="dimensions"
+                style={compactFormItemStyle}
+              >
                 <Select allowClear mode="multiple" options={dimensionOptions} />
               </Form.Item>
             </Col>
 
             <Col xs={24}>
-              <Form.Item label="维度过滤">
+              <Form.Item label="维度过滤" style={compactFormItemStyle}>
                 <FilterTreeEditor<DashboardDimension>
                   value={dimensionFilterTree}
                   onChange={setDimensionFilterTree}
@@ -888,7 +922,7 @@ const DashboardAnalysis: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-              <Form.Item label="指标过滤">
+              <Form.Item label="指标过滤" style={compactFormItemStyle}>
                 <FilterTreeEditor<DashboardMetric>
                   value={metricFilterTree}
                   onChange={setMetricFilterTree}
@@ -902,16 +936,16 @@ const DashboardAnalysis: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-              <Form.Item label="排序">
+              <Form.Item label="排序" style={compactFormItemStyle}>
                 <Form.List name="orderBy">
                   {(fields, { add, remove }) => (
                     <>
                       {fields.map((field) => (
                         <Row
                           align="middle"
-                          gutter={8}
+                          gutter={6}
                           key={field.key}
-                          style={{ marginBottom: 8 }}
+                          style={{ marginBottom: 4 }}
                         >
                           <Col xs={24} md={14}>
                             <Form.Item name={[field.name, 'field']} noStyle>

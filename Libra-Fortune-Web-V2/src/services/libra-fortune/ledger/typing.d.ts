@@ -65,6 +65,7 @@ declare namespace LibraFortune.Ledger {
   type DashboardLedgerBO = {
     year?: string;
     month?: string;
+    week?: string;
     day?: string;
     ledgerId?: number;
     categoryIdL1?: number;
@@ -77,7 +78,7 @@ declare namespace LibraFortune.Ledger {
     fundedSum?: string;
   }
 
-  type DashboardTimeDimension = 'year' | 'month' | 'day';
+  type DashboardTimeDimension = 'year' | 'month' | 'week' | 'day';
 
   type DashboardMetric = 'originalSum' | 'settlementSum' | 'fundedSum';
 

@@ -11,7 +11,7 @@ import lombok.Getter;
 public enum LedgerTimeDimension implements BaseEnum<LedgerTimeDimension>, Field {
 
     DAILY("day", "按日", "entry.`date`", null),
-    WEEKLY("week", "按周", "", null),
+    WEEKLY("week", "按周", "DATE_FORMAT(DATE_SUB(entry.`date`, INTERVAL (DAYOFWEEK(entry.`date`) - 1) DAY), '%Y-%m-%d')", null),
     MONTHLY("month", "按月", "DATE_FORMAT(entry.`date`, '%Y-%m')", null),
     YEARLY("year", "按年", "YEAR(entry.`date`)", null);
 
