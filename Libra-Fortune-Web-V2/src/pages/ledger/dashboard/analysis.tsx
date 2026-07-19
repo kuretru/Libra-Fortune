@@ -7,6 +7,7 @@ import {
   DatePicker,
   Drawer,
   Form,
+  Input,
   InputNumber,
   message,
   Row,
@@ -587,6 +588,18 @@ const DashboardAnalysis: React.FC = () => {
                 values: [String(nextLedgerOptions[0].value)],
               });
             }
+            children.push(
+              {
+                name: 'type',
+                operator: 'in',
+                values: ['expense'],
+              },
+              {
+                name: 'settlementCurrency',
+                operator: 'in',
+                values: ['CNY'],
+              },
+            );
             if (currentUsername) {
               children.push({
                 name: 'username',
@@ -613,6 +626,8 @@ const DashboardAnalysis: React.FC = () => {
         categoryOptions.map((item) => [item.value, item.label]),
       ),
       type: new Map(entryTypeOptions.map((item) => [item.value, item.label])),
+      originalCurrency: new Map(),
+      settlementCurrency: new Map(),
       username: new Map(
         usernameOptions.map((item) => [item.value, item.label]),
       ),
@@ -671,7 +686,7 @@ const DashboardAnalysis: React.FC = () => {
 
   const getDimensionValueOptions = (
     name?: DashboardDimension,
-  ): Option<string>[] => {
+  ): Option<string>[] | undefined => {
     const mapNumberOptions = (options: Option<number>[]) =>
       options.map((item) => ({
         label: item.label,
@@ -685,6 +700,9 @@ const DashboardAnalysis: React.FC = () => {
         return mapNumberOptions(categoryOptions);
       case 'type':
         return entryTypeOptions;
+      case 'originalCurrency':
+      case 'settlementCurrency':
+        return undefined;
       case 'username':
         return usernameOptions;
       case 'tagItemId':
@@ -707,11 +725,43 @@ const DashboardAnalysis: React.FC = () => {
     ) => void,
   ) => {
     const multiple = isMultiValueOperator(node.operator);
+    const options = getDimensionValueOptions(node.name);
+    if (options === undefined) {
+      if (multiple) {
+        return (
+          <Select
+            allowClear
+            mode="tags"
+            placeholder="值"
+            value={node.values ?? []}
+            onChange={(value) =>
+              updateNode(path, (current) => ({
+                ...current,
+                values: value,
+              }))
+            }
+          />
+        );
+      }
+      return (
+        <Input
+          allowClear
+          placeholder="值"
+          value={node.values?.[0]}
+          onChange={(event) =>
+            updateNode(path, (current) => ({
+              ...current,
+              values: event.target.value ? [event.target.value] : [],
+            }))
+          }
+        />
+      );
+    }
     return (
       <Select
         allowClear
         mode={multiple ? 'multiple' : undefined}
-        options={getDimensionValueOptions(node.name)}
+        options={options}
         placeholder="值"
         showSearch
         value={multiple ? (node.values ?? []) : node.values?.[0]}
