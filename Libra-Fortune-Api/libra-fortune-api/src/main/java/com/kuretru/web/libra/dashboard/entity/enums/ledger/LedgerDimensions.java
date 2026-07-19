@@ -16,6 +16,8 @@ public enum LedgerDimensions implements BaseEnum<LedgerDimensions>, Field {
     CATEGORY_ID_L1("categoryIdL1", "一级分类", "entry.category_id_l1", List.of()),
     CATEGORY_ID_L2("categoryIdL2", "二级分类", "entry.category_id_l2", List.of()),
     TYPE("type", "条目类型", "entry.`type`", List.of()),
+    ORIGINAL_CURRENCY("originalCurrency", "原始消费货币", "entry.original_currency", List.of()),
+    SETTLEMENT_CURRENCY("settlementCurrency", "结算货币", "entry.settlement_currency", List.of()),
     USERNAME("username", "用户名", "detail.username", List.of(LedgerJoin.DETAIL)),
     TAG_SET_ID("tagSetId", "标签组ID", "tag_item.set_id", List.of(LedgerJoin.TAG, LedgerJoin.TAG_ITEM)),
     TAG_ITEM_ID("tagItemId", "标签项ID", "tag.tag_id", List.of(LedgerJoin.TAG));
