@@ -33,6 +33,12 @@ public class DashboardLedgerBO {
     private String type;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String originalCurrency;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String settlementCurrency;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String username;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
