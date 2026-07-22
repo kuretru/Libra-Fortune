@@ -22,9 +22,12 @@ public class DashboardLedgerSqlProvider {
 
         var sql = new StringBuilder();
         sql.append("SELECT ");
-        columns.add(query.getTime().getDimension().getColumn() + " AS " + query.getTime().getDimension().getValue());
-        groupBys.add(query.getTime().getDimension().getColumn());
-        joins.addAll(query.getTime().getDimension().getJoins());
+        var timeDimension = query.getTime().getDimension();
+        if (timeDimension != null) {
+            columns.add(timeDimension.getColumn() + " AS " + timeDimension.getValue());
+            groupBys.add(timeDimension.getColumn());
+            joins.addAll(timeDimension.getJoins());
+        }
         for (var groupBy : emptyIfNull(query.getDimensions())) {
             columns.add(groupBy.getColumn() + " AS " + groupBy.getValue());
             groupBys.add(groupBy.getColumn());
@@ -50,8 +53,10 @@ public class DashboardLedgerSqlProvider {
             sql.append(" AND ").append(dimensionsFilter);
         }
 
-        sql.append(" GROUP BY ");
-        sql.append(String.join(", ", groupBys));
+        if (!groupBys.isEmpty()) {
+            sql.append(" GROUP BY ");
+            sql.append(String.join(", ", groupBys));
+        }
 
         var metricsFilter = buildFilter(query.getMetricsFilter(), "metricsFilter");
         if (!metricsFilter.isBlank()) {
@@ -196,7 +201,7 @@ public class DashboardLedgerSqlProvider {
         return switch (type) {
             case TIME -> {
                 var dimension = query.getTime().getDimension();
-                if (dimension.getValue().equals(name)) {
+                if (dimension != null && dimension.getValue().equals(name)) {
                     yield dimension.getValue();
                 }
                 throw new IllegalArgumentException("order by time field is not selected: " + name);

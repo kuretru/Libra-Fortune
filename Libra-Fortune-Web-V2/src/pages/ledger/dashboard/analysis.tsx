@@ -46,14 +46,14 @@ type FilterTreeNode<T extends string> =
 
 type AnalysisFormValues = {
   dateRange: [Dayjs, Dayjs];
-  timeDimension: DashboardTimeDimension;
+  timeDimension?: DashboardTimeDimension;
   metrics: DashboardMetric[];
   dimensions?: DashboardDimension[];
   orderBy?: OrderByFormValue[];
 };
 
 type SelectedFields = {
-  timeDimension: DashboardTimeDimension;
+  timeDimension?: DashboardTimeDimension;
   dimensions: DashboardDimension[];
   metrics: DashboardMetric[];
 };
@@ -460,7 +460,9 @@ const DashboardAnalysis: React.FC = () => {
   const [usernameOptions, setUsernameOptions] = useState<Option<string>[]>([]);
   const [tagOptions, setTagOptions] = useState<Option<number>[]>([]);
   const [tagSetOptions, setTagSetOptions] = useState<Option<number>[]>([]);
-  const watchedTimeDimension = Form.useWatch('timeDimension', form) ?? 'month';
+  const watchedTimeDimension = Form.useWatch('timeDimension', form) as
+    | DashboardTimeDimension
+    | undefined;
   const selectedMetrics =
     (Form.useWatch('metrics', form) as DashboardMetric[] | undefined) ?? [];
   const selectedDimensions =
@@ -484,10 +486,14 @@ const DashboardAnalysis: React.FC = () => {
   );
   const orderByFieldOptions = useMemo(
     () => [
-      {
-        label: `时间 / ${titleMap.get(watchedTimeDimension) ?? watchedTimeDimension}`,
-        value: `time:${watchedTimeDimension}`,
-      },
+      ...(watchedTimeDimension
+        ? [
+            {
+              label: `时间 / ${titleMap.get(watchedTimeDimension) ?? watchedTimeDimension}`,
+              value: `time:${watchedTimeDimension}`,
+            },
+          ]
+        : []),
       ...selectedDimensions.map((dimension) => ({
         label: `维度 / ${titleMap.get(dimension) ?? dimension}`,
         value: `dimension:${dimension}`,
@@ -648,14 +654,21 @@ const DashboardAnalysis: React.FC = () => {
     TableColumnsType<LibraFortune.Ledger.DashboardLedgerBO>
   >(
     () => [
-      {
-        dataIndex: selectedFields.timeDimension,
-        title:
-          titleMap.get(selectedFields.timeDimension) ??
-          selectedFields.timeDimension,
-        render: (value: string | number | undefined) =>
-          formatTimeDimensionValue(selectedFields.timeDimension, value),
-      },
+      ...(selectedFields.timeDimension
+        ? [
+            {
+              dataIndex: selectedFields.timeDimension,
+              title:
+                titleMap.get(selectedFields.timeDimension) ??
+                selectedFields.timeDimension,
+              render: (value: string | number | undefined) =>
+                formatTimeDimensionValue(
+                  selectedFields.timeDimension as DashboardTimeDimension,
+                  value,
+                ),
+            },
+          ]
+        : []),
       ...selectedFields.dimensions.map((dimension) => ({
         dataIndex: dimension,
         title: titleMap.get(dimension) ?? dimension,
@@ -801,7 +814,9 @@ const DashboardAnalysis: React.FC = () => {
     />
   );
 
-  const buildOrderBy = (values: AnalysisFormValues): DashboardOrderBy[] => {
+  const buildOrderBy = (
+    values: AnalysisFormValues,
+  ): DashboardOrderBy[] | undefined => {
     const dimensions = new Set(values.dimensions ?? []);
     const metrics = new Set(values.metrics);
     const orderBy: DashboardOrderBy[] = [];
@@ -813,7 +828,11 @@ const DashboardAnalysis: React.FC = () => {
       if (!name) {
         continue;
       }
-      if (type === 'time' && name === values.timeDimension) {
+      if (
+        type === 'time' &&
+        values.timeDimension &&
+        name === values.timeDimension
+      ) {
         orderBy.push({ type: 'time', name, mode: item.mode });
         continue;
       }
@@ -826,9 +845,12 @@ const DashboardAnalysis: React.FC = () => {
       }
     }
 
-    return orderBy.length
-      ? orderBy
-      : [{ type: 'time', name: values.timeDimension, mode: 'asc' }];
+    if (orderBy.length) {
+      return orderBy;
+    }
+    return values.timeDimension
+      ? [{ type: 'time', name: values.timeDimension, mode: 'asc' }]
+      : undefined;
   };
 
   const onFinish = async (values: AnalysisFormValues) => {
@@ -852,7 +874,7 @@ const DashboardAnalysis: React.FC = () => {
         time: {
           dateBegin: values.dateRange[0].format('YYYY-MM-DD'),
           dateEnd: values.dateRange[1].format('YYYY-MM-DD'),
-          dimension: values.timeDimension,
+          dimension: values.timeDimension ?? null,
         },
         metrics: values.metrics,
         dimensions: values.dimensions ?? [],
@@ -929,10 +951,13 @@ const DashboardAnalysis: React.FC = () => {
               <Form.Item
                 label="时间维度"
                 name="timeDimension"
-                rules={[{ required: true }]}
                 style={compactFormItemStyle}
               >
-                <Select options={timeDimensionOptions} />
+                <Select
+                  allowClear
+                  options={timeDimensionOptions}
+                  placeholder="不按时间聚合"
+                />
               </Form.Item>
             </Col>
             <Col xs={24} md={16}>
@@ -1035,7 +1060,7 @@ const DashboardAnalysis: React.FC = () => {
                         icon={<PlusOutlined />}
                         onClick={() =>
                           add({
-                            field: `time:${watchedTimeDimension}`,
+                            field: orderByFieldOptions[0]?.value,
                             mode: 'asc',
                           })
                         }

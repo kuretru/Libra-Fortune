@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DashboardLedgerSqlProviderTest {
@@ -18,13 +19,9 @@ class DashboardLedgerSqlProviderTest {
 
     @Test
     void buildQueryAddsTagSetDependencyJoinsInOrder() {
-        var query = new DashboardLedgerQuery();
-        var time = new TimeQuery<LedgerTimeDimension>();
-        time.setDateBegin(LocalDate.of(2026, 1, 1));
-        time.setDateEnd(LocalDate.of(2026, 7, 31));
+        var query = buildQuery();
+        var time = query.getTime();
         time.setDimension(LedgerTimeDimension.MONTHLY);
-        query.setTime(time);
-        query.setMetrics(List.of(LedgerMetrics.ORIGINAL_SUM));
         query.setDimensions(List.of(LedgerDimensions.TAG_SET_ID));
 
         var sql = sqlProvider.buildQuery(query);
@@ -33,6 +30,37 @@ class DashboardLedgerSqlProviderTest {
         var tagItemJoinIndex = sql.indexOf("LEFT JOIN metadata_tag_set_item tag_item");
         assertTrue(tagJoinIndex >= 0);
         assertTrue(tagItemJoinIndex > tagJoinIndex);
+    }
+
+    @Test
+    void buildQueryDoesNotGroupByTimeWhenTimeDimensionIsNull() {
+        var query = buildQuery();
+
+        var sql = sqlProvider.buildQuery(query);
+
+        assertTrue(sql.startsWith("SELECT SUM(entry.original_amount) AS originalSum FROM"));
+        assertFalse(sql.contains(" GROUP BY "));
+    }
+
+    @Test
+    void buildQueryStillGroupsBySelectedDimensionsWhenTimeDimensionIsNull() {
+        var query = buildQuery();
+        query.setDimensions(List.of(LedgerDimensions.LEDGER_ID));
+
+        var sql = sqlProvider.buildQuery(query);
+
+        assertTrue(sql.startsWith("SELECT entry.ledger_id AS ledgerId, SUM(entry.original_amount) AS originalSum FROM"));
+        assertTrue(sql.contains(" GROUP BY entry.ledger_id"));
+    }
+
+    private DashboardLedgerQuery buildQuery() {
+        var query = new DashboardLedgerQuery();
+        var time = new TimeQuery<LedgerTimeDimension>();
+        time.setDateBegin(LocalDate.of(2026, 1, 1));
+        time.setDateEnd(LocalDate.of(2026, 7, 31));
+        query.setTime(time);
+        query.setMetrics(List.of(LedgerMetrics.ORIGINAL_SUM));
+        return query;
     }
 
 }
