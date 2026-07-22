@@ -178,14 +178,6 @@ const addFilterChildAtPath = <T extends string>(
     children: [...(node.children ?? []), child],
   }));
 
-const flattenCategories = (
-  categories: LibraFortune.Metadata.CategoryDTO[],
-): LibraFortune.Metadata.CategoryDTO[] =>
-  categories.flatMap((category) => [
-    category,
-    ...flattenCategories(category.children ?? []),
-  ]);
-
 type FilterTreeEditorProps<T extends string> = {
   value: FilterTreeNode<T>;
   onChange: (value: FilterTreeNode<T>) => void;
@@ -453,7 +445,12 @@ const DashboardAnalysis: React.FC = () => {
     Option<DashboardOrderBy['mode']>[]
   >([]);
   const [ledgerOptions, setLedgerOptions] = useState<Option<number>[]>([]);
-  const [categoryOptions, setCategoryOptions] = useState<Option<number>[]>([]);
+  const [categoryIdL1Options, setCategoryIdL1Options] = useState<
+    Option<number>[]
+  >([]);
+  const [categoryIdL2Options, setCategoryIdL2Options] = useState<
+    Option<number>[]
+  >([]);
   const [entryTypeOptions, setEntryTypeOptions] = useState<Option<string>[]>(
     [],
   );
@@ -525,7 +522,6 @@ const DashboardAnalysis: React.FC = () => {
           const dashboardEnums = dashboardEnumResponse.data;
           const ledgers = ledgerResponse.data.list;
           const categoryTree = categoryResponse.data.list;
-          const categories = flattenCategories(categoryTree);
           const tagSets = tagSetResponse.data.list;
           const usernames = Array.from(
             new Set(
@@ -553,9 +549,23 @@ const DashboardAnalysis: React.FC = () => {
             ledger.id ? [{ label: ledger.name, value: ledger.id }] : [],
           );
           setLedgerOptions(nextLedgerOptions);
-          setCategoryOptions(
-            categories.flatMap((category) =>
+          setCategoryIdL1Options(
+            categoryTree.flatMap((category) =>
               category.id ? [{ label: category.name, value: category.id }] : [],
+            ),
+          );
+          setCategoryIdL2Options(
+            categoryTree.flatMap((category) =>
+              (category.children ?? []).flatMap((child) =>
+                child.id
+                  ? [
+                      {
+                        label: `${category.name} / ${child.name}`,
+                        value: child.id,
+                      },
+                    ]
+                  : [],
+              ),
             ),
           );
           setEntryTypeOptions(
@@ -626,10 +636,10 @@ const DashboardAnalysis: React.FC = () => {
     () => ({
       ledgerId: new Map(ledgerOptions.map((item) => [item.value, item.label])),
       categoryIdL1: new Map(
-        categoryOptions.map((item) => [item.value, item.label]),
+        categoryIdL1Options.map((item) => [item.value, item.label]),
       ),
       categoryIdL2: new Map(
-        categoryOptions.map((item) => [item.value, item.label]),
+        categoryIdL2Options.map((item) => [item.value, item.label]),
       ),
       type: new Map(entryTypeOptions.map((item) => [item.value, item.label])),
       originalCurrency: new Map(),
@@ -641,7 +651,8 @@ const DashboardAnalysis: React.FC = () => {
       tagSetId: new Map(tagSetOptions.map((item) => [item.value, item.label])),
     }),
     [
-      categoryOptions,
+      categoryIdL1Options,
+      categoryIdL2Options,
       entryTypeOptions,
       ledgerOptions,
       tagSetOptions,
@@ -709,8 +720,9 @@ const DashboardAnalysis: React.FC = () => {
       case 'ledgerId':
         return mapNumberOptions(ledgerOptions);
       case 'categoryIdL1':
+        return mapNumberOptions(categoryIdL1Options);
       case 'categoryIdL2':
-        return mapNumberOptions(categoryOptions);
+        return mapNumberOptions(categoryIdL2Options);
       case 'type':
         return entryTypeOptions;
       case 'originalCurrency':
