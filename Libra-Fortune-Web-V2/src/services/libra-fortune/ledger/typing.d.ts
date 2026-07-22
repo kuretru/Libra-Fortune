@@ -128,7 +128,7 @@ declare namespace LibraFortune.Ledger {
     time: {
       dateBegin: string;
       dateEnd: string;
-      dimension: DashboardTimeDimension;
+      dimension: DashboardTimeDimension | null;
     };
     metrics: DashboardMetric[];
     dimensions?: DashboardDimension[];

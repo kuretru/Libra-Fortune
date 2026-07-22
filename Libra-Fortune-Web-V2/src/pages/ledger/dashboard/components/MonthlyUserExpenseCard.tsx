@@ -68,7 +68,7 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
       time: {
         dateBegin: now.startOf('month').format('YYYY-MM-DD'),
         dateEnd: now.endOf('month').format('YYYY-MM-DD'),
-        dimension: 'month' as const,
+        dimension: null,
       },
       metrics: ['fundedSum'] as LibraFortune.Ledger.DashboardMetric[],
       dimensionsFilter: buildAndFilter(baseDimensionsFilter),

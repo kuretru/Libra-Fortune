@@ -21,8 +21,7 @@ public class TimeQuery<T extends Field> {
     @Schema(description = "交易日期结束")
     private LocalDate dateEnd;
 
-    @NotNull
-    @Schema(description = "时间维度")
+    @Schema(description = "时间维度，可选；为空时不按时间聚合")
     private T dimension;
 
 }
