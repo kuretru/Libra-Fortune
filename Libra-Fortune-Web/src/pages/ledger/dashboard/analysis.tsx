@@ -1,6 +1,6 @@
 import { DeleteOutlined, PlusOutlined, RedoOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { useModel } from '@umijs/max';
+import { history, useModel } from '@umijs/max';
 import {
   Button,
   Col,
@@ -20,7 +20,7 @@ import {
   Typography,
 } from 'antd';
 import dayjs, { type Dayjs } from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as dashboardApi from '@/services/libra-fortune/ledger/dashboard';
 import * as ledgerApi from '@/services/libra-fortune/ledger/ledger';
 import * as categoryApi from '@/services/libra-fortune/metadata/category';
@@ -56,6 +56,11 @@ type SelectedFields = {
   timeDimension?: DashboardTimeDimension;
   dimensions: DashboardDimension[];
   metrics: DashboardMetric[];
+};
+
+type DrillDownContext = {
+  dimensionsFilter?: DimensionFilter;
+  time: LibraFortune.Ledger.DashboardQuery['time'];
 };
 
 type Option<Value extends string | number = string | number> = {
@@ -403,6 +408,111 @@ const normalizeFilterTree = <T extends string>(
   };
 };
 
+const addDrillCriterion = (
+  criteria: Map<DashboardDimension, string[]>,
+  name: DashboardDimension,
+  values: string[],
+) => {
+  const normalizedValues = Array.from(new Set(values.map(String)));
+  const currentValues = criteria.get(name);
+  if (!currentValues) {
+    criteria.set(name, normalizedValues);
+    return;
+  }
+  const nextValues = currentValues.filter((value) =>
+    normalizedValues.includes(value),
+  );
+  if (!nextValues.length) {
+    throw new Error(`${name} 的过滤条件与当前结果行冲突`);
+  }
+  criteria.set(name, nextValues);
+};
+
+const collectDrillCriteria = (
+  node: DimensionFilter | undefined,
+  criteria: Map<DashboardDimension, string[]>,
+) => {
+  if (!node) return;
+  if (node.children !== undefined || node.logic !== undefined) {
+    if (node.logic !== 'and') {
+      throw new Error('包含“或者”的维度过滤，无法精确下钻');
+    }
+    for (const child of node.children ?? []) {
+      collectDrillCriteria(child, criteria);
+    }
+    return;
+  }
+  if (
+    !node.name ||
+    (node.operator !== 'equal' && node.operator !== 'in') ||
+    !node.values?.length
+  ) {
+    throw new Error('当前维度过滤包含列表页无法精确还原的条件');
+  }
+  addDrillCriterion(criteria, node.name, node.values);
+};
+
+const getSingleDrillValue = (
+  criteria: Map<DashboardDimension, string[]>,
+  name: DashboardDimension,
+  label: string,
+  required = false,
+) => {
+  const values = criteria.get(name) ?? [];
+  if (values.length > 1) {
+    throw new Error(`${label}包含多个值，无法精确下钻`);
+  }
+  if (required && !values.length) {
+    throw new Error(`下钻条件缺少${label}`);
+  }
+  return values[0];
+};
+
+const getDrillDateRange = (
+  context: DrillDownContext,
+  record: LibraFortune.Ledger.DashboardLedgerBO,
+) => {
+  let dateBegin = dayjs(context.time.dateBegin);
+  let dateEnd = dayjs(context.time.dateEnd);
+  const timeDimension = context.time.dimension;
+  if (timeDimension) {
+    const value = record[timeDimension];
+    if (value === undefined) {
+      throw new Error('当前结果行缺少时间维度值');
+    }
+    const bucketBegin =
+      timeDimension === 'year'
+        ? dayjs(`${value}-01-01`)
+        : timeDimension === 'month'
+          ? dayjs(`${value}-01`)
+          : dayjs(String(value));
+    if (!bucketBegin.isValid()) {
+      throw new Error('当前结果行的时间维度值不合法');
+    }
+    const bucketEnd =
+      timeDimension === 'year'
+        ? bucketBegin.endOf('year')
+        : timeDimension === 'month'
+          ? bucketBegin.endOf('month')
+          : timeDimension === 'week'
+            ? bucketBegin.add(6, 'day')
+            : bucketBegin;
+    if (bucketBegin.isAfter(dateBegin)) {
+      dateBegin = bucketBegin;
+    }
+    if (bucketEnd.isBefore(dateEnd)) {
+      dateEnd = bucketEnd;
+    }
+  }
+  if (dateBegin.isAfter(dateEnd)) {
+    throw new Error('当前结果行不在查询日期范围内');
+  }
+  return {
+    dateBegin: dateBegin.format('YYYY-MM-DD'),
+    dateEnd: dateEnd.format('YYYY-MM-DD'),
+  };
+};
+
 const DashboardAnalysis: React.FC = () => {
   const [form] = Form.useForm<AnalysisFormValues>();
   const { initialState } = useModel('@@initialState');
@@ -425,6 +535,7 @@ const DashboardAnalysis: React.FC = () => {
     dimensions: [],
     metrics: ['fundedSum'],
   });
+  const [drillDownContext, setDrillDownContext] = useState<DrillDownContext>();
   const [timeDimensionOptions, setTimeDimensionOptions] = useState<
     Option<DashboardTimeDimension>[]
   >([]);
@@ -451,6 +562,9 @@ const DashboardAnalysis: React.FC = () => {
   const [categoryIdL2Options, setCategoryIdL2Options] = useState<
     Option<number>[]
   >([]);
+  const [categoryParentMap, setCategoryParentMap] = useState<
+    Map<number, number>
+  >(new Map());
   const [entryTypeOptions, setEntryTypeOptions] = useState<Option<string>[]>(
     [],
   );
@@ -568,6 +682,15 @@ const DashboardAnalysis: React.FC = () => {
               ),
             ),
           );
+          setCategoryParentMap(
+            new Map(
+              categoryTree.flatMap((category) =>
+                (category.children ?? []).flatMap((child) =>
+                  category.id && child.id ? [[child.id, category.id]] : [],
+                ),
+              ),
+            ),
+          );
           setEntryTypeOptions(
             enumResponse.data.entryTypes.map((item) => ({
               label: item.label,
@@ -661,6 +784,77 @@ const DashboardAnalysis: React.FC = () => {
     ],
   );
 
+  const getDrillDownHref = useCallback(
+    (record: LibraFortune.Ledger.DashboardLedgerBO) => {
+      if (!drillDownContext) {
+        throw new Error('请先查询分析数据');
+      }
+      const criteria = new Map<DashboardDimension, string[]>();
+      collectDrillCriteria(drillDownContext.dimensionsFilter, criteria);
+      for (const dimension of selectedFields.dimensions) {
+        const value = record[dimension];
+        if (value === undefined) {
+          throw new Error(
+            `当前结果行缺少${titleMap.get(dimension) ?? dimension}`,
+          );
+        }
+        addDrillCriterion(criteria, dimension, [String(value)]);
+      }
+
+      const categoryIdL2 = getSingleDrillValue(
+        criteria,
+        'categoryIdL2',
+        '二级分类',
+      );
+      if (categoryIdL2) {
+        const parentId = categoryParentMap.get(Number(categoryIdL2));
+        if (!parentId) {
+          throw new Error('无法确定二级分类所属的一级分类');
+        }
+        addDrillCriterion(criteria, 'categoryIdL1', [String(parentId)]);
+      }
+
+      const ledgerId = getSingleDrillValue(criteria, 'ledgerId', '账本', true);
+      const categoryIdL1 = getSingleDrillValue(
+        criteria,
+        'categoryIdL1',
+        '一级分类',
+      );
+      const searchParams = new URLSearchParams(
+        getDrillDateRange(drillDownContext, record),
+      );
+      if (categoryIdL1) {
+        searchParams.set('categoryIdL1', categoryIdL1);
+      }
+      if (categoryIdL2) {
+        searchParams.set('categoryIdL2', categoryIdL2);
+      }
+      for (const [dimension, paramName] of [
+        ['type', 'type'],
+        ['originalCurrency', 'originalCurrency'],
+        ['settlementCurrency', 'settlementCurrency'],
+        ['username', 'username'],
+        ['tagSetId', 'tagSetId'],
+      ] as const) {
+        const value = getSingleDrillValue(
+          criteria,
+          dimension,
+          titleMap.get(dimension) ?? dimension,
+        );
+        if (value) {
+          searchParams.set(paramName, value);
+        }
+      }
+      for (const tagId of criteria.get('tagItemId') ?? []) {
+        searchParams.append('tagItemId', tagId);
+      }
+      return history.createHref(
+        `/ledger/${ledgerId}/entry?${searchParams.toString()}`,
+      );
+    },
+    [categoryParentMap, drillDownContext, selectedFields.dimensions, titleMap],
+  );
+
   const columns = useMemo<
     TableColumnsType<LibraFortune.Ledger.DashboardLedgerBO>
   >(
@@ -704,8 +898,36 @@ const DashboardAnalysis: React.FC = () => {
         render: (value: string | number | undefined) =>
           `¥${formatAmount(value)}`,
       })),
+      {
+        key: 'action',
+        title: '操作',
+        render: (_, record) => {
+          try {
+            return (
+              <Button
+                href={getDrillDownHref(record)}
+                rel="noopener noreferrer"
+                size="small"
+                target="_blank"
+              >
+                下钻
+              </Button>
+            );
+          } catch (error: any) {
+            const errorMessage = error?.message ?? '无法下钻到记账详情';
+            return (
+              <Button
+                size="small"
+                onClick={() => messageApi.error(errorMessage)}
+              >
+                下钻
+              </Button>
+            );
+          }
+        },
+      },
     ],
-    [labelMaps, selectedFields, titleMap],
+    [getDrillDownHref, labelMaps, messageApi, selectedFields, titleMap],
   );
 
   const getDimensionValueOptions = (
@@ -882,7 +1104,7 @@ const DashboardAnalysis: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const response = await dashboardApi.ledger({
+      const query: LibraFortune.Ledger.DashboardQuery = {
         time: {
           dateBegin: values.dateRange[0].format('YYYY-MM-DD'),
           dateEnd: values.dateRange[1].format('YYYY-MM-DD'),
@@ -893,11 +1115,16 @@ const DashboardAnalysis: React.FC = () => {
         dimensionsFilter,
         metricsFilter,
         orderBy: buildOrderBy(values),
-      });
+      };
+      const response = await dashboardApi.ledger(query);
       setSelectedFields({
         timeDimension: values.timeDimension,
         dimensions: values.dimensions ?? [],
         metrics: values.metrics,
+      });
+      setDrillDownContext({
+        dimensionsFilter: query.dimensionsFilter,
+        time: query.time,
       });
       setResult(response.data);
       setQueryDrawerOpen(false);
