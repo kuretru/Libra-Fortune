@@ -1,42 +1,35 @@
-// @ts-ignore
-/* eslint-disable */
-
-declare namespace API {
-  type BaseDTO = {
-    id?: string;
-  };
-
-  type BaseHistoryDTO = {};
-
+declare namespace GalaxyWeb {
   type ApiResponse<T> = {
     code: number;
     message: string;
     data: T;
-  };
-
-  type PaginationQuery = {
-    current?: number;
-    pageSize?: number;
-    keryword?: string;
-  };
-
+  }
   type PaginationResponse<T> = {
     list: T[];
     current: number;
     pageSize: number;
     total: number;
-  };
-
-  type ProTableData<T> = {
-    success: boolean;
-    data: T[];
+  }
+  type EmptyQuery = {}
+  type PaginationQuery = {
     current: number;
     pageSize: number;
-    total: number;
-  };
-
-  type EnumDTO = {
+    noPage?: boolean;
+  }
+  type BaseDTO = {
+    id?: number;
+  }
+  type BaseCreateDTO = BaseDTO & {
+    createTime?: string;
+    createBy?: string;
+  }
+  type BaseCreateUpdateDTO = BaseCreateDTO & {
+    updateTime?: string;
+    updateBy?: string;
+  }
+  type EnumDTO<T = string> = {
     label: string;
-    value: string;
-  };
+    value: T;
+    children?: EnumDTO<T>[];
+  }
 }

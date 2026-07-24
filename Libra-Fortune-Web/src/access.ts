@@ -1,12 +1,11 @@
 /**
- * @see https://umijs.org/zh-CN/plugins/plugin-access
+ * @see https://umijs.org/docs/max/access#access
  * */
 export default function access(
-  initialState: { currentUser?: Galaxy.OAuth2.System.UserDTO } | undefined,
+  initialState: { currentUser?: API.CurrentUser } | undefined,
 ) {
   const { currentUser } = initialState ?? {};
   return {
-    // canAdmin: currentUser && currentUser.access === 'admin',
-    canAdmin: currentUser,
+    canAdmin: currentUser && currentUser.access === 'admin',
   };
 }

@@ -37,7 +37,7 @@ jobs:
     name: frontend
     runs-on: ubuntu-latest
     env:
-      working-directory: Libra-Fortune-Web-V2/
+      working-directory: Libra-Fortune-Web/
     steps:
       -
         uses: actions/checkout@v6
@@ -52,7 +52,7 @@ jobs:
         with:
           node-version: '26'
           cache: 'pnpm'
-          cache-dependency-path: 'Libra-Fortune-Web-V2/pnpm-lock.yaml'
+          cache-dependency-path: 'Libra-Fortune-Web/pnpm-lock.yaml'
       -
         name: Dependency
         run: pnpm install --frozen-lockfile
@@ -78,7 +78,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: frontend
-          path: Libra-Fortune-Web-V2/frontend.tar.gz
+          path: Libra-Fortune-Web/frontend.tar.gz
           retention-days: 7
   docker:
     name: docker

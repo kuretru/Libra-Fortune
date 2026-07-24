@@ -1,6 +1,3 @@
-[submodule "Libra-Fortune-Api/api-common-utils"]
-	path = Libra-Fortune-Api/api-common-utils
-	url = git@github.com:kuretru/Api-Common-Utils.git
 [submodule "Galaxy-Microservices"]
 	path = Galaxy-Microservices
 	url = git@github.com:kuretru/Api-Common-Utils.git

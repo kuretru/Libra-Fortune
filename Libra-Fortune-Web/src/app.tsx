@@ -1,74 +1,119 @@
-import Footer from '@/components/Footer';
-import { Question } from '@/components/RightContent';
-import { AvatarDropdown, AvatarName } from '@/components/RightContent/AvatarDropdown';
 import { LinkOutlined } from '@ant-design/icons';
-import { ProSettings, SettingDrawer } from '@ant-design/pro-components';
+import type { Settings as LayoutSettings } from '@ant-design/pro-components';
+import { SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
-import { AvatarProps, message } from 'antd';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import React from 'react';
+
+// Initialize dayjs plugins globally
+dayjs.extend(relativeTime);
+
+import {
+  AvatarDropdown,
+  DocLink,
+  ErrorBoundary,
+  Footer,
+  LangDropdown,
+  OfflineBanner,
+} from '@/components';
+import { currentUser } from '@/services/cloud-sso';
 import defaultSettings from '../config/defaultSettings';
-import { requestConfig } from './utils/request-config';
-import { appendSearchParams } from './utils/request-utils';
-import { getUserInfo } from './utils/user-utils';
+import { errorConfig } from './requestErrorConfig';
 
 const isDev = process.env.NODE_ENV === 'development';
-const loginPath = '/users/login';
-const callbackPath = '/users/login/callback';
-const nonLoginPaths = [loginPath, callbackPath];
+const loginPath = '/user/login';
+const authFreePaths = [loginPath, '/user/register', '/user/register-result'];
+const defaultOpenMenuKeys = [
+  '/dashboard',
+  '/metadata',
+  '/account',
+  '/ledger',
+  '/admin',
+];
 
 /**
- * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
- */
+ * @see https://umijs.org/docs/api/runtime-config#getinitialstate
+ * */
 export async function getInitialState(): Promise<{
-  settings?: Partial<ProSettings>;
-  currentUser?: Galaxy.OAuth2.System.UserDTO;
+  settings?: Partial<LayoutSettings>;
+  currentUser?: API.CurrentUser;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<Galaxy.OAuth2.System.UserDTO | undefined>;
+  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  settingDrawerOpen?: boolean;
 }> {
+  const fetchUserInfo = async () => {
+    try {
+      return await currentUser();
+    } catch (_cloudSsoError) {
+      const { pathname, search, hash } = history.location;
+      history.replace(
+        `${loginPath}?redirect=${encodeURIComponent(pathname + search + hash)}`,
+      );
+    }
+    return undefined;
+  };
   // 如果不是登录页面，执行
   const { location } = history;
-  if (!nonLoginPaths.includes(location.pathname)) {
-    const currentUser = await getUserInfo();
+  if (!authFreePaths.includes(location.pathname)) {
+    const currentUser = await fetchUserInfo();
     return {
-      settings: defaultSettings as Partial<ProSettings>,
-      currentUser: currentUser,
-      fetchUserInfo: getUserInfo,
+      fetchUserInfo,
+      currentUser,
+      settings: defaultSettings as Partial<LayoutSettings>,
+      settingDrawerOpen: false,
     };
   }
   return {
-    settings: defaultSettings as Partial<ProSettings>,
-    fetchUserInfo: getUserInfo,
+    fetchUserInfo,
+    settings: defaultSettings as Partial<LayoutSettings>,
+    settingDrawerOpen: false,
   };
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
-export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+export const layout: RunTimeLayoutConfig = ({
+  initialState,
+  setInitialState,
+}) => {
   return {
-    actionsRender: () => [<Question key="doc" />],
+    openKeys: defaultOpenMenuKeys,
+    menuItemRender: (item, dom) => {
+      if (item.path) {
+        return (
+          <Link to={item.path} prefetch>
+            {dom}
+          </Link>
+        );
+      }
+      return dom;
+    },
+    actionsRender: () => [
+      <DocLink key="doc" />,
+      <LangDropdown key="lang" />,
+    ],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
-      title: <AvatarName />,
-      render: (_: AvatarProps, avatarChildren: React.ReactNode) => {
-        return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
-      },
+      title: 'ProUser',
+      render: (_, avatarChildren) => (
+        <AvatarDropdown>{avatarChildren}</AvatarDropdown>
+      ),
     },
-    waterMarkProps: {
-      content: initialState?.currentUser?.nickname,
-    },
+    // waterMarkProps: {
+    //   content: initialState?.index?.name,
+    // },
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && !nonLoginPaths.includes(location.pathname)) {
-        message.error('没有用户信息，请登录');
-        history.push({
-          pathname: loginPath,
-          search: appendSearchParams({ redirect: location.pathname }),
-        });
+      if (!initialState?.currentUser && location.pathname !== loginPath) {
+        history.replace(
+          `${loginPath}?redirect=${encodeURIComponent(location.pathname + location.search + location.hash)}`,
+        );
       }
     },
-    layoutBgImgList: [
+    bgLayoutImgList: [
       {
         src: 'https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/D2LWSqNny4sAAAAAAAAAAAAAFl94AQBr',
         left: 85,
@@ -96,6 +141,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
           </Link>,
         ]
       : [],
+    // Replace ProLayout's default ErrorBoundary with our offline-aware version,
+    // so chunk load errors show friendly messages instead of "Something went wrong."
+    ErrorBoundary,
     menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
@@ -105,19 +153,24 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       return (
         <>
           {children}
-          {isDev && (
-            <SettingDrawer
-              disableUrlParams
-              enableDarkTheme
-              settings={initialState?.settings}
-              onSettingChange={(settings) => {
-                setInitialState((preInitialState) => ({
-                  ...preInitialState,
-                  settings,
-                }));
-              }}
-            />
-          )}
+          <SettingDrawer
+            disableUrlParams
+            enableDarkTheme
+            collapse={initialState?.settingDrawerOpen}
+            onCollapseChange={(open) => {
+              setInitialState((s) => ({
+                ...s,
+                settingDrawerOpen: open,
+              }));
+            }}
+            settings={initialState?.settings}
+            onSettingChange={(settings) => {
+              setInitialState((s) => ({
+                ...s,
+                settings,
+              }));
+            }}
+          />
         </>
       );
     },
@@ -127,9 +180,19 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 
 /**
  * @name request 配置，可以配置错误处理
- * 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
+ * 它基于 axios 提供了一套统一的网络请求和错误处理方案。
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const request: RequestConfig = {
-  ...requestConfig,
+  baseURL: '',
+  ...errorConfig,
 };
+
+export function rootContainer(container: React.ReactNode) {
+  return (
+    <>
+      <OfflineBanner />
+      <ErrorBoundary>{container}</ErrorBoundary>
+    </>
+  );
+}
