@@ -60,6 +60,23 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     @Override
     protected QueryWrapper<LedgerEntryDO> buildQueryWrapper(LedgerEntryQuery query) {
         var queryWrapper = super.buildQueryWrapper(query);
+        if (query.getUsername() != null) {
+            queryWrapper.apply(
+                    "EXISTS (SELECT 1 FROM ledger_v2_entry_detail detail " +
+                            "WHERE ledger_v2_entry.id = detail.entry_id " +
+                            "AND detail.username = {0})",
+                    query.getUsername()
+            );
+        }
+        if (query.getTagSetId() != null) {
+            queryWrapper.apply(
+                    "EXISTS (SELECT 1 FROM ledger_v2_entry_tag tag " +
+                            "INNER JOIN metadata_tag_set_item tag_item ON tag.tag_id = tag_item.id " +
+                            "WHERE ledger_v2_entry.id = tag.entry_id " +
+                            "AND tag_item.set_id = {0})",
+                    query.getTagSetId()
+            );
+        }
         if (query.getTagIdIn() != null && !query.getTagIdIn().isEmpty()) {
             var placeholders = new StringBuilder();
             for (var index = 0; index < query.getTagIdIn().size(); index++) {

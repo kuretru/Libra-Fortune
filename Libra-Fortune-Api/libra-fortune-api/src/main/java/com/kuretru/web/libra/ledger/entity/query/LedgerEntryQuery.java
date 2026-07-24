@@ -40,6 +40,12 @@ public class LedgerEntryQuery {
     @Schema(description = "结算货币")
     private String settlementCurrency;
 
+    @Schema(description = "分担人用户名")
+    private String username;
+
+    @Schema(description = "标签组ID")
+    private Long tagSetId;
+
     @Schema(description = "标签ID")
     private List<Long> tagIdIn;
 
