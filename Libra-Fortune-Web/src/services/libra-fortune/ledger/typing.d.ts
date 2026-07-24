@@ -59,6 +59,8 @@ declare namespace LibraFortune.Ledger {
     nameLike?: string;
     originalCurrency?: string;
     settlementCurrency?: string;
+    username?: string;
+    tagSetId?: number;
     tagIdIn?: number[];
   }
 

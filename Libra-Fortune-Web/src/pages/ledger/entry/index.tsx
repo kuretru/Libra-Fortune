@@ -74,6 +74,7 @@ type GroupedTagOption = {
   name: string;
   options: Option<number>[];
   required: boolean;
+  value: number;
 };
 
 type CategoryTagSelectorProps = {
@@ -195,6 +196,43 @@ const parseCategoryQueryValue = (value?: string) => {
   return {
     categoryIdL1: Number.isInteger(categoryIdL1) ? categoryIdL1 : undefined,
     categoryIdL2: Number.isInteger(categoryIdL2) ? categoryIdL2 : undefined,
+  };
+};
+
+const parsePositiveInteger = (value: string | null): number | undefined => {
+  if (!value) return undefined;
+  const result = Number(value);
+  return Number.isInteger(result) && result > 0 ? result : undefined;
+};
+
+const parseSearchParams = (search: string): LedgerEntrySearchParams => {
+  const params = new URLSearchParams(search);
+  const dateBegin = params.get('dateBegin');
+  const dateEnd = params.get('dateEnd');
+  const categoryIdL1 = parsePositiveInteger(params.get('categoryIdL1'));
+  const categoryIdL2 = parsePositiveInteger(params.get('categoryIdL2'));
+  const categoryIds =
+    params.get('categoryIds') ??
+    (categoryIdL1
+      ? [categoryIdL1, categoryIdL2].filter(Boolean).join(',')
+      : undefined);
+  const tagId = [...params.getAll('tagIdIn'), ...params.getAll('tagItemId')]
+    .flatMap((value) => value.split(','))
+    .flatMap((value) => {
+      const tagId = parsePositiveInteger(value);
+      return tagId ? [tagId] : [];
+    });
+
+  return {
+    categoryIds,
+    dateRange: dateBegin && dateEnd ? [dateBegin, dateEnd] : undefined,
+    name: params.get('name') ?? params.get('nameLike') ?? undefined,
+    originalCurrency: params.get('originalCurrency') ?? undefined,
+    settlementCurrency: params.get('settlementCurrency') ?? undefined,
+    tagIdIn: tagId.length ? tagId : undefined,
+    tagSetId: parsePositiveInteger(params.get('tagSetId')),
+    type: params.get('type') ?? undefined,
+    username: params.get('username') ?? undefined,
   };
 };
 
@@ -407,6 +445,10 @@ const LedgerEntry: React.FC = () => {
     const value = Number(params.ledgerId);
     return Number.isInteger(value) && value > 0 ? value : undefined;
   }, [params.ledgerId]);
+  const initialSearchParams = useMemo(
+    () => parseSearchParams(history.location.search),
+    [],
+  );
 
   const [messageApi, contextHolder] = message.useMessage();
   const [modalVisible, setModalVisible] = useState(false);
@@ -578,6 +620,7 @@ const LedgerEntry: React.FC = () => {
                 value: item.id!,
               })),
               required: tagSet.required,
+              value: tagSet.id!,
             })),
           );
           setAccountOptions(
@@ -885,6 +928,15 @@ const LedgerEntry: React.FC = () => {
       ),
     },
     {
+      dataIndex: 'originalCurrency',
+      title: '原始消费货币',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: currencyOptions,
+      },
+    },
+    {
       dataIndex: 'settlementAmount',
       title: '结算金额',
       align: 'right',
@@ -897,6 +949,15 @@ const LedgerEntry: React.FC = () => {
       ),
     },
     {
+      dataIndex: 'settlementCurrency',
+      title: '结算货币',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: currencyOptions,
+      },
+    },
+    {
       dataIndex: 'tagIdIn',
       title: '标签',
       valueType: 'select',
@@ -904,6 +965,27 @@ const LedgerEntry: React.FC = () => {
       fieldProps: {
         mode: 'multiple',
         options: tagSetOptions,
+      },
+    },
+    {
+      dataIndex: 'tagSetId',
+      title: '标签组',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: tagSetOptions.map((tagSet) => ({
+          label: tagSet.name,
+          value: tagSet.value,
+        })),
+      },
+    },
+    {
+      dataIndex: 'username',
+      title: '分担人',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: memberOptions,
       },
     },
     {
@@ -1140,6 +1222,9 @@ const LedgerEntry: React.FC = () => {
         columns={columns}
         defaultSize="small"
         formRef={searchFormRef}
+        form={{
+          initialValues: initialSearchParams,
+        }}
         rowKey="id"
         request={onRequest}
         search={{
