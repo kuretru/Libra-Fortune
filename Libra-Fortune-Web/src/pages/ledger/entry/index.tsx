@@ -63,6 +63,10 @@ type LedgerEntryFormValues = Omit<
 type LedgerEntryDetailFormValues =
   Partial<LibraFortune.Ledger.LedgerEntryDetailDTO>;
 
+type BatchCategoryFormValues = {
+  categoryIds?: CategorySelectorValue;
+};
+
 type Option<T extends string | number = string | number> = {
   label: string;
   value: T;
@@ -465,6 +469,8 @@ const LedgerEntry: React.FC = () => {
 
   const [messageApi, contextHolder] = message.useMessage();
   const [modalVisible, setModalVisible] = useState(false);
+  const [batchCategoryVisible, setBatchCategoryVisible] = useState(false);
+  const [selectedEntryIds, setSelectedEntryIds] = useState<number[]>([]);
   const [currentRecord, setCurrentRecord] = useState<
     LibraFortune.Ledger.LedgerEntryDTO | undefined
   >(undefined);
@@ -488,6 +494,7 @@ const LedgerEntry: React.FC = () => {
     Dayjs | undefined
   >(undefined);
   const [form] = Form.useForm<LedgerEntryFormValues>();
+  const [batchCategoryForm] = Form.useForm<BatchCategoryFormValues>();
   const detailValues = Form.useWatch('details', form) ?? [];
   const actionRef = useRef<ActionType | null>(null);
   const searchFormRef =
@@ -1252,12 +1259,55 @@ const LedgerEntry: React.FC = () => {
   const onRemoveButtonClick = (id: number) => {
     if (!ledgerId) return;
     entryApi.remove(ledgerId, id).then(() => {
+      setSelectedEntryIds((oldEntryIds) =>
+        oldEntryIds.filter((entryId) => entryId !== id),
+      );
       actionRef.current?.reload();
       messageApi.open({
         type: 'success',
         content: '删除成功',
       });
     });
+  };
+
+  const onBatchCategoryFinish = async (
+    values: BatchCategoryFormValues,
+  ): Promise<boolean> => {
+    if (!ledgerId || selectedEntryIds.length === 0) return false;
+    const categoryIds = values.categoryIds;
+    if (!categoryIds?.categoryIdL1 || !categoryIds.categoryIdL2) return false;
+
+    try {
+      const response = await entryApi.batchUpdateCategory(ledgerId, {
+        entryIds: selectedEntryIds,
+        categoryIdL1: categoryIds.categoryIdL1,
+        categoryIdL2: categoryIds.categoryIdL2,
+      });
+      setSelectedEntryIds([]);
+      actionRef.current?.reload();
+      messageApi.open({
+        type: 'success',
+        content: `已修改 ${response.data} 条账目分类`,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const onSelectedEntryIdsChange = (selectedRowKeys: React.Key[]) => {
+    const nextEntryIds = selectedRowKeys.flatMap((key) => {
+      const entryId = Number(key);
+      return Number.isInteger(entryId) && entryId > 0 ? [entryId] : [];
+    });
+    if (nextEntryIds.length > 1000) {
+      messageApi.open({
+        type: 'warning',
+        content: '单次最多选择 1000 条账目',
+      });
+      return;
+    }
+    setSelectedEntryIds(nextEntryIds);
   };
 
   return (
@@ -1284,11 +1334,38 @@ const LedgerEntry: React.FC = () => {
         }}
         onReset={onSearchReset}
         rowKey="id"
+        rowSelection={{
+          fixed: true,
+          preserveSelectedRowKeys: true,
+          selectedRowKeys: selectedEntryIds,
+          onChange: onSelectedEntryIdsChange,
+        }}
         request={onRequest}
         search={{
           labelWidth: 'auto',
         }}
         scroll={{ x: 1340 }}
+        tableAlertOptionRender={() => (
+          <Space size={4}>
+            <Button
+              size="small"
+              type="primary"
+              onClick={() => {
+                batchCategoryForm.resetFields();
+                setBatchCategoryVisible(true);
+              }}
+            >
+              修改分类
+            </Button>
+            <Button
+              size="small"
+              type="text"
+              onClick={() => setSelectedEntryIds([])}
+            >
+              清空选择
+            </Button>
+          </Space>
+        )}
         toolBarRender={() => [
           <Button
             key="create"
@@ -1300,6 +1377,44 @@ const LedgerEntry: React.FC = () => {
           </Button>,
         ]}
       />
+      <ModalForm<BatchCategoryFormValues>
+        form={batchCategoryForm}
+        title={`批量修改分类（${selectedEntryIds.length} 条）`}
+        open={batchCategoryVisible}
+        onOpenChange={(open) => {
+          setBatchCategoryVisible(open);
+          if (!open) {
+            batchCategoryForm.resetFields();
+          }
+        }}
+        onFinish={onBatchCategoryFinish}
+        submitter={{
+          searchConfig: {
+            submitText: '确认修改',
+          },
+        }}
+        modalProps={{
+          destroyOnHidden: true,
+          width: 720,
+        }}
+      >
+        <Form.Item
+          name="categoryIds"
+          label="分类"
+          rules={[
+            {
+              validator: async (_, value?: CategorySelectorValue) => {
+                if (value?.categoryIdL1 && value.categoryIdL2) {
+                  return;
+                }
+                throw new Error('请选择分类');
+              },
+            },
+          ]}
+        >
+          <CategoryTagSelector categories={categories} />
+        </Form.Item>
+      </ModalForm>
       <ModalForm<LedgerEntryFormValues>
         form={form}
         title={currentRecord?.id ? '编辑条目' : '新增条目'}

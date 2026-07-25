@@ -53,6 +53,18 @@ export async function update(
   );
 }
 
+export async function batchUpdateCategory(
+  ledgerId: number,
+  payload: LibraFortune.Ledger.LedgerEntryBatchCategoryRequest,
+) {
+  return request<GalaxyWeb.ApiResponse<number>>(
+    `${endpointPrefix(ledgerId)}/batch/category`, {
+      method: 'PUT',
+      data: payload,
+    },
+  );
+}
+
 export async function remove(ledgerId: number, id: number) {
   return request<GalaxyWeb.ApiResponse<string>>(
     `${endpointPrefix(ledgerId)}/${id}`, {

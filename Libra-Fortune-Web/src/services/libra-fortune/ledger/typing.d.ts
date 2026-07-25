@@ -27,6 +27,12 @@ declare namespace LibraFortune.Ledger {
     details?: LedgerEntryDetailDTO[];
   }
 
+  type LedgerEntryBatchCategoryRequest = {
+    entryIds: number[];
+    categoryIdL1: number;
+    categoryIdL2: number;
+  }
+
   type LedgerEntryTagDTO = GalaxyWeb.BaseCreateDTO & {
     ledgerId?: number;
     tagId: number;
