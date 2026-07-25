@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 
 import java.util.Map;
@@ -96,9 +94,7 @@ public class LedgerEntryController extends BaseRestController<LedgerEntryService
 
     @SuppressWarnings("unchecked")
     private Long getLedgerId() {
-        var requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        Map<String, String> variables = (Map<String, String>) requestAttributes.getRequest()
-                .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        Map<String, String> variables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         return Long.valueOf(variables.get("ledgerId"));
     }
 
