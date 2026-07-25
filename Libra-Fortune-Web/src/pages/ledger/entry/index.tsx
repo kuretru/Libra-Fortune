@@ -236,6 +236,19 @@ const parseSearchParams = (search: string): LedgerEntrySearchParams => {
   };
 };
 
+const stringifySearchParams = (params: Record<string, unknown>): string => {
+  const searchParams = new URLSearchParams();
+  for (const [name, rawValue] of Object.entries(params)) {
+    const values = Array.isArray(rawValue) ? rawValue : [rawValue];
+    for (const value of values) {
+      if (value !== undefined && value !== null && value !== '') {
+        searchParams.append(name, String(value));
+      }
+    }
+  }
+  return searchParams.toString();
+};
+
 const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
   categories,
   value,
@@ -486,7 +499,6 @@ const LedgerEntry: React.FC = () => {
   const onSearchReset = useCallback(() => {
     const searchForm = searchFormRef.current;
     if (!searchForm) return;
-    // ProForm 默认会恢复 URL 注入的 initialValues，这里需要显式清空。
     searchForm.setFieldsValue({
       categoryIds: undefined,
       dateRange: undefined,
@@ -1126,6 +1138,23 @@ const LedgerEntry: React.FC = () => {
       (field) => sorter[field],
     );
     const sortOrder = sortField ? (sorter[sortField] ?? undefined) : undefined;
+    const nextSearch = stringifySearchParams({
+      categoryIdL1: query.categoryIdL1,
+      categoryIdL2: query.categoryIdL2,
+      type: query.type,
+      dateBegin,
+      dateEnd,
+      nameLike: name,
+      originalCurrency: query.originalCurrency,
+      settlementCurrency: query.settlementCurrency,
+      username: query.username,
+      tagSetId: query.tagSetId,
+      tagIdIn: query.tagIdIn,
+    });
+    if (history.location.search.replace(/^\?/, '') !== nextSearch) {
+      const { pathname, hash } = history.location;
+      history.replace({ pathname, search: nextSearch, hash });
+    }
     const response = await entryApi.list(ledgerId, {
       current: current!,
       pageSize: pageSize!,
