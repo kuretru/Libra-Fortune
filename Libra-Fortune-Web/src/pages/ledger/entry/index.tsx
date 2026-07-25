@@ -920,6 +920,7 @@ const LedgerEntry: React.FC = () => {
       title: '原始金额',
       align: 'right',
       search: false,
+      sorter: true,
       width: 100,
       render: (_, record) => (
         <span>
@@ -941,6 +942,7 @@ const LedgerEntry: React.FC = () => {
       title: '结算金额',
       align: 'right',
       search: false,
+      sorter: true,
       width: 100,
       render: (_, record) => (
         <span>
@@ -1087,7 +1089,7 @@ const LedgerEntry: React.FC = () => {
       LibraFortune.Ledger.LedgerEntryDTO,
       LedgerEntrySearchParams
     >['request']
-  > = async (params) => {
+  > = async (params, sorter) => {
     if (!ledgerId) {
       return { data: [], success: false, total: 0 };
     }
@@ -1100,6 +1102,15 @@ const LedgerEntry: React.FC = () => {
       categoryIds,
       ...query
     } = params;
+    const sortField = (['originalAmount', 'settlementAmount'] as const).find(
+      (field) => sorter[field],
+    );
+    const sortOrder =
+      sortField && sorter[sortField] === 'ascend'
+        ? 'asc'
+        : sortField && sorter[sortField] === 'descend'
+          ? 'desc'
+          : undefined;
     const response = await entryApi.list(ledgerId, {
       current: current!,
       pageSize: pageSize!,
@@ -1108,6 +1119,8 @@ const LedgerEntry: React.FC = () => {
       dateBegin,
       dateEnd,
       ...query,
+      sortField: sortOrder ? sortField : undefined,
+      sortOrder,
     });
 
     return {

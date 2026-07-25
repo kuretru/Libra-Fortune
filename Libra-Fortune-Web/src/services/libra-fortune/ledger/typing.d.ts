@@ -62,6 +62,8 @@ declare namespace LibraFortune.Ledger {
     username?: string;
     tagSetId?: number;
     tagIdIn?: number[];
+    sortField?: 'originalAmount' | 'settlementAmount';
+    sortOrder?: 'asc' | 'desc';
   }
 
   type DashboardLedgerBO = {
