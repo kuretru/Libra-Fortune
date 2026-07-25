@@ -1,6 +1,6 @@
 package com.kuretru.web.libra.dashboard.entity.query;
 
-import com.kuretru.web.libra.dashboard.entity.enums.OrderByMode;
+import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
 import com.kuretru.web.libra.dashboard.entity.enums.OrderByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +20,6 @@ public class OrderByQuery {
 
     @NotNull
     @Schema(description = "排序方向")
-    private OrderByMode mode;
+    private SortOrderEnum mode;
 
 }
