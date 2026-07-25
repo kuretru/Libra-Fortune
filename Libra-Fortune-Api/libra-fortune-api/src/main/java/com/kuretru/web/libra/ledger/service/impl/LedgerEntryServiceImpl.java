@@ -205,15 +205,15 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     }
 
     @Override
-    protected LedgerEntryDO beforeSave(LedgerEntryDTO record) throws ServiceException {
+    protected LedgerEntryDO beforeCreate(LedgerEntryDTO record) throws ServiceException {
         ledgerService.verifyCanManagerEntry(record.getLedgerId());
         verifyDTO(record);
-        return super.beforeSave(record);
+        return super.beforeCreate(record);
     }
 
     @Override
-    protected LedgerEntryDTO afterSave(LedgerEntryDO record, LedgerEntryDTO raw) throws ServiceException {
-        var result = super.afterSave(record, raw);
+    protected LedgerEntryDTO afterCreate(LedgerEntryDO record, LedgerEntryDTO raw) throws ServiceException {
+        var result = super.afterCreate(record, raw);
         result.setTags(tagService.syncByParentId(record.getId(), raw.getTags()));
         result.setDetails(detailService.syncByParentId(record.getId(), raw.getDetails()));
         return result;

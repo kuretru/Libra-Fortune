@@ -53,9 +53,9 @@ public class AccountServiceImpl
     }
 
     @Override
-    protected AccountDO beforeSave(AccountDTO record) throws ServiceException {
+    protected AccountDO beforeCreate(AccountDTO record) throws ServiceException {
         record.setOwner(CurrentUserContext.getUsername());
-        return super.beforeSave(record);
+        return super.beforeCreate(record);
     }
 
     @Override

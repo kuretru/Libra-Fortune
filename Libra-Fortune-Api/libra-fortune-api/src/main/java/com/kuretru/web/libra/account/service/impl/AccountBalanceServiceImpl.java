@@ -92,7 +92,7 @@ public class AccountBalanceServiceImpl implements AccountBalanceService {
     }
 
     @Override
-    public void save(AccountBalanceRequest request) throws ServiceException {
+    public void create(AccountBalanceRequest request) throws ServiceException {
         var accountList = listAccount();
         var accountIdList = accountList.stream().map(AccountDTO::getId).toList();
         for (var balance : request.getBalances()) {

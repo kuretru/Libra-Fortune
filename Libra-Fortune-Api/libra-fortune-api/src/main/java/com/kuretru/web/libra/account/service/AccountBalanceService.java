@@ -8,6 +8,6 @@ public interface AccountBalanceService {
 
     AccountBalanceResultBO list(AccountBalanceQuery query);
 
-    void save(AccountBalanceRequest request);
+    void create(AccountBalanceRequest request);
 
 }

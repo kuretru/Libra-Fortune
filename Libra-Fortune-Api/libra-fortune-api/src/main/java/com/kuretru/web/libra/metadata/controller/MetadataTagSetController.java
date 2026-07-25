@@ -40,7 +40,7 @@ public class MetadataTagSetController extends BaseSequencedRestController<Metada
             throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定记录");
         }
         record.setSetId(setId);
-        var result = itemService.save(record);
+        var result = itemService.create(record);
         return ApiResponse.created(result);
     }
 

@@ -94,14 +94,14 @@ public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, Le
     }
 
     @Override
-    protected LedgerDO beforeSave(LedgerDTO record) throws ServiceException {
+    protected LedgerDO beforeCreate(LedgerDTO record) throws ServiceException {
         record.setOwner(CurrentUserContext.getUsername());
-        return super.beforeSave(record);
+        return super.beforeCreate(record);
     }
 
     @Override
-    protected LedgerDTO afterSave(LedgerDO record, LedgerDTO raw) throws ServiceException {
-        var result = super.afterSave(record, raw);
+    protected LedgerDTO afterCreate(LedgerDO record, LedgerDTO raw) throws ServiceException {
+        var result = super.afterCreate(record, raw);
         result.setMembers(memberService.syncByParentId(record.getId(), raw.getMembers()));
         return result;
     }

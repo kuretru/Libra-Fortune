@@ -39,8 +39,8 @@ public class AccountBalanceController extends BaseController {
 
     @PutMapping("/balances")
     @Operation(summary = "幂等修改账户余额记录")
-    public ApiResponse<?> save(@RequestBody AccountBalanceRequest request) throws ServiceException {
-        service.save(request);
+    public ApiResponse<?> create(@RequestBody AccountBalanceRequest request) throws ServiceException {
+        service.create(request);
         return ApiResponse.success(null);
     }
 
