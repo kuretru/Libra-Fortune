@@ -10,7 +10,6 @@ version = "0.4.0"
 val mybatisPlusVersion = "3.5.17"
 val mapstructVersion = "1.6.3"
 val springdocOpenapiVersion = "3.0.3"
-val guavaVersion = "33.5.0-jre"
 
 java {
     toolchain {
@@ -29,7 +28,6 @@ dependencies {
     implementation("com.baomidou:mybatis-plus-spring-boot4-starter:${mybatisPlusVersion}")
     implementation("com.baomidou:mybatis-plus-jsqlparser:${mybatisPlusVersion}")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenapiVersion}")
-    implementation("com.google.guava:guava:$guavaVersion")
 
     runtimeOnly("com.mysql:mysql-connector-j")
 
