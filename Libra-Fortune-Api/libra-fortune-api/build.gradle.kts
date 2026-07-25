@@ -1,13 +1,13 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.5"
+    id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "com.kuretru.web"
 version = "0.4.0"
 
-val mybatisPlusVersion = "3.5.16"
+val mybatisPlusVersion = "3.5.17"
 val mapstructVersion = "1.6.3"
 val springdocOpenapiVersion = "3.0.3"
 val guavaVersion = "33.5.0-jre"
