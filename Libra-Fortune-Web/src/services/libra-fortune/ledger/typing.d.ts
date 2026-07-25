@@ -63,7 +63,7 @@ declare namespace LibraFortune.Ledger {
     tagSetId?: number;
     tagIdIn?: number[];
     sortField?: 'originalAmount' | 'settlementAmount';
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: 'ascend' | 'descend';
   }
 
   type DashboardLedgerBO = {
@@ -125,7 +125,7 @@ declare namespace LibraFortune.Ledger {
   type DashboardOrderBy = {
     type: 'time' | 'metric' | 'dimension';
     name: string;
-    mode: 'asc' | 'desc';
+    mode: 'ascend' | 'descend';
   }
 
   type DashboardQuery = {

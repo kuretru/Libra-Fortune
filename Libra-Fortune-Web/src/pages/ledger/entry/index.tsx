@@ -1105,12 +1105,7 @@ const LedgerEntry: React.FC = () => {
     const sortField = (['originalAmount', 'settlementAmount'] as const).find(
       (field) => sorter[field],
     );
-    const sortOrder =
-      sortField && sorter[sortField] === 'ascend'
-        ? 'asc'
-        : sortField && sorter[sortField] === 'descend'
-          ? 'desc'
-          : undefined;
+    const sortOrder = sortField ? (sorter[sortField] ?? undefined) : undefined;
     const response = await entryApi.list(ledgerId, {
       current: current!,
       pageSize: pageSize!,

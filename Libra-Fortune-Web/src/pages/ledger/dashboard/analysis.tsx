@@ -1083,7 +1083,7 @@ const DashboardAnalysis: React.FC = () => {
       return orderBy;
     }
     return values.timeDimension
-      ? [{ type: 'time', name: values.timeDimension, mode: 'asc' }]
+      ? [{ type: 'time', name: values.timeDimension, mode: 'ascend' }]
       : undefined;
   };
 
@@ -1181,7 +1181,7 @@ const DashboardAnalysis: React.FC = () => {
             timeDimension: 'month',
             metrics: ['fundedSum'],
             dimensions: [],
-            orderBy: [{ field: 'time:month', mode: 'asc' }],
+            orderBy: [{ field: 'time:month', mode: 'ascend' }],
           }}
           onFinish={onFinish}
         >
@@ -1300,7 +1300,7 @@ const DashboardAnalysis: React.FC = () => {
                         onClick={() =>
                           add({
                             field: orderByFieldOptions[0]?.value,
-                            mode: 'asc',
+                            mode: 'ascend',
                           })
                         }
                         type="dashed"
