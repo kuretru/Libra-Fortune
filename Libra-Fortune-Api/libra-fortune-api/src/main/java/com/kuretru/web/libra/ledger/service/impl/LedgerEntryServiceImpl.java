@@ -1,12 +1,14 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
 import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.account.service.AccountService;
+import com.kuretru.web.libra.ledger.entity.business.LedgerEntryBatchCategoryRequest;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryEntityMapper;
 import com.kuretru.web.libra.ledger.entity.query.LedgerEntryQuery;
@@ -23,12 +25,12 @@ import com.kuretru.web.libra.metadata.service.MetadataCurrencyService;
 import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEntryDO, LedgerEntryDTO, LedgerEntryQuery> implements LedgerEntryService {
@@ -153,6 +155,53 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             record.setDetails(detailMap.get(record.getId()));
         }
         return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public int batchUpdateCategory(Long ledgerId, LedgerEntryBatchCategoryRequest request) {
+        ledgerService.verifyCanManagerEntry(ledgerId);
+        verifyCategory(request.getCategoryIdL1(), request.getCategoryIdL2());
+        var entryIds = verifyBatchEntries(ledgerId, request.getEntryIds());
+
+        var record = new LedgerEntryDO();
+        record.setCategoryIdL1(request.getCategoryIdL1());
+        record.setCategoryIdL2(request.getCategoryIdL2());
+        var updateWrapper = new UpdateWrapper<LedgerEntryDO>();
+        updateWrapper.eq("ledger_id", ledgerId);
+        updateWrapper.in("id", entryIds);
+        mapper.update(record, updateWrapper);
+        return entryIds.size();
+    }
+
+    private List<Long> verifyBatchEntries(Long ledgerId, List<Long> rawEntryIds) {
+        var entryIds = normalizeIds(rawEntryIds, "条目");
+        var queryWrapper = new QueryWrapper<LedgerEntryDO>();
+        queryWrapper.select("id");
+        queryWrapper.eq("ledger_id", ledgerId);
+        queryWrapper.in("id", entryIds);
+        queryWrapper.last("FOR UPDATE");
+        var records = mapper.selectList(queryWrapper);
+        if (records.size() != entryIds.size()) {
+            throw ServiceException.build(
+                    UserErrorCodes.REQUEST_PARAMETER_ERROR,
+                    "部分条目不存在或不属于该账本"
+            );
+        }
+        return entryIds;
+    }
+
+    private List<Long> normalizeIds(List<Long> rawIds, String name) {
+        if (rawIds == null || rawIds.isEmpty()) {
+            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, name + "ID列表不能为空");
+        }
+        if (rawIds.size() > 1000) {
+            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, name + "ID不能超过1000个");
+        }
+        if (rawIds.stream().anyMatch(id -> id == null || id <= 0)) {
+            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, name + "ID不合法");
+        }
+        return new ArrayList<>(new LinkedHashSet<>(rawIds));
     }
 
     @Override

@@ -1,11 +1,12 @@
 package com.kuretru.web.libra.ledger.controller;
 
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.controller.BaseRestController;
 import com.kuretru.microservices.web.entity.ApiResponse;
 import com.kuretru.microservices.web.entity.PaginationQuery;
 import com.kuretru.microservices.web.entity.PaginationResponse;
 import com.kuretru.microservices.web.exception.ServiceException;
-import com.kuretru.microservices.web.controller.BaseRestController;
+import com.kuretru.web.libra.ledger.entity.business.LedgerEntryBatchCategoryRequest;
 import com.kuretru.web.libra.ledger.entity.query.LedgerEntryQuery;
 import com.kuretru.web.libra.ledger.entity.transfer.LedgerEntryDTO;
 import com.kuretru.web.libra.ledger.service.LedgerEntryService;
@@ -73,6 +74,15 @@ public class LedgerEntryController extends BaseRestController<LedgerEntryService
         }
         record.setLedgerId(getLedgerId());
         return super.update(id, record);
+    }
+
+    @PutMapping("/batch/category")
+    @Operation(summary = "批量修改条目分类")
+    public ApiResponse<Integer> batchUpdateCategory(
+            @Parameter(description = "账本ID") @PathVariable Long ledgerId,
+            @Parameter(description = "批量修改内容", required = true)
+            @Validated @RequestBody LedgerEntryBatchCategoryRequest request) throws ServiceException {
+        return ApiResponse.success(service.batchUpdateCategory(ledgerId, request));
     }
 
     @DeleteMapping("/{id}")
