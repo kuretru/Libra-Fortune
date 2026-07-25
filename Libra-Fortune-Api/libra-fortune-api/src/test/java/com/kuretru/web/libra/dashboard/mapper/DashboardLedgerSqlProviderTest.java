@@ -1,9 +1,12 @@
 package com.kuretru.web.libra.dashboard.mapper;
 
+import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
+import com.kuretru.web.libra.dashboard.entity.enums.OrderByType;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeDimension;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
+import com.kuretru.web.libra.dashboard.entity.query.OrderByQuery;
 import com.kuretru.web.libra.dashboard.entity.query.TimeQuery;
 import org.junit.jupiter.api.Test;
 
@@ -51,6 +54,24 @@ class DashboardLedgerSqlProviderTest {
 
         assertTrue(sql.startsWith("SELECT entry.ledger_id AS ledgerId, SUM(entry.original_amount) AS originalSum FROM"));
         assertTrue(sql.contains(" GROUP BY entry.ledger_id"));
+    }
+
+    @Test
+    void buildQueryTranslatesSortOrderValuesToSqlKeywords() {
+        var query = buildQuery();
+        var ascend = new OrderByQuery();
+        ascend.setType(OrderByType.METRIC);
+        ascend.setName(LedgerMetrics.ORIGINAL_SUM.getValue());
+        ascend.setMode(SortOrderEnum.ASCEND);
+        var descend = new OrderByQuery();
+        descend.setType(OrderByType.METRIC);
+        descend.setName(LedgerMetrics.ORIGINAL_SUM.getValue());
+        descend.setMode(SortOrderEnum.DESCEND);
+        query.setOrderBy(List.of(ascend, descend));
+
+        var sql = sqlProvider.buildQuery(query);
+
+        assertTrue(sql.contains(" ORDER BY originalSum ASC, originalSum DESC"));
     }
 
     private DashboardLedgerQuery buildQuery() {

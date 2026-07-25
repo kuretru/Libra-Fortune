@@ -121,7 +121,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     protected void applyOrderBy(QueryWrapper<LedgerEntryDO> queryWrapper, LedgerEntryQuery query) {
         if (query.getSortField() != null) {
             if (query.getSortOrder() == null) {
-                query.setSortOrder(SortOrderEnum.ASC);
+                query.setSortOrder(SortOrderEnum.ASCEND);
             }
             switch (query.getSortField()) {
                 case ORIGINAL_AMOUNT:
@@ -133,7 +133,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
                     queryWrapper.orderByAsc("settlement_currency");
                     break;
             }
-            queryWrapper.orderBy(true, query.getSortOrder() == SortOrderEnum.ASC, query.getSortField().getColumn());
+            queryWrapper.orderBy(true, query.getSortOrder() == SortOrderEnum.ASCEND, query.getSortField().getColumn());
         }
         applyDefaultOrderBy(queryWrapper);
     }

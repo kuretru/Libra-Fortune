@@ -192,7 +192,11 @@ public class DashboardLedgerSqlProvider {
         var orderBySql = new ArrayList<String>();
         for (var orderBy : query.getOrderBy()) {
             var alias = resolveOrderByAlias(query, orderBy.getType(), orderBy.getName());
-            orderBySql.add(alias + " " + orderBy.getMode().name());
+            var direction = switch (orderBy.getMode()) {
+                case ASCEND -> "ASC";
+                case DESCEND -> "DESC";
+            };
+            orderBySql.add(alias + " " + direction);
         }
         return String.join(", ", orderBySql);
     }
