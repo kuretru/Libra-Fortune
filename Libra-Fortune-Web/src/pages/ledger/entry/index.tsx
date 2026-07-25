@@ -483,6 +483,26 @@ const LedgerEntry: React.FC = () => {
   const originalAmountAutoFilledRef = useRef(false);
   const continuousEntryRef = useRef(false);
 
+  const onSearchReset = useCallback(() => {
+    const searchForm = searchFormRef.current;
+    if (!searchForm) return;
+    // ProForm 默认会恢复 URL 注入的 initialValues，这里需要显式清空。
+    searchForm.setFieldsValue({
+      categoryIds: undefined,
+      dateRange: undefined,
+      name: undefined,
+      originalCurrency: undefined,
+      settlementCurrency: undefined,
+      tagIdIn: undefined,
+      tagSetId: undefined,
+      type: undefined,
+      username: undefined,
+    });
+    const { pathname, hash } = history.location;
+    history.replace({ pathname, search: '', hash });
+    searchForm.submit();
+  }, []);
+
   const memberOptions = useMemo(
     () =>
       (ledger?.members ?? []).map((member) => ({
@@ -1233,6 +1253,7 @@ const LedgerEntry: React.FC = () => {
         form={{
           initialValues: initialSearchParams,
         }}
+        onReset={onSearchReset}
         rowKey="id"
         request={onRequest}
         search={{
