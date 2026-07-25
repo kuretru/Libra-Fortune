@@ -2,3 +2,12 @@ spring:
   config:
     activate:
       on-profile: development
+    import:
+      - optional:file:./libra-fortune-api/src/main/resources/config/application-development-local.yml
+  datasource:
+    username: libra-fortune
+    password: libra-fortune
+    url: jdbc:mysql://127.0.0.1:3306/libra-fortune?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+  redis:
+    host: 127.0.0.1
+    password:
