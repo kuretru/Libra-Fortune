@@ -1,6 +1,8 @@
 package com.kuretru.web.libra.ledger.entity.query;
 
+import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
 import com.kuretru.web.libra.ledger.entity.enums.EntryType;
+import com.kuretru.web.libra.ledger.entity.enums.LedgerEntrySortField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,5 +50,11 @@ public class LedgerEntryQuery {
 
     @Schema(description = "标签ID")
     private List<Long> tagIdIn;
+
+    @Schema(description = "排序字段")
+    private LedgerEntrySortField sortField;
+
+    @Schema(description = "排序方向")
+    private SortOrderEnum sortOrder;
 
 }

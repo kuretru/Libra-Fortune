@@ -3,6 +3,7 @@ package com.kuretru.web.libra.ledger.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.account.service.AccountService;
@@ -108,6 +109,33 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         result.setTags(tagService.listByParentId(record.getId()));
         result.setDetails(detailService.listByParentId(record.getId()));
         return result;
+    }
+
+    @Override
+    protected QueryWrapper<LedgerEntryDO> beforeList(LedgerEntryQuery query) throws ServiceException {
+        var queryWrapper = buildQueryWrapper(query);
+        applyOrderBy(queryWrapper, query);
+        return queryWrapper;
+    }
+
+    protected void applyOrderBy(QueryWrapper<LedgerEntryDO> queryWrapper, LedgerEntryQuery query) {
+        if (query.getSortField() != null) {
+            if (query.getSortOrder() == null) {
+                query.setSortOrder(SortOrderEnum.ASC);
+            }
+            switch (query.getSortField()) {
+                case ORIGINAL_AMOUNT:
+                    queryWrapper.orderByAsc("CASE WHEN original_currency = 'CNY' THEN 1 ELSE 0 END");
+                    queryWrapper.orderByAsc("original_currency");
+                    break;
+                case SETTLEMENT_AMOUNT:
+                    queryWrapper.orderByAsc("CASE WHEN settlement_currency = 'CNY' THEN 1 ELSE 0 END");
+                    queryWrapper.orderByAsc("settlement_currency");
+                    break;
+            }
+            queryWrapper.orderBy(true, query.getSortOrder() == SortOrderEnum.ASC, query.getSortField().getColumn());
+        }
+        applyDefaultOrderBy(queryWrapper);
     }
 
     @Override
