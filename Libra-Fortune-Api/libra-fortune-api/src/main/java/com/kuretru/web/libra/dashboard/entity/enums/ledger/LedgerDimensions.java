@@ -1,10 +1,10 @@
 package com.kuretru.web.libra.dashboard.entity.enums.ledger;
 
+import com.kuretru.microservices.dashboard.entity.interfaces.Field;
+import com.kuretru.microservices.dashboard.entity.interfaces.Join;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.kuretru.microservices.common.entity.enums.BaseEnum;
-import com.kuretru.web.libra.dashboard.entity.interfaces.Field;
-import com.kuretru.web.libra.dashboard.entity.interfaces.Join;
 import lombok.Getter;
 
 import java.util.List;

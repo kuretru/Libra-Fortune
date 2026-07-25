@@ -1,13 +1,14 @@
 package com.kuretru.web.libra.dashboard.mapper;
 
+import com.kuretru.microservices.dashboard.entity.enums.OrderByType;
+import com.kuretru.microservices.dashboard.entity.query.OrderByQuery;
+import com.kuretru.microservices.dashboard.entity.query.TimeQuery;
+import com.kuretru.microservices.dashboard.mapper.DashboardSqlProvider;
 import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
-import com.kuretru.web.libra.dashboard.entity.enums.OrderByType;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeDimension;
 import com.kuretru.web.libra.dashboard.entity.query.DashboardLedgerQuery;
-import com.kuretru.web.libra.dashboard.entity.query.OrderByQuery;
-import com.kuretru.web.libra.dashboard.entity.query.TimeQuery;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -16,9 +17,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class DashboardLedgerSqlProviderTest {
+class DashboardSqlProviderAdapterTest {
 
-    private final DashboardLedgerSqlProvider sqlProvider = new DashboardLedgerSqlProvider();
+    private final DashboardSqlProvider sqlProvider = new DashboardSqlProvider();
 
     @Test
     void buildQueryAddsTagSetDependencyJoinsInOrder() {

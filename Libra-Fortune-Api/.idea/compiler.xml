@@ -8,6 +8,8 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
         </processorPath>
+        <module name="galaxy-dashboard.main" />
+        <module name="galaxy-dashboard.test" />
         <module name="galaxy-common.main" />
         <module name="galaxy-common.test" />
       </profile>
@@ -66,6 +68,9 @@
       <module name="galaxy-common" options="-parameters" />
       <module name="galaxy-common.main" options="-parameters" />
       <module name="galaxy-common.test" options="-parameters" />
+      <module name="galaxy-dashboard" options="-parameters" />
+      <module name="galaxy-dashboard.main" options="-parameters" />
+      <module name="galaxy-dashboard.test" options="-parameters" />
       <module name="galaxy-oauth2-client" options="-parameters" />
       <module name="galaxy-oauth2-common" options="-parameters" />
       <module name="galaxy-web" options="-parameters" />

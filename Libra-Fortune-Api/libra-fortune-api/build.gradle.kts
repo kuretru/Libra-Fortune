@@ -21,6 +21,7 @@ dependencies {
     implementation("com.kuretru.microservices:galaxy-common:0.0.1-SNAPSHOT")
     implementation("com.kuretru.microservices:galaxy-web:0.0.1-SNAPSHOT")
     implementation("com.kuretru.microservices:galaxy-authentication:1.0.0")
+    implementation("com.kuretru.microservices:galaxy-dashboard:0.0.1-SNAPSHOT")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")

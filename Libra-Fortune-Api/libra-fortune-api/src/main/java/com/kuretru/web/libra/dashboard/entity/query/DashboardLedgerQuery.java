@@ -1,5 +1,6 @@
 package com.kuretru.web.libra.dashboard.entity.query;
 
+import com.kuretru.microservices.dashboard.entity.query.BaseDashboardQuery;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeDimension;
