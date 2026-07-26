@@ -750,9 +750,7 @@ const DashboardAnalysis: React.FC = () => {
           });
         },
       )
-      .catch((error) => {
-        messageApi.error(error?.message ?? '加载筛选项失败');
-      });
+      .catch(() => undefined);
   }, [currentUsername, form, messageApi]);
 
   const labelMaps = useMemo(
@@ -1128,8 +1126,8 @@ const DashboardAnalysis: React.FC = () => {
       });
       setResult(response.data);
       setQueryDrawerOpen(false);
-    } catch (error: any) {
-      messageApi.error(error?.message ?? '查询失败');
+    } catch {
+      // 接口错误由全局 requestErrorConfig 统一展示。
     } finally {
       setSubmitting(false);
     }
