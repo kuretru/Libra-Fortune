@@ -1,11 +1,14 @@
 package com.kuretru.web.libra.ledger.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.kuretru.microservices.common.entity.enums.EnumDTO;
 import com.kuretru.microservices.web.constant.code.UserErrorCodes;
+import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
 import com.kuretru.microservices.web.exception.ServiceException;
 import com.kuretru.microservices.web.service.impl.BaseServiceImpl;
 import com.kuretru.web.libra.account.service.AccountService;
+import com.kuretru.web.libra.ledger.entity.business.LedgerEntryBatchCategoryRequest;
 import com.kuretru.web.libra.ledger.entity.data.LedgerEntryDO;
 import com.kuretru.web.libra.ledger.entity.mapper.LedgerEntryEntityMapper;
 import com.kuretru.web.libra.ledger.entity.query.LedgerEntryQuery;
@@ -22,12 +25,12 @@ import com.kuretru.web.libra.metadata.service.MetadataCurrencyService;
 import com.kuretru.web.libra.metadata.service.MetadataTagSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEntryDO, LedgerEntryDTO, LedgerEntryQuery> implements LedgerEntryService {
@@ -60,6 +63,23 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     @Override
     protected QueryWrapper<LedgerEntryDO> buildQueryWrapper(LedgerEntryQuery query) {
         var queryWrapper = super.buildQueryWrapper(query);
+        if (query.getUsername() != null) {
+            queryWrapper.apply(
+                    "EXISTS (SELECT 1 FROM ledger_v2_entry_detail detail " +
+                            "WHERE ledger_v2_entry.id = detail.entry_id " +
+                            "AND detail.username = {0})",
+                    query.getUsername()
+            );
+        }
+        if (query.getTagSetId() != null) {
+            queryWrapper.apply(
+                    "EXISTS (SELECT 1 FROM ledger_v2_entry_tag tag " +
+                            "INNER JOIN metadata_tag_set_item tag_item ON tag.tag_id = tag_item.id " +
+                            "WHERE ledger_v2_entry.id = tag.entry_id " +
+                            "AND tag_item.set_id = {0})",
+                    query.getTagSetId()
+            );
+        }
         if (query.getTagIdIn() != null && !query.getTagIdIn().isEmpty()) {
             var placeholders = new StringBuilder();
             for (var index = 0; index < query.getTagIdIn().size(); index++) {
@@ -94,6 +114,33 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     }
 
     @Override
+    protected QueryWrapper<LedgerEntryDO> beforeList(LedgerEntryQuery query) throws ServiceException {
+        var queryWrapper = buildQueryWrapper(query);
+        applyOrderBy(queryWrapper, query);
+        return queryWrapper;
+    }
+
+    protected void applyOrderBy(QueryWrapper<LedgerEntryDO> queryWrapper, LedgerEntryQuery query) {
+        if (query.getSortField() != null) {
+            if (query.getSortOrder() == null) {
+                query.setSortOrder(SortOrderEnum.ASCEND);
+            }
+            switch (query.getSortField()) {
+                case ORIGINAL_AMOUNT:
+                    queryWrapper.orderByAsc("CASE WHEN original_currency = 'CNY' THEN 1 ELSE 0 END");
+                    queryWrapper.orderByAsc("original_currency");
+                    break;
+                case SETTLEMENT_AMOUNT:
+                    queryWrapper.orderByAsc("CASE WHEN settlement_currency = 'CNY' THEN 1 ELSE 0 END");
+                    queryWrapper.orderByAsc("settlement_currency");
+                    break;
+            }
+            queryWrapper.orderBy(true, query.getSortOrder() == SortOrderEnum.ASCEND, query.getSortField().getColumn());
+        }
+        applyDefaultOrderBy(queryWrapper);
+    }
+
+    @Override
     protected List<LedgerEntryDTO> afterList(LedgerEntryQuery query, List<LedgerEntryDO> records) throws ServiceException {
         var result = super.afterList(query, records);
         var idList = result.stream().map(LedgerEntryDTO::getId).toList();
@@ -110,16 +157,60 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         return result;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    protected LedgerEntryDO beforeSave(LedgerEntryDTO record) throws ServiceException {
-        ledgerService.verifyCanManagerEntry(record.getLedgerId());
-        verifyDTO(record);
-        return super.beforeSave(record);
+    public int batchUpdateCategory(Long ledgerId, LedgerEntryBatchCategoryRequest request) {
+        ledgerService.verifyCanManagerEntry(ledgerId);
+        verifyCategory(request.getCategoryIdL1(), request.getCategoryIdL2());
+        var entryIds = verifyBatchEntries(ledgerId, request.getEntryIds());
+
+        var record = new LedgerEntryDO();
+        record.setCategoryIdL1(request.getCategoryIdL1());
+        record.setCategoryIdL2(request.getCategoryIdL2());
+        var updateWrapper = new UpdateWrapper<LedgerEntryDO>();
+        updateWrapper.eq("ledger_id", ledgerId);
+        updateWrapper.in("id", entryIds);
+        mapper.update(record, updateWrapper);
+        return entryIds.size();
+    }
+
+    private List<Long> verifyBatchEntries(Long ledgerId, List<Long> rawEntryIds) {
+        var entryIds = normalizeIds(rawEntryIds, "条目");
+        var queryWrapper = new QueryWrapper<LedgerEntryDO>();
+        queryWrapper.select("id");
+        queryWrapper.eq("ledger_id", ledgerId);
+        queryWrapper.in("id", entryIds);
+        queryWrapper.last("FOR UPDATE");
+        var records = mapper.selectList(queryWrapper);
+        if (records.size() != entryIds.size()) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("部分条目不存在或不属于该账本");
+        }
+        return entryIds;
+    }
+
+    private List<Long> normalizeIds(List<Long> rawIds, String name) {
+        if (rawIds == null || rawIds.isEmpty()) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "ID列表不能为空");
+        }
+        if (rawIds.size() > 1000) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "ID不能超过1000个");
+        }
+        if (rawIds.stream().anyMatch(id -> id == null || id <= 0)) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "ID不合法");
+        }
+        return new ArrayList<>(new LinkedHashSet<>(rawIds));
     }
 
     @Override
-    protected LedgerEntryDTO afterSave(LedgerEntryDO record, LedgerEntryDTO raw) throws ServiceException {
-        var result = super.afterSave(record, raw);
+    protected LedgerEntryDO beforeCreate(LedgerEntryDTO record) throws ServiceException {
+        ledgerService.verifyCanManagerEntry(record.getLedgerId());
+        verifyDTO(record);
+        return super.beforeCreate(record);
+    }
+
+    @Override
+    protected LedgerEntryDTO afterCreate(LedgerEntryDO record, LedgerEntryDTO raw) throws ServiceException {
+        var result = super.afterCreate(record, raw);
         result.setTags(tagService.syncByParentId(record.getId(), raw.getTags()));
         result.setDetails(detailService.syncByParentId(record.getId(), raw.getDetails()));
         return result;
@@ -159,15 +250,15 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 
         // 校验日期
         if (record.getDate().isAfter(LocalDate.now())) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不能添加今天之后的条目");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("不能添加今天之后的条目");
         }
 
         // 校验货币类型
         var currencies = currencyService.enums().stream().map(EnumDTO::getValue).toList();
         if (!currencies.contains(record.getOriginalCurrency())) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "原始消费货币类型不合法");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("原始消费货币类型不合法");
         } else if (!currencies.contains(record.getSettlementCurrency())) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "结算货币类型不合法");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("结算货币类型不合法");
         }
 
         // 校验标签
@@ -181,7 +272,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     private void verifyCategory(Long categoryIdL1, Long categoryIdL2) throws ServiceException {
         var category = categoryService.get(categoryIdL2);
         if (category == null) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类不存在");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("账本分类不存在");
         }
         if (category.getParentId() != null && category.getParentId().equals(categoryIdL1)) {
             var parent = categoryService.get(category.getParentId());
@@ -189,26 +280,26 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
                 return;
             }
         }
-        throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类路径不合法");
+        throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("账本分类路径不合法");
     }
 
     private void verifyDetails(LedgerEntryDTO entry, List<LedgerEntryDetailDTO> details) throws ServiceException {
         if (details.isEmpty()) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目明细不能为空");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("条目明细不能为空");
         }
         var sum = new BigDecimal(0);
         var ratioSum = new BigDecimal(0);
         var fundedUsernameSet = new HashSet<String>();
         for (var detail : details) {
             if (entry.getId() != null && detail.getEntryId() != null && !detail.getEntryId().equals(entry.getId())) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目详情不属于该条目");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("条目详情不属于该条目");
             }
             var percent = detail.getAmount().divide(entry.getSettlementAmount(), 4, RoundingMode.HALF_DOWN).multiply(HUNDRED).setScale(2, RoundingMode.HALF_DOWN);
             if (!percent.equals(detail.getFundedRatio())) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担金额与分担比例对不上");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担金额与分担比例对不上");
             }
             if (fundedUsernameSet.contains(detail.getUsername())) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担人重复");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担人重复");
             }
             verifyPaymentChain(detail.getPaymentChain());
             fundedUsernameSet.add(detail.getUsername());
@@ -216,9 +307,9 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             ratioSum = ratioSum.add(detail.getFundedRatio());
         }
         if (sum.compareTo(entry.getSettlementAmount()) != 0) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "明细金额总和不等于结算金额");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("明细金额总和不等于结算金额");
         } else if (ratioSum.compareTo(HUNDRED) != 0) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担比例总和不等于100.00%");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担比例总和不等于100.00%");
         }
     }
 
@@ -227,14 +318,14 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             return;
         }
         if (paymentChain.contains(null)) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链不能包含空账户");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("付款链不能包含空账户");
         }
         if (new HashSet<>(paymentChain).size() != paymentChain.size()) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链账户不能重复");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("付款链账户不能重复");
         }
         for (Long accountId : paymentChain) {
             if (accountService.get(accountId) == null) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链账户不存在");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("付款链账户不存在");
             }
         }
     }

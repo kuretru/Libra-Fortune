@@ -2,6 +2,15 @@ spring:
   config:
     activate:
       on-profile: production
+    import:
+      - optional:file:./libra-fortune-api/src/main/resources/config/application-production-local.yml
+  datasource:
+    username:
+    password:
+    url:
+  redis:
+    host:
+    password:
   web:
     resources:
       static-locations: file:/web

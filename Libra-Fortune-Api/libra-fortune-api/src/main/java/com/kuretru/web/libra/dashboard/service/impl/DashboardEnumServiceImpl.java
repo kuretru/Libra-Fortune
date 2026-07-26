@@ -1,10 +1,10 @@
 package com.kuretru.web.libra.dashboard.service.impl;
 
 import com.kuretru.microservices.common.utils.EnumUtils;
-import com.kuretru.web.libra.dashboard.entity.enums.FilterLogic;
-import com.kuretru.web.libra.dashboard.entity.enums.FilterOperator;
-import com.kuretru.web.libra.dashboard.entity.enums.OrderByMode;
-import com.kuretru.web.libra.dashboard.entity.enums.OrderByType;
+import com.kuretru.microservices.dashboard.entity.enums.FilterLogic;
+import com.kuretru.microservices.dashboard.entity.enums.FilterOperator;
+import com.kuretru.microservices.dashboard.entity.enums.OrderByType;
+import com.kuretru.microservices.web.entity.enums.SortOrderEnum;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerDimensions;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerMetrics;
 import com.kuretru.web.libra.dashboard.entity.enums.ledger.LedgerTimeDimension;
@@ -24,7 +24,7 @@ public class DashboardEnumServiceImpl implements DashboardEnumService {
         result.setFilterLogics(EnumUtils.buildDTO(FilterLogic.values()));
         result.setFilterOperators(EnumUtils.buildDTO(FilterOperator.values()));
         result.setOrderByTypes(EnumUtils.buildDTO(OrderByType.values()));
-        result.setOrderByModes(EnumUtils.buildDTO(OrderByMode.values()));
+        result.setOrderByModes(EnumUtils.buildDTO(SortOrderEnum.values()));
         return result;
     }
 

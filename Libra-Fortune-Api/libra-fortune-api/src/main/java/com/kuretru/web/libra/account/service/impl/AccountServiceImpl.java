@@ -53,9 +53,9 @@ public class AccountServiceImpl
     }
 
     @Override
-    protected AccountDO beforeSave(AccountDTO record) throws ServiceException {
+    protected AccountDO beforeCreate(AccountDTO record) throws ServiceException {
         record.setOwner(CurrentUserContext.getUsername());
-        return super.beforeSave(record);
+        return super.beforeCreate(record);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class AccountServiceImpl
 
     private void verifyOwner(AccountDO record) {
         if (!CurrentUserContext.getUsername().equals(record.getOwner())) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能访问自己的账户");
+            throw UserErrorCodes.ACCESS_PERMISSION_ERROR.asException("仅能访问自己的账户");
         }
     }
 
@@ -88,7 +88,7 @@ public class AccountServiceImpl
     @Override
     public void verifyOwner(AccountDTO record) throws ServiceException {
         if (!CurrentUserContext.getUsername().equals(record.getOwner())) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅能访问自己的账户");
+            throw UserErrorCodes.ACCESS_PERMISSION_ERROR.asException("仅能访问自己的账户");
         }
     }
 

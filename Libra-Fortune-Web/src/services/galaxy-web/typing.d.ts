@@ -1,4 +1,9 @@
 declare namespace GalaxyWeb {
+  type ErrorHandleType = 'ignore' | 'info' | 'warn' | 'error' | 'login';
+  type ApiError<T = unknown> = {
+    handleType?: ErrorHandleType;
+    details?: T;
+  }
   type ApiResponse<T> = {
     code: number;
     message: string;

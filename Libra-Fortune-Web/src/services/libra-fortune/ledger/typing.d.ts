@@ -27,6 +27,12 @@ declare namespace LibraFortune.Ledger {
     details?: LedgerEntryDetailDTO[];
   }
 
+  type LedgerEntryBatchCategoryRequest = {
+    entryIds: number[];
+    categoryIdL1: number;
+    categoryIdL2: number;
+  }
+
   type LedgerEntryTagDTO = GalaxyWeb.BaseCreateDTO & {
     ledgerId?: number;
     tagId: number;
@@ -59,7 +65,11 @@ declare namespace LibraFortune.Ledger {
     nameLike?: string;
     originalCurrency?: string;
     settlementCurrency?: string;
+    username?: string;
+    tagSetId?: number;
     tagIdIn?: number[];
+    sortField?: 'originalAmount' | 'settlementAmount';
+    sortOrder?: 'ascend' | 'descend';
   }
 
   type DashboardLedgerBO = {
@@ -121,7 +131,7 @@ declare namespace LibraFortune.Ledger {
   type DashboardOrderBy = {
     type: 'time' | 'metric' | 'dimension';
     name: string;
-    mode: 'asc' | 'desc';
+    mode: 'ascend' | 'descend';
   }
 
   type DashboardQuery = {

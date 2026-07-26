@@ -30,7 +30,7 @@ public class CalculatorServiceImpl implements CalculatorService {
     @Override
     public CalculatorResult divide(CalculatorDTO record) throws ServiceException {
         if (record.getAccuracy() == 0) {
-            throw new ServiceException(UserErrorCodes.MISSING_REQUIRED_PARAMETERS, "未提供精度字段");
+            throw UserErrorCodes.MISSING_REQUIRED_PARAMETERS.asException("未提供精度字段");
         }
         return new CalculatorResult(record.getX().divide(record.getY(), record.getAccuracy(), RoundingMode.HALF_DOWN));
     }

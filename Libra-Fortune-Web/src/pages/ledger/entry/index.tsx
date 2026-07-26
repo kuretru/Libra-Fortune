@@ -63,6 +63,10 @@ type LedgerEntryFormValues = Omit<
 type LedgerEntryDetailFormValues =
   Partial<LibraFortune.Ledger.LedgerEntryDetailDTO>;
 
+type BatchCategoryFormValues = {
+  categoryIds?: CategorySelectorValue;
+};
+
 type Option<T extends string | number = string | number> = {
   label: string;
   value: T;
@@ -74,6 +78,7 @@ type GroupedTagOption = {
   name: string;
   options: Option<number>[];
   required: boolean;
+  value: number;
 };
 
 type CategoryTagSelectorProps = {
@@ -196,6 +201,56 @@ const parseCategoryQueryValue = (value?: string) => {
     categoryIdL1: Number.isInteger(categoryIdL1) ? categoryIdL1 : undefined,
     categoryIdL2: Number.isInteger(categoryIdL2) ? categoryIdL2 : undefined,
   };
+};
+
+const parsePositiveInteger = (value: string | null): number | undefined => {
+  if (!value) return undefined;
+  const result = Number(value);
+  return Number.isInteger(result) && result > 0 ? result : undefined;
+};
+
+const parseSearchParams = (search: string): LedgerEntrySearchParams => {
+  const params = new URLSearchParams(search);
+  const dateBegin = params.get('dateBegin');
+  const dateEnd = params.get('dateEnd');
+  const categoryIdL1 = parsePositiveInteger(params.get('categoryIdL1'));
+  const categoryIdL2 = parsePositiveInteger(params.get('categoryIdL2'));
+  const categoryIds =
+    params.get('categoryIds') ??
+    (categoryIdL1
+      ? [categoryIdL1, categoryIdL2].filter(Boolean).join(',')
+      : undefined);
+  const tagId = [...params.getAll('tagIdIn'), ...params.getAll('tagItemId')]
+    .flatMap((value) => value.split(','))
+    .flatMap((value) => {
+      const tagId = parsePositiveInteger(value);
+      return tagId ? [tagId] : [];
+    });
+
+  return {
+    categoryIds,
+    dateRange: dateBegin && dateEnd ? [dateBegin, dateEnd] : undefined,
+    name: params.get('name') ?? params.get('nameLike') ?? undefined,
+    originalCurrency: params.get('originalCurrency') ?? undefined,
+    settlementCurrency: params.get('settlementCurrency') ?? undefined,
+    tagIdIn: tagId.length ? tagId : undefined,
+    tagSetId: parsePositiveInteger(params.get('tagSetId')),
+    type: params.get('type') ?? undefined,
+    username: params.get('username') ?? undefined,
+  };
+};
+
+const stringifySearchParams = (params: Record<string, unknown>): string => {
+  const searchParams = new URLSearchParams();
+  for (const [name, rawValue] of Object.entries(params)) {
+    const values = Array.isArray(rawValue) ? rawValue : [rawValue];
+    for (const value of values) {
+      if (value !== undefined && value !== null && value !== '') {
+        searchParams.append(name, String(value));
+      }
+    }
+  }
+  return searchParams.toString();
 };
 
 const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
@@ -407,9 +462,15 @@ const LedgerEntry: React.FC = () => {
     const value = Number(params.ledgerId);
     return Number.isInteger(value) && value > 0 ? value : undefined;
   }, [params.ledgerId]);
+  const initialSearchParams = useMemo(
+    () => parseSearchParams(history.location.search),
+    [],
+  );
 
   const [messageApi, contextHolder] = message.useMessage();
   const [modalVisible, setModalVisible] = useState(false);
+  const [batchCategoryVisible, setBatchCategoryVisible] = useState(false);
+  const [selectedEntryIds, setSelectedEntryIds] = useState<number[]>([]);
   const [currentRecord, setCurrentRecord] = useState<
     LibraFortune.Ledger.LedgerEntryDTO | undefined
   >(undefined);
@@ -433,6 +494,7 @@ const LedgerEntry: React.FC = () => {
     Dayjs | undefined
   >(undefined);
   const [form] = Form.useForm<LedgerEntryFormValues>();
+  const [batchCategoryForm] = Form.useForm<BatchCategoryFormValues>();
   const detailValues = Form.useWatch('details', form) ?? [];
   const actionRef = useRef<ActionType | null>(null);
   const searchFormRef =
@@ -440,6 +502,25 @@ const LedgerEntry: React.FC = () => {
   const calculateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const originalAmountAutoFilledRef = useRef(false);
   const continuousEntryRef = useRef(false);
+
+  const onSearchReset = useCallback(() => {
+    const searchForm = searchFormRef.current;
+    if (!searchForm) return;
+    searchForm.setFieldsValue({
+      categoryIds: undefined,
+      dateRange: undefined,
+      name: undefined,
+      originalCurrency: undefined,
+      settlementCurrency: undefined,
+      tagIdIn: undefined,
+      tagSetId: undefined,
+      type: undefined,
+      username: undefined,
+    });
+    const { pathname, hash } = history.location;
+    history.replace({ pathname, search: '', hash });
+    searchForm.submit();
+  }, []);
 
   const memberOptions = useMemo(
     () =>
@@ -578,6 +659,7 @@ const LedgerEntry: React.FC = () => {
                 value: item.id!,
               })),
               required: tagSet.required,
+              value: tagSet.id!,
             })),
           );
           setAccountOptions(
@@ -877,6 +959,7 @@ const LedgerEntry: React.FC = () => {
       title: '原始金额',
       align: 'right',
       search: false,
+      sorter: true,
       width: 100,
       render: (_, record) => (
         <span>
@@ -885,16 +968,35 @@ const LedgerEntry: React.FC = () => {
       ),
     },
     {
+      dataIndex: 'originalCurrency',
+      title: '原始消费货币',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: currencyOptions,
+      },
+    },
+    {
       dataIndex: 'settlementAmount',
       title: '结算金额',
       align: 'right',
       search: false,
+      sorter: true,
       width: 100,
       render: (_, record) => (
         <span>
           {record.settlementAmount} {record.settlementCurrency}
         </span>
       ),
+    },
+    {
+      dataIndex: 'settlementCurrency',
+      title: '结算货币',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: currencyOptions,
+      },
     },
     {
       dataIndex: 'tagIdIn',
@@ -904,6 +1006,27 @@ const LedgerEntry: React.FC = () => {
       fieldProps: {
         mode: 'multiple',
         options: tagSetOptions,
+      },
+    },
+    {
+      dataIndex: 'tagSetId',
+      title: '标签组',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: tagSetOptions.map((tagSet) => ({
+          label: tagSet.name,
+          value: tagSet.value,
+        })),
+      },
+    },
+    {
+      dataIndex: 'username',
+      title: '分担人',
+      valueType: 'select',
+      hideInTable: true,
+      fieldProps: {
+        options: memberOptions,
       },
     },
     {
@@ -1005,7 +1128,7 @@ const LedgerEntry: React.FC = () => {
       LibraFortune.Ledger.LedgerEntryDTO,
       LedgerEntrySearchParams
     >['request']
-  > = async (params) => {
+  > = async (params, sorter) => {
     if (!ledgerId) {
       return { data: [], success: false, total: 0 };
     }
@@ -1018,6 +1141,27 @@ const LedgerEntry: React.FC = () => {
       categoryIds,
       ...query
     } = params;
+    const sortField = (['originalAmount', 'settlementAmount'] as const).find(
+      (field) => sorter[field],
+    );
+    const sortOrder = sortField ? (sorter[sortField] ?? undefined) : undefined;
+    const nextSearch = stringifySearchParams({
+      categoryIdL1: query.categoryIdL1,
+      categoryIdL2: query.categoryIdL2,
+      type: query.type,
+      dateBegin,
+      dateEnd,
+      nameLike: name,
+      originalCurrency: query.originalCurrency,
+      settlementCurrency: query.settlementCurrency,
+      username: query.username,
+      tagSetId: query.tagSetId,
+      tagIdIn: query.tagIdIn,
+    });
+    if (history.location.search.replace(/^\?/, '') !== nextSearch) {
+      const { pathname, hash } = history.location;
+      history.replace({ pathname, search: nextSearch, hash });
+    }
     const response = await entryApi.list(ledgerId, {
       current: current!,
       pageSize: pageSize!,
@@ -1026,6 +1170,8 @@ const LedgerEntry: React.FC = () => {
       dateBegin,
       dateEnd,
       ...query,
+      sortField: sortOrder ? sortField : undefined,
+      sortOrder,
     });
 
     return {
@@ -1113,12 +1259,55 @@ const LedgerEntry: React.FC = () => {
   const onRemoveButtonClick = (id: number) => {
     if (!ledgerId) return;
     entryApi.remove(ledgerId, id).then(() => {
+      setSelectedEntryIds((oldEntryIds) =>
+        oldEntryIds.filter((entryId) => entryId !== id),
+      );
       actionRef.current?.reload();
       messageApi.open({
         type: 'success',
         content: '删除成功',
       });
     });
+  };
+
+  const onBatchCategoryFinish = async (
+    values: BatchCategoryFormValues,
+  ): Promise<boolean> => {
+    if (!ledgerId || selectedEntryIds.length === 0) return false;
+    const categoryIds = values.categoryIds;
+    if (!categoryIds?.categoryIdL1 || !categoryIds.categoryIdL2) return false;
+
+    try {
+      const response = await entryApi.batchUpdateCategory(ledgerId, {
+        entryIds: selectedEntryIds,
+        categoryIdL1: categoryIds.categoryIdL1,
+        categoryIdL2: categoryIds.categoryIdL2,
+      });
+      setSelectedEntryIds([]);
+      actionRef.current?.reload();
+      messageApi.open({
+        type: 'success',
+        content: `已修改 ${response.data} 条账目分类`,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const onSelectedEntryIdsChange = (selectedRowKeys: React.Key[]) => {
+    const nextEntryIds = selectedRowKeys.flatMap((key) => {
+      const entryId = Number(key);
+      return Number.isInteger(entryId) && entryId > 0 ? [entryId] : [];
+    });
+    if (nextEntryIds.length > 1000) {
+      messageApi.open({
+        type: 'warning',
+        content: '单次最多选择 1000 条账目',
+      });
+      return;
+    }
+    setSelectedEntryIds(nextEntryIds);
   };
 
   return (
@@ -1140,12 +1329,43 @@ const LedgerEntry: React.FC = () => {
         columns={columns}
         defaultSize="small"
         formRef={searchFormRef}
+        form={{
+          initialValues: initialSearchParams,
+        }}
+        onReset={onSearchReset}
         rowKey="id"
+        rowSelection={{
+          fixed: true,
+          preserveSelectedRowKeys: true,
+          selectedRowKeys: selectedEntryIds,
+          onChange: onSelectedEntryIdsChange,
+        }}
         request={onRequest}
         search={{
           labelWidth: 'auto',
         }}
         scroll={{ x: 1340 }}
+        tableAlertOptionRender={() => (
+          <Space size={4}>
+            <Button
+              size="small"
+              type="primary"
+              onClick={() => {
+                batchCategoryForm.resetFields();
+                setBatchCategoryVisible(true);
+              }}
+            >
+              修改分类
+            </Button>
+            <Button
+              size="small"
+              type="text"
+              onClick={() => setSelectedEntryIds([])}
+            >
+              清空选择
+            </Button>
+          </Space>
+        )}
         toolBarRender={() => [
           <Button
             key="create"
@@ -1157,6 +1377,44 @@ const LedgerEntry: React.FC = () => {
           </Button>,
         ]}
       />
+      <ModalForm<BatchCategoryFormValues>
+        form={batchCategoryForm}
+        title={`批量修改分类（${selectedEntryIds.length} 条）`}
+        open={batchCategoryVisible}
+        onOpenChange={(open) => {
+          setBatchCategoryVisible(open);
+          if (!open) {
+            batchCategoryForm.resetFields();
+          }
+        }}
+        onFinish={onBatchCategoryFinish}
+        submitter={{
+          searchConfig: {
+            submitText: '确认修改',
+          },
+        }}
+        modalProps={{
+          destroyOnHidden: true,
+          width: 720,
+        }}
+      >
+        <Form.Item
+          name="categoryIds"
+          label="分类"
+          rules={[
+            {
+              validator: async (_, value?: CategorySelectorValue) => {
+                if (value?.categoryIdL1 && value.categoryIdL2) {
+                  return;
+                }
+                throw new Error('请选择分类');
+              },
+            },
+          ]}
+        >
+          <CategoryTagSelector categories={categories} />
+        </Form.Item>
+      </ModalForm>
       <ModalForm<LedgerEntryFormValues>
         form={form}
         title={currentRecord?.id ? '编辑条目' : '新增条目'}

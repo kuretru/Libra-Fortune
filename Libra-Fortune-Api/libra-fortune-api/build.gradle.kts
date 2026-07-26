@@ -1,16 +1,15 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.5"
+    id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "com.kuretru.web"
 version = "0.4.0"
 
-val mybatisPlusVersion = "3.5.16"
+val mybatisPlusVersion = "3.5.17"
 val mapstructVersion = "1.6.3"
 val springdocOpenapiVersion = "3.0.3"
-val guavaVersion = "33.5.0-jre"
 
 java {
     toolchain {
@@ -22,6 +21,7 @@ dependencies {
     implementation("com.kuretru.microservices:galaxy-common:0.0.1-SNAPSHOT")
     implementation("com.kuretru.microservices:galaxy-web:0.0.1-SNAPSHOT")
     implementation("com.kuretru.microservices:galaxy-authentication:1.0.0")
+    implementation("com.kuretru.microservices:galaxy-dashboard:0.0.1-SNAPSHOT")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -29,7 +29,6 @@ dependencies {
     implementation("com.baomidou:mybatis-plus-spring-boot4-starter:${mybatisPlusVersion}")
     implementation("com.baomidou:mybatis-plus-jsqlparser:${mybatisPlusVersion}")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenapiVersion}")
-    implementation("com.google.guava:guava:$guavaVersion")
 
     runtimeOnly("com.mysql:mysql-connector-j")
 

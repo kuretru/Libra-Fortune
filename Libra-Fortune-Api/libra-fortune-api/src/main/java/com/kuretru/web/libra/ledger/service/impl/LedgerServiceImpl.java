@@ -32,7 +32,7 @@ public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, Le
     public void verifyCanManagerEntry(Long ledgerId) throws ServiceException {
         var ledger = mapper.selectById(ledgerId);
         if (ledger == null) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "账本不存在");
+            throw UserErrorCodes.ACCESS_PERMISSION_ERROR.asException("账本不存在");
         }
 
         var username = CurrentUserContext.getUsername();
@@ -45,12 +45,12 @@ public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, Le
                 return;
             }
         }
-        throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "没有账本条目管理权限");
+        throw UserErrorCodes.ACCESS_PERMISSION_ERROR.asException("没有账本条目管理权限");
     }
 
     private void verifyIsOwner(LedgerDO record) throws ServiceException {
         if (!CurrentUserContext.getUsername().equals(record.getOwner())) {
-            throw ServiceException.build(UserErrorCodes.ACCESS_PERMISSION_ERROR, "仅账本Owner可以操作");
+            throw UserErrorCodes.ACCESS_PERMISSION_ERROR.asException("仅账本Owner可以操作");
         }
     }
 
@@ -94,14 +94,14 @@ public class LedgerServiceImpl extends BaseSequencedServiceImpl<LedgerMapper, Le
     }
 
     @Override
-    protected LedgerDO beforeSave(LedgerDTO record) throws ServiceException {
+    protected LedgerDO beforeCreate(LedgerDTO record) throws ServiceException {
         record.setOwner(CurrentUserContext.getUsername());
-        return super.beforeSave(record);
+        return super.beforeCreate(record);
     }
 
     @Override
-    protected LedgerDTO afterSave(LedgerDO record, LedgerDTO raw) throws ServiceException {
-        var result = super.afterSave(record, raw);
+    protected LedgerDTO afterCreate(LedgerDO record, LedgerDTO raw) throws ServiceException {
+        var result = super.afterCreate(record, raw);
         result.setMembers(memberService.syncByParentId(record.getId(), raw.getMembers()));
         return result;
     }
