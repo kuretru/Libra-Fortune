@@ -38,7 +38,7 @@ public class MetadataCurrencyController
     @Parameter(name = "idList", description = "新顺序的记录ID列表")
     public ApiResponse<String> reorder(@RequestBody List<Long> idList) throws ServiceException {
         if (idList == null || idList.isEmpty()) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定ID列表");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定ID列表");
         }
         service.reorder(idList);
         return ApiResponse.success("重新排序成功");

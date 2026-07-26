@@ -56,7 +56,7 @@ public class LedgerEntryController extends BaseRestController<LedgerEntryService
     @Override
     public ApiResponse<LedgerEntryDTO> create(@Parameter(description = "记录内容", required = true) @Validated @RequestBody LedgerEntryDTO record) throws ServiceException {
         if (record == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定记录");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定记录");
         }
         record.setLedgerId(getLedgerId());
         return super.create(record);
@@ -68,7 +68,7 @@ public class LedgerEntryController extends BaseRestController<LedgerEntryService
     public ApiResponse<LedgerEntryDTO> update(@Parameter(description = "记录ID") @PathVariable Long id,
                                               @Parameter(description = "记录内容", required = true) @Validated @RequestBody LedgerEntryDTO record) throws ServiceException {
         if (record == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定记录");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定记录");
         }
         record.setLedgerId(getLedgerId());
         return super.update(id, record);
@@ -100,10 +100,10 @@ public class LedgerEntryController extends BaseRestController<LedgerEntryService
 
     private void verifyLedgerId(Long ledgerId, LedgerEntryDTO record) {
         if (record == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定资源不存在");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("指定资源不存在");
         }
         if (!ledgerId.equals(record.getLedgerId())) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定条目不属于该账本");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("指定条目不属于该账本");
         }
     }
 

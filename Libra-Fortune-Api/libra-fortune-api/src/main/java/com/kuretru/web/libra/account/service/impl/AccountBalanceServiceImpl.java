@@ -97,7 +97,7 @@ public class AccountBalanceServiceImpl implements AccountBalanceService {
         var accountIdList = accountList.stream().map(AccountDTO::getId).toList();
         for (var balance : request.getBalances()) {
             if (!accountIdList.contains(balance.getAccountId())) {
-                throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("你不是账户[%d]的Owner", balance.getAccountId()));
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(String.format("你不是账户[%d]的Owner", balance.getAccountId()));
             }
         }
 

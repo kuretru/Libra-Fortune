@@ -80,13 +80,13 @@ public class MetadataTagSetServiceImpl extends BaseSequencedServiceImpl<Metadata
                 }
             }
             if (tagSet.getRequired() && !hasOne) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("[%s]标签为必选项但未选择", tagSet.getName()));
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(String.format("[%s]标签为必选项但未选择", tagSet.getName()));
             } else if (!tagSet.getAllowMultiple() && hasMultiple) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("[%s]标签不允许多选", tagSet.getName()));
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(String.format("[%s]标签不允许多选", tagSet.getName()));
             }
         }
         if (!tagSetItemIdSet.isEmpty()) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, String.format("未知的标签[%s]", ListFormat.getInstance().format(new ArrayList<>(tagSetItemIdSet))));
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(String.format("未知的标签[%s]", ListFormat.getInstance().format(new ArrayList<>(tagSetItemIdSet))));
         }
     }
 

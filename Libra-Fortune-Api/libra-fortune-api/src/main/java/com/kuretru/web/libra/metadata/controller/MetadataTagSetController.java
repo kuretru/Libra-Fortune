@@ -37,7 +37,7 @@ public class MetadataTagSetController extends BaseSequencedRestController<Metada
     @Operation(summary = "创建新记录")
     public ApiResponse<MetadataTagSetItemDTO> create(@Parameter(description = "标签组ID") @PathVariable Long setId, @Parameter(description = "记录内容", required = true) @Validated @RequestBody MetadataTagSetItemDTO record) throws ServiceException {
         if (record == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定记录");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定记录");
         }
         record.setSetId(setId);
         var result = itemService.create(record);
@@ -48,11 +48,11 @@ public class MetadataTagSetController extends BaseSequencedRestController<Metada
     @Operation(summary = "更新记录")
     public ApiResponse<MetadataTagSetItemDTO> update(@Parameter(description = "标签组ID") @PathVariable Long setId, @Parameter(description = "记录ID") @PathVariable Long id, @Parameter(description = "记录内容", required = true) @Validated @RequestBody MetadataTagSetItemDTO record) throws ServiceException {
         if (id == null || id == 0) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定ID或ID错误");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定ID或ID错误");
         } else if (record == null) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定记录");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定记录");
         } else if (!id.equals(record.getId())) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "指定ID与记录ID不符");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("指定ID与记录ID不符");
         }
         record.setId(id);
         var result = itemService.update(record);
@@ -63,7 +63,7 @@ public class MetadataTagSetController extends BaseSequencedRestController<Metada
     @Operation(summary = "根据ID删除记录")
     public ApiResponse<String> remove(@Parameter(description = "记录ID") @PathVariable Long id) throws ServiceException {
         if (id == null || id == 0) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定ID或ID错误");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定ID或ID错误");
         }
         itemService.remove(id);
         return ApiResponse.removed("资源已删除");
@@ -74,14 +74,14 @@ public class MetadataTagSetController extends BaseSequencedRestController<Metada
     @Parameter(name = "idList", description = "新顺序的记录ID列表")
     public ApiResponse<String> reorderItems(@Parameter(description = "标签组ID") @PathVariable Long setId, @RequestBody List<Long> idList) throws ServiceException {
         if (idList == null || idList.isEmpty()) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "未指定ID列表");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("未指定ID列表");
         }
 
         var itemIdList = itemService.listByParentId(setId).stream()
                 .map(MetadataTagSetItemDTO::getId)
                 .toList();
         if (!itemIdList.containsAll(idList)) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, "标签ID不属于指定标签组");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("标签ID不属于指定标签组");
         }
 
         itemService.reorder(idList);

@@ -183,23 +183,20 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         queryWrapper.last("FOR UPDATE");
         var records = mapper.selectList(queryWrapper);
         if (records.size() != entryIds.size()) {
-            throw ServiceException.build(
-                    UserErrorCodes.REQUEST_PARAMETER_ERROR,
-                    "部分条目不存在或不属于该账本"
-            );
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("部分条目不存在或不属于该账本");
         }
         return entryIds;
     }
 
     private List<Long> normalizeIds(List<Long> rawIds, String name) {
         if (rawIds == null || rawIds.isEmpty()) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, name + "ID列表不能为空");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "ID列表不能为空");
         }
         if (rawIds.size() > 1000) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, name + "ID不能超过1000个");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "ID不能超过1000个");
         }
         if (rawIds.stream().anyMatch(id -> id == null || id <= 0)) {
-            throw ServiceException.build(UserErrorCodes.REQUEST_PARAMETER_ERROR, name + "ID不合法");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "ID不合法");
         }
         return new ArrayList<>(new LinkedHashSet<>(rawIds));
     }
@@ -253,15 +250,15 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 
         // 校验日期
         if (record.getDate().isAfter(LocalDate.now())) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "不能添加今天之后的条目");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("不能添加今天之后的条目");
         }
 
         // 校验货币类型
         var currencies = currencyService.enums().stream().map(EnumDTO::getValue).toList();
         if (!currencies.contains(record.getOriginalCurrency())) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "原始消费货币类型不合法");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("原始消费货币类型不合法");
         } else if (!currencies.contains(record.getSettlementCurrency())) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "结算货币类型不合法");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("结算货币类型不合法");
         }
 
         // 校验标签
@@ -275,7 +272,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     private void verifyCategory(Long categoryIdL1, Long categoryIdL2) throws ServiceException {
         var category = categoryService.get(categoryIdL2);
         if (category == null) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类不存在");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("账本分类不存在");
         }
         if (category.getParentId() != null && category.getParentId().equals(categoryIdL1)) {
             var parent = categoryService.get(category.getParentId());
@@ -283,26 +280,26 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
                 return;
             }
         }
-        throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "账本分类路径不合法");
+        throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("账本分类路径不合法");
     }
 
     private void verifyDetails(LedgerEntryDTO entry, List<LedgerEntryDetailDTO> details) throws ServiceException {
         if (details.isEmpty()) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目明细不能为空");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("条目明细不能为空");
         }
         var sum = new BigDecimal(0);
         var ratioSum = new BigDecimal(0);
         var fundedUsernameSet = new HashSet<String>();
         for (var detail : details) {
             if (entry.getId() != null && detail.getEntryId() != null && !detail.getEntryId().equals(entry.getId())) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "条目详情不属于该条目");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("条目详情不属于该条目");
             }
             var percent = detail.getAmount().divide(entry.getSettlementAmount(), 4, RoundingMode.HALF_DOWN).multiply(HUNDRED).setScale(2, RoundingMode.HALF_DOWN);
             if (!percent.equals(detail.getFundedRatio())) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担金额与分担比例对不上");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担金额与分担比例对不上");
             }
             if (fundedUsernameSet.contains(detail.getUsername())) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担人重复");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担人重复");
             }
             verifyPaymentChain(detail.getPaymentChain());
             fundedUsernameSet.add(detail.getUsername());
@@ -310,9 +307,9 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             ratioSum = ratioSum.add(detail.getFundedRatio());
         }
         if (sum.compareTo(entry.getSettlementAmount()) != 0) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "明细金额总和不等于结算金额");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("明细金额总和不等于结算金额");
         } else if (ratioSum.compareTo(HUNDRED) != 0) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "分担比例总和不等于100.00%");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担比例总和不等于100.00%");
         }
     }
 
@@ -321,14 +318,14 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             return;
         }
         if (paymentChain.contains(null)) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链不能包含空账户");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("付款链不能包含空账户");
         }
         if (new HashSet<>(paymentChain).size() != paymentChain.size()) {
-            throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链账户不能重复");
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("付款链账户不能重复");
         }
         for (Long accountId : paymentChain) {
             if (accountService.get(accountId) == null) {
-                throw new ServiceException(UserErrorCodes.REQUEST_PARAMETER_ERROR, "付款链账户不存在");
+                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("付款链账户不存在");
             }
         }
     }
