@@ -39,7 +39,7 @@ const OfflineBanner: React.FC = () => {
         zIndex: 10,
         maxWidth: 480,
       }}
-      message={'当前处于离线状态，部分功能可能不可用'}
+      title="当前处于离线状态，部分功能可能不可用"
     />
   );
 };

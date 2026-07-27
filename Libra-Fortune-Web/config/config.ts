@@ -196,6 +196,14 @@ export default defineConfig({
       mock: false,
     },
   ],
+
+  tailwindcss: {},
+
+  mock: {
+    include: ['src/pages/**/_mock.ts'],
+    exclude: ['mock/requestRecord.mock.js'],
+  },
+
   utoopack: {
     module: {
       rules: {
