@@ -1168,7 +1168,7 @@ const DashboardAnalysis: React.FC = () => {
         onClose={() => setQueryDrawerOpen(false)}
         open={queryDrawerOpen}
         title="查询条件"
-        width="min(760px, 100vw)"
+        size="min(760px, 100vw)"
       >
         <Form<AnalysisFormValues>
           form={form}
