@@ -1,11 +1,12 @@
 import { StatisticCard } from '@ant-design/pro-components';
 import { Space, Typography, theme } from 'antd';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import * as dashboardApi from '@/services/libra-fortune/ledger/dashboard';
 import { formatAmount } from '@/utils/format';
+import type { DashboardTimeRange } from './types';
 
 type MonthlyUserExpenseCardProps = {
+  timeRange: DashboardTimeRange;
   username?: string;
 };
 
@@ -42,6 +43,7 @@ const SubStatistic: React.FC<{ title: string; value: string }> = ({
 };
 
 const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
+  timeRange,
   username,
 }) => {
   const [loading, setLoading] = useState(false);
@@ -59,15 +61,15 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
       return;
     }
 
-    const now = dayjs();
     const baseDimensionsFilter: DimensionFilter[] = [
       { name: 'type', operator: 'in', values: ['expense'] },
+      { name: 'settlementCurrency', operator: 'in', values: ['CNY'] },
       { name: 'username', operator: 'in', values: [username] },
     ];
     const baseQuery: DashboardQuery = {
       time: {
-        dateBegin: now.startOf('month').format('YYYY-MM-DD'),
-        dateEnd: now.endOf('month').format('YYYY-MM-DD'),
+        dateBegin: timeRange.dateBegin,
+        dateEnd: timeRange.dateEnd,
         dimension: null,
       },
       metrics: ['fundedSum'] as LibraFortune.Ledger.DashboardMetric[],
@@ -119,13 +121,13 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
     return () => {
       mounted = false;
     };
-  }, [username]);
+  }, [timeRange.dateBegin, timeRange.dateEnd, username]);
 
   return (
     <StatisticCard
       loading={loading}
       statistic={{
-        title: <strong>本月支出</strong>,
+        title: <strong>支出统计</strong>,
         value: amount,
         prefix: '¥',
         description: (

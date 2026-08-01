@@ -13,12 +13,12 @@ export default [
       {
         name: '统计',
         path: '/dashboard/statistics',
-        component: './ledger/dashboard',
+        component: './dashboard',
       },
       {
         name: '分析',
         path: '/dashboard/analysis',
-        component: './ledger/dashboard/analysis',
+        component: './dashboard/analysis',
       },
     ],
   },

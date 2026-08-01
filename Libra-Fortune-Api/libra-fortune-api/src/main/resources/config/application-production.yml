@@ -8,9 +8,6 @@ spring:
     username:
     password:
     url:
-  redis:
-    host:
-    password:
   web:
     resources:
       static-locations: file:/web
