@@ -37,7 +37,7 @@ export async function currentUser(): Promise<API.CurrentUser> {
 
   return {
     userid: payload.sub,
-    name: payload.name || payload.nickname || payload.preferred_username,
+    name: payload.name,
     email: payload.email,
     access: payload.groups?.includes('admin') ? 'admin' : 'user',
   };
