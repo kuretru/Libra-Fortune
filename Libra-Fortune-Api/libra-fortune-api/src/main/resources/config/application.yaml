@@ -15,11 +15,6 @@ spring:
     username: ${MYSQL_USERNAME:libra}
     password: ${MYSQL_PASSWORD:123456}
     url: jdbc:mysql://${MYSQL_HOSTNAME:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_SCHEMA:libra}?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
-  redis:
-    host: ${REDIS_HOST:127.0.0.1}
-    password: ${REDIS_PASSWORD:}
-    port: ${REDIS_PORT:6379}
-    database: ${REDIS_DATABASE:4}
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
