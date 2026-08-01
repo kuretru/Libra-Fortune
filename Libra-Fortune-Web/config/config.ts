@@ -1,5 +1,6 @@
 // https://umijs.org/config/
 
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { defineConfig } from '@umijs/max';
 import defaultSettings from './defaultSettings';
@@ -8,6 +9,7 @@ import proxy from './proxy';
 import routes from './routes';
 
 const { UMI_ENV = 'dev' } = process.env;
+const projectReadme = readFileSync(join(__dirname, '../../README.md'), 'utf-8');
 
 // Compute commit hash: env vars take precedence, fall back to git at build time
 const commitHash =
@@ -222,5 +224,6 @@ export default defineConfig({
     __APP_VERSION__: require('./../package.json').version,
     __UMI_VERSION__: require('@umijs/max/package.json').version,
     __UTOO_VERSION__: require('@utoo/pack/package.json').version,
+    __PROJECT_README__: projectReadme,
   },
 });

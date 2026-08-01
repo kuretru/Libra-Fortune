@@ -29,3 +29,4 @@ declare namespace API {
 declare const __APP_VERSION__: string;
 declare const __UMI_VERSION__: string;
 declare const __UTOO_VERSION__: string;
+declare const __PROJECT_README__: string;
