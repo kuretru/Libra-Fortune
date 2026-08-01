@@ -72,6 +72,12 @@ type Option<T extends string | number = string | number> = {
   value: T;
 };
 
+type CategoryCascaderOption = {
+  label: string;
+  value: number;
+  children?: CategoryCascaderOption[];
+};
+
 type GroupedTagOption = {
   allowMultiple: boolean;
   label: string;
@@ -100,7 +106,7 @@ type PaymentChainEditorProps = {
 };
 
 type LedgerEntrySearchParams = LibraFortune.Ledger.LedgerEntryQuery & {
-  categoryIds?: string;
+  categoryIds?: number[];
   dateRange?: string[];
   name?: string;
   tagId?: number[];
@@ -158,23 +164,17 @@ const ratioToUnits = (value: string): bigint | undefined => {
   return BigInt(match[1]) * 100n + BigInt((match[2] ?? '').padEnd(2, '0'));
 };
 
-const flattenCategoryQueryOptions = (
+const buildCategoryQueryOptions = (
   records: GalaxyWeb.EnumDTO<number>[],
-  prefix = '',
-): Option<string>[] =>
-  records.flatMap((record) => {
-    const label = `${prefix}${record.label}`;
-    return [
-      {
-        label,
-        value: String(record.value),
-      },
-      ...(record.children ?? []).map((child) => ({
-        label: `${label} / ${child.label}`,
-        value: `${record.value},${child.value}`,
-      })),
-    ];
-  });
+): CategoryCascaderOption[] =>
+  records.map((record) => ({
+    label: record.label,
+    value: record.value,
+    children: record.children?.map((child) => ({
+      label: child.label,
+      value: child.value,
+    })),
+  }));
 
 const buildCategoryNameMap = (
   categories: GalaxyWeb.EnumDTO<number>[],
@@ -193,8 +193,8 @@ const findParentCategory = (
   categoryIdL1?: number,
 ) => categories.find((category) => category.value === categoryIdL1);
 
-const parseCategoryQueryValue = (value?: string) => {
-  const [rawCategoryIdL1, rawCategoryIdL2] = (value ?? '').split(',');
+const parseCategoryQueryValue = (value?: (number | string)[]) => {
+  const [rawCategoryIdL1, rawCategoryIdL2] = value ?? [];
   const categoryIdL1 = rawCategoryIdL1 ? Number(rawCategoryIdL1) : undefined;
   const categoryIdL2 = rawCategoryIdL2 ? Number(rawCategoryIdL2) : undefined;
   return {
@@ -209,6 +209,13 @@ const parsePositiveInteger = (value: string | null): number | undefined => {
   return Number.isInteger(result) && result > 0 ? result : undefined;
 };
 
+const parseCategoryPath = (value: string | null): number[] | undefined => {
+  const [categoryIdL1, categoryIdL2] =
+    value?.split(',').map((item) => parsePositiveInteger(item)) ?? [];
+  if (!categoryIdL1) return undefined;
+  return categoryIdL2 ? [categoryIdL1, categoryIdL2] : [categoryIdL1];
+};
+
 const parseSearchParams = (search: string): LedgerEntrySearchParams => {
   const params = new URLSearchParams(search);
   const dateBegin = params.get('dateBegin');
@@ -216,9 +223,11 @@ const parseSearchParams = (search: string): LedgerEntrySearchParams => {
   const categoryIdL1 = parsePositiveInteger(params.get('categoryIdL1'));
   const categoryIdL2 = parsePositiveInteger(params.get('categoryIdL2'));
   const categoryIds =
-    params.get('categoryIds') ??
+    parseCategoryPath(params.get('categoryIds')) ??
     (categoryIdL1
-      ? [categoryIdL1, categoryIdL2].filter(Boolean).join(',')
+      ? [categoryIdL1, categoryIdL2].filter(
+          (categoryId): categoryId is number => categoryId !== undefined,
+        )
       : undefined);
   const tagId = [...params.getAll('tagIdIn'), ...params.getAll('tagItemId')]
     .flatMap((value) => value.split(','))
@@ -479,7 +488,7 @@ const LedgerEntry: React.FC = () => {
   >(undefined);
   const [categories, setCategories] = useState<GalaxyWeb.EnumDTO<number>[]>([]);
   const [categoryQueryOptions, setCategoryQueryOptions] = useState<
-    Option<string>[]
+    CategoryCascaderOption[]
   >([]);
   const [currencyOptions, setCurrencyOptions] = useState<Option<string>[]>([]);
   const [tagSetOptions, setTagSetOptions] = useState<GroupedTagOption[]>([]);
@@ -646,7 +655,7 @@ const LedgerEntry: React.FC = () => {
           setLedger(ledgerResponse.data);
           setCategories(categoryResponse.data);
           setCategoryQueryOptions(
-            flattenCategoryQueryOptions(categoryResponse.data),
+            buildCategoryQueryOptions(categoryResponse.data),
           );
           setCurrencyOptions(currencyResponse.data);
           setTagSetOptions(
@@ -943,12 +952,24 @@ const LedgerEntry: React.FC = () => {
     {
       dataIndex: 'categoryIds',
       title: '分类',
-      valueType: 'select',
+      valueType: 'cascader',
       fieldProps: {
+        changeOnSelect: true,
+        displayRender: (labels: string[]) => labels.join(' > '),
         options: categoryQueryOptions,
+        placeholder: '请选择分类',
+        showSearch: {
+          filter: (
+            inputValue: string,
+            path: CategoryCascaderOption[],
+          ): boolean =>
+            path.some((option) =>
+              option.label.toLowerCase().includes(inputValue.toLowerCase()),
+            ),
+        },
       },
       search: {
-        transform: (value: string) => parseCategoryQueryValue(value),
+        transform: (value: number[]) => parseCategoryQueryValue(value),
       },
       renderText: (_, record) =>
         categoryNameMap.get(record.categoryIdL2) ?? record.categoryIdL2,
