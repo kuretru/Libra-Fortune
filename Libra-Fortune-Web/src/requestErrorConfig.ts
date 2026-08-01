@@ -4,6 +4,14 @@ import { history } from '@umijs/max';
 import { message } from 'antd';
 import { ACCESS_TOKEN_STORAGE_KEY } from '@/services/cloud-sso';
 
+type MessageApi = Pick<typeof message, 'error' | 'info' | 'warning'>;
+
+let messageApi: MessageApi = message;
+
+export const setMessageApi = (api: MessageApi) => {
+  messageApi = api;
+};
+
 // 错误处理方案： 错误类型
 // enum ErrorShowType {
 //   SILENT = 0,
@@ -93,16 +101,16 @@ const handleApiErrorResponse = (response: GalaxyWeb.ApiResponse<unknown>) => {
     case 'ignore':
       return;
     case 'info':
-      message.info(content);
+      messageApi.info(content);
       return;
     case 'warn':
-      message.warning(content);
+      messageApi.warning(content);
       return;
     case 'login':
       redirectToLogin();
       return;
     default:
-      message.error(content);
+      messageApi.error(content);
   }
 };
 
@@ -140,16 +148,16 @@ export const errorConfig: RequestConfig = {
         // Axios 的错误
         // 请求成功发出且服务器也响应了状态码，但状态代码超出了 2xx 的范围
         const fallbackMessage = getHttpErrorMessage(error);
-        message.error(fallbackMessage);
+        messageApi.error(fallbackMessage);
       } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
         const fallbackMessage = '网络不可用，请检查网络连接后重试。';
-        message.error(fallbackMessage);
+        messageApi.error(fallbackMessage);
       } else if (error.request) {
         const fallbackMessage = '服务未响应，请稍后重试。';
-        message.error(fallbackMessage);
+        messageApi.error(fallbackMessage);
       } else {
         const fallbackMessage = '请求失败，请稍后重试。';
-        message.error(fallbackMessage);
+        messageApi.error(fallbackMessage);
       }
     },
   },
