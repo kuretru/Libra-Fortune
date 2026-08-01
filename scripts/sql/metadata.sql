@@ -11,7 +11,7 @@ CREATE TABLE `metadata_category` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_parent_id_name` (`parent_id`,`name`) USING BTREE,
   KEY `idx_parent_id` (`parent_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·账本分类表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·账本分类表';
 
 CREATE TABLE `metadata_currency` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -25,7 +25,7 @@ CREATE TABLE `metadata_currency` (
   `sequence` int NOT NULL COMMENT '排序标识',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·货币单位表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·货币单位表';
 
 CREATE TABLE `metadata_tag_set` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -39,7 +39,7 @@ CREATE TABLE `metadata_tag_set` (
   `sequence` int NOT NULL COMMENT '排序标识',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·标签组表'
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·标签组表';
 
 CREATE TABLE `metadata_tag_set_item` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -52,4 +52,4 @@ CREATE TABLE `metadata_tag_set_item` (
   `sequence` int NOT NULL COMMENT '排序标识',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_set_id_name` (`set_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·标签组元素表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='元数据·标签组元素表';
