@@ -2,12 +2,25 @@ import {jwtDecode} from 'jwt-decode';
 
 const OAUTH_STATE_STORAGE_KEY = 'cloudSso.state';
 const OAUTH_REDIRECT_STORAGE_KEY = 'cloudSso.redirect';
+const AUTO_LOGIN_STORAGE_KEY = 'cloudSso.autoLogin';
 export const ACCESS_TOKEN_STORAGE_KEY = 'accessToken';
 const SSO_CLIENT_ID = 'U9XLAUhQIiyfwscUfdQwRmnBJvfTIbcAxXuMZJYa';
 const SSO_AUTHORIZE_URL = 'https://sso.i5zhen.com/application/o/authorize/';
 const SSO_TOKEN_URL = 'https://sso.i5zhen.com/application/o/token/';
 
 const getRedirectUri = () => `${window.location.origin}/#/user/login`;
+
+export function isAutoLoginEnabled() {
+  return localStorage.getItem(AUTO_LOGIN_STORAGE_KEY) === 'true';
+}
+
+export function setAutoLoginEnabled(enabled: boolean) {
+  if (enabled) {
+    localStorage.setItem(AUTO_LOGIN_STORAGE_KEY, 'true');
+  } else {
+    localStorage.removeItem(AUTO_LOGIN_STORAGE_KEY);
+  }
+}
 
 export async function currentUser(): Promise<API.CurrentUser> {
   const token = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);

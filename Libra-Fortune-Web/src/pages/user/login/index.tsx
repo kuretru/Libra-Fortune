@@ -2,9 +2,14 @@ import { LoginForm, ProFormCheckbox } from '@ant-design/pro-components';
 import { Helmet, useModel } from '@umijs/max';
 import { App, Flex, Skeleton, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
-import React, { startTransition, useEffect } from 'react';
+import React, { startTransition, useEffect, useRef } from 'react';
 import { Footer } from '@/components';
-import { accessToken, authorization } from '@/services/cloud-sso';
+import {
+  accessToken,
+  authorization,
+  isAutoLoginEnabled,
+  setAutoLoginEnabled,
+} from '@/services/cloud-sso';
 import Settings from '../../../../config/defaultSettings';
 
 const getLocationSearchParams = () => {
@@ -20,6 +25,10 @@ const getLocationSearchParams = () => {
 const getHashRouteUrl = (route: string) => {
   const normalizedRoute = route.startsWith('/') ? route : '/welcome';
   return `${window.location.origin}/#${normalizedRoute}`;
+};
+
+type LoginFormValues = {
+  autoLogin?: boolean;
 };
 
 const useStyles = createStyles(({ token }) => {
@@ -62,6 +71,7 @@ const Login: React.FC = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const { styles } = useStyles();
   const { message } = App.useApp();
+  const autoLoginStartedRef = useRef(false);
 
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.();
@@ -80,8 +90,20 @@ const Login: React.FC = () => {
       const searchParams = getLocationSearchParams();
       const code = searchParams.get('code');
       const state = searchParams.get('state');
+      const hasSsoCallback = Boolean(code || state);
 
-      if (!code || !state) return;
+      if (!code || !state) {
+        if (
+          !hasSsoCallback &&
+          isAutoLoginEnabled() &&
+          !autoLoginStartedRef.current
+        ) {
+          autoLoginStartedRef.current = true;
+          const redirect = searchParams.get('redirect') || '';
+          authorization(redirect);
+        }
+        return;
+      }
 
       try {
         const redirect = await accessToken(code, state);
@@ -96,7 +118,8 @@ const Login: React.FC = () => {
     completeSsoLogin();
   }, [message]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: LoginFormValues) => {
+    setAutoLoginEnabled(Boolean(values.autoLogin));
     const searchParams = getLocationSearchParams();
     const redirect = searchParams.get('redirect') || '';
     authorization(redirect);
@@ -116,7 +139,7 @@ const Login: React.FC = () => {
           padding: '32px 0',
         }}
       >
-        <LoginForm
+        <LoginForm<LoginFormValues>
           contentStyle={{
             minWidth: 280,
             maxWidth: '75vw',
@@ -124,8 +147,16 @@ const Login: React.FC = () => {
           logo={<img alt="logo" src="/logo.svg" />}
           title="天秤·财富"
           subTitle={'家庭多人记账中心'}
-          onFinish={async () => {
-            await handleSubmit();
+          initialValues={{
+            autoLogin: isAutoLoginEnabled(),
+          }}
+          onFinish={async (values) => {
+            await handleSubmit(values);
+          }}
+          onValuesChange={(changedValues) => {
+            if ('autoLogin' in changedValues) {
+              setAutoLoginEnabled(Boolean(changedValues.autoLogin));
+            }
           }}
         >
           <Tabs
