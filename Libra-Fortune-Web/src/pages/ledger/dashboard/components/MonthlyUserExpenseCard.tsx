@@ -129,7 +129,7 @@ const MonthlyUserExpenseCard: React.FC<MonthlyUserExpenseCardProps> = ({
         value: amount,
         prefix: '¥',
         description: (
-          <Space direction="vertical" size={2}>
+          <Space vertical size={2}>
             <SubStatistic title="必要支出" value={necessaryAmount} />
             <SubStatistic title="必要可削减" value={reducibleAmount} />
             <SubStatistic title="非必要" value={unnecessaryAmount} />

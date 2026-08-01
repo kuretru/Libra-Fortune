@@ -11,7 +11,7 @@ CREATE TABLE `account` (
   `sequence` int NOT NULL COMMENT '排序标识',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_owner_name` (`owner`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账户管理·账户表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账户管理·账户表';
 
 CREATE TABLE `account_balance` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -24,4 +24,4 @@ CREATE TABLE `account_balance` (
   `balance` decimal(9,2) NOT NULL COMMENT '余额',
   PRIMARY KEY (`id`),
   KEY `idx_account_id` (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账户管理·账户余额表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账户管理·账户余额表';

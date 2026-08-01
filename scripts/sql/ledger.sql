@@ -9,7 +9,7 @@ CREATE TABLE `ledger_v2` (
   `sequence` int NOT NULL COMMENT '排序标识',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_owner_name` (`owner`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本表';
 
 CREATE TABLE `ledger_v2_entry` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -30,7 +30,7 @@ CREATE TABLE `ledger_v2_entry` (
   `remark` text COLLATE utf8mb4_general_ci COMMENT '备注',
   PRIMARY KEY (`id`),
   KEY `idx_main` (`ledger_id`,`category_id_l1`,`category_id_l2`,`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本条目表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本条目表';
 
 CREATE TABLE `ledger_v2_entry_detail` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -46,7 +46,7 @@ CREATE TABLE `ledger_v2_entry_detail` (
   `amount` decimal(10,2) NOT NULL COMMENT '承担金额',
   PRIMARY KEY (`id`),
   KEY `idx_entry_id` (`entry_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本条目详情表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本条目详情表';
 
 CREATE TABLE `ledger_v2_entry_tag` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -57,7 +57,7 @@ CREATE TABLE `ledger_v2_entry_tag` (
   PRIMARY KEY (`id`),
   KEY `idx_entry_id` (`entry_id`),
   KEY `idx_tag_id` (`tag_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本条目标签表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本条目标签表';
 
 CREATE TABLE `ledger_v2_member` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '物理主键，自增',
@@ -70,4 +70,4 @@ CREATE TABLE `ledger_v2_member` (
   `default_funded_ratio` decimal(5,2) NOT NULL COMMENT '百分数，默认承担比例',
   PRIMARY KEY (`id`),
   KEY `uk_ledger_id_username` (`ledger_id`,`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本成员表'
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='账本管理·账本成员表';

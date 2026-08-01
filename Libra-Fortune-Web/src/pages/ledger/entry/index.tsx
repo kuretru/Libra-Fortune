@@ -286,7 +286,7 @@ const CategoryTagSelector: React.FC<CategoryTagSelectorProps> = ({
   };
 
   return (
-    <Space direction="vertical" size={8}>
+    <Space vertical size={8}>
       <Space size={[0, 8]} wrap>
         {categories.map((category) => (
           <Tag.CheckableTag
@@ -346,7 +346,7 @@ const PaymentChainEditor: React.FC<PaymentChainEditorProps> = ({
   };
 
   return (
-    <Space direction="vertical" size={8} style={{ width: '100%' }}>
+    <Space vertical size={8} style={{ width: '100%' }}>
       <Select
         allowClear
         options={accountOptions.map((option) => ({
@@ -437,7 +437,7 @@ const TagSetTagSelector: React.FC<TagSetTagSelectorProps> = ({
   };
 
   return (
-    <Space direction="vertical" size={10}>
+    <Space vertical size={10}>
       {tagSets.map((tagSet) => (
         <Space key={tagSet.label} size={[8, 8]} wrap>
           <span>{tagSet.label}</span>
@@ -1548,7 +1548,7 @@ const LedgerEntry: React.FC = () => {
         <Form.Item label="分担明细" required>
           <Form.List name="details">
             {(fields, { add, remove }) => (
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <Space vertical style={{ width: '100%' }}>
                 <Table
                   columns={[
                     {
@@ -1603,7 +1603,7 @@ const LedgerEntry: React.FC = () => {
                             style={{ marginBottom: 0 }}
                           >
                             <InputNumber
-                              addonAfter={
+                              suffix={
                                 <Space size={0}>
                                   <span>%</span>
                                   <Button
@@ -1672,7 +1672,7 @@ const LedgerEntry: React.FC = () => {
                             style={{ marginBottom: 0 }}
                           >
                             <InputNumber
-                              addonAfter={
+                              suffix={
                                 <Button
                                   aria-label={lockLabel}
                                   icon={

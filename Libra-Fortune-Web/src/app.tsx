@@ -3,6 +3,7 @@ import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
+import { App as AntdApp } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React from 'react';
@@ -20,7 +21,7 @@ import {
 } from '@/components';
 import { currentUser } from '@/services/cloud-sso';
 import defaultSettings from '../config/defaultSettings';
-import { errorConfig } from './requestErrorConfig';
+import { errorConfig, setMessageApi } from './requestErrorConfig';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
@@ -188,11 +189,25 @@ export const request: RequestConfig = {
   ...errorConfig,
 };
 
+const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const { message: messageApi } = AntdApp.useApp();
+
+  React.useEffect(() => {
+    setMessageApi(messageApi);
+  }, [messageApi]);
+
+  return <>{children}</>;
+};
+
 export function rootContainer(container: React.ReactNode) {
   return (
-    <>
-      <OfflineBanner />
-      <ErrorBoundary>{container}</ErrorBoundary>
-    </>
+    <AntdApp>
+      <MessageProvider>
+        <OfflineBanner />
+        <ErrorBoundary>{container}</ErrorBoundary>
+      </MessageProvider>
+    </AntdApp>
   );
 }

@@ -307,7 +307,7 @@ const Ledger: React.FC = () => {
         <Form.Item label="成员" required>
           <Form.List name="members">
             {(fields, { add, remove }) => (
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <Space vertical style={{ width: '100%' }}>
                 <Table
                   columns={[
                     {
@@ -346,7 +346,7 @@ const Ledger: React.FC = () => {
                           style={{ marginBottom: 0 }}
                         >
                           <InputNumber
-                            addonAfter="%"
+                            suffix="%"
                             max={100}
                             min={0}
                             precision={2}

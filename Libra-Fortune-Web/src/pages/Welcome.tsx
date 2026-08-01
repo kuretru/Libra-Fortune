@@ -1,8 +1,6 @@
 import { PageContainer } from '@ant-design/pro-components';
 import XMarkdown from '@ant-design/x-markdown';
 import '@ant-design/x-markdown/es/XMarkdown/index.css';
-import enUS from '@root/docs/cheatsheet.en-US.md';
-import zhCN from '@root/docs/cheatsheet.zh-CN.md';
 import { useModel } from '@umijs/max';
 import { Card } from 'antd';
 import hljs from 'highlight.js';
@@ -12,33 +10,7 @@ import 'highlight.js/styles/github.css';
 import './Welcome.css';
 import './Welcome-dark.css';
 
-interface InfoCardProps {
-  title: string;
-  index: number;
-  desc: string;
-  href: string;
-}
-
-const InfoCard: React.FC<InfoCardProps> = ({ title, index, desc, href }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" aria-label={title}>
-    <Card hoverable size="small">
-      <div className="flex items-start gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#1677ff] text-base font-bold text-white">
-          {index}
-        </div>
-        <div className="min-w-0 flex-1">
-          <h4 className="mb-1 mt-0 text-sm font-semibold">{title}</h4>
-          <p className="mb-0 line-clamp-2 text-xs text-zinc-500">{desc}</p>
-        </div>
-      </div>
-    </Card>
-  </a>
-);
-
-const mdContent: Record<string, string> = {
-  'zh-CN': zhCN,
-  'en-US': enUS,
-};
+const readme = __PROJECT_README__;
 
 // XMarkdown Renderer passes class names via non-standard props
 interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
@@ -109,81 +81,21 @@ const mdConfig = {
   },
 };
 
-const infoCards = [
-  {
-    index: 1,
-    href: 'https://umijs.org/docs/introduce/introduce',
-    titleId: 'pages.welcome.infoCard.umi.title',
-    titleDefault: 'Learn umi',
-    descId: 'pages.welcome.infoCard.umi.desc',
-    descDefault:
-      'umi is an extensible enterprise-level frontend framework based on routing, supporting both config-based and convention-based routes.',
-  },
-  {
-    index: 2,
-    href: 'https://ant.design',
-    titleId: 'pages.welcome.infoCard.antd.title',
-    titleDefault: 'Learn Ant Design',
-    descId: 'pages.welcome.infoCard.antd.desc',
-    descDefault:
-      'antd is a React UI component library based on the Ant Design system, mainly for enterprise-level mid-end products.',
-  },
-  {
-    index: 3,
-    href: 'https://procomponents.ant.design',
-    titleId: 'pages.welcome.infoCard.procomponents.title',
-    titleDefault: 'Learn Pro Components',
-    descId: 'pages.welcome.infoCard.procomponents.desc',
-    descDefault:
-      'ProComponents provides higher-abstraction template components on top of Ant Design, with one-component-one-page philosophy.',
-  },
-] as const;
-
 const Welcome: React.FC = () => {
-  const locale = 'zh-CN';
-  const normalizedLocale = locale.toLowerCase();
-  const content =
-    mdContent[locale] ??
-    (normalizedLocale.startsWith('zh')
-      ? mdContent['zh-CN']
-      : mdContent['en-US']);
   const { initialState } = useModel('@@initialState');
   const isDark = initialState?.settings?.navTheme === 'realDark';
 
   return (
-    <PageContainer
-      title={
-        <>
-          欢迎使用 Ant Design Pro{' '}
-          <span key="v6" className="welcome-gradient-title">
-            V6
-          </span>
-          🎉
-        </>
-      }
-    >
+    <PageContainer title="Libra-Fortune">
       <div
         data-theme={isDark ? 'dark' : 'light'}
-        className="flex flex-col gap-6 md:flex-row"
+        className="welcome-markdown"
       >
-        <div className="min-w-0 md:flex-[2] welcome-markdown">
-          <Card>
-            <XMarkdown components={mdComponents} config={mdConfig}>
-              {content}
-            </XMarkdown>
-          </Card>
-        </div>
-        <div className="flex flex-1 flex-col gap-4">
-          {infoCards.map((card) => (
-            <InfoCard
-              key={card.href}
-              index={card.index}
-              href={card.href}
-              title={card.titleDefault}
-              desc={card.descDefault}
-            />
-          ))}
-        </div>
+        <Card>
+          <XMarkdown components={mdComponents} config={mdConfig}>
+            {readme}
+          </XMarkdown>
+        </Card>
       </div>
     </PageContainer>
   );

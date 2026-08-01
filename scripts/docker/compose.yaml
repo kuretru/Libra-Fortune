@@ -4,22 +4,14 @@ services:
     image: ghcr.io/kuretru/libra-fortune:main
     container_name: libra-fortune
     hostname: libra-fortune
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./application-production.yml:/app/config/application-production.yml:ro
     deploy:
       resources:
         limits:
-          memory: 256M
-    user: docker:docker
-    restart: always
-    environment:
-      TZ: Asia/Shanghai
-      MYSQL_HOSTNAME:
-      MYSQL_PORT:
-      MYSQL_USERNAME:
-      MYSQL_PASSWORD:
-      MYSQL_SCHEMA:
-      REDIS_HOST:
-      REDIS_PORT:
-      REDIS_PASSWORD:
-      GEMINI_APPLICATION_ID:
-      GEMINI_APPLICATION_SECRET:
-    network_mode: host
+          memory: 512M

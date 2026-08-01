@@ -1,5 +1,11 @@
 export default [
   {
+    path: '/welcome',
+    name: '欢迎',
+    icon: 'smile',
+    component: './Welcome',
+  },
+  {
     name: '面板',
     path: '/dashboard',
     icon: 'dashboard',
@@ -26,12 +32,6 @@ export default [
         component: './user/login',
       },
     ],
-  },
-  {
-    path: '/welcome',
-    name: '欢迎',
-    icon: 'smile',
-    component: './Welcome',
   },
   {
     name: '元数据管理',
