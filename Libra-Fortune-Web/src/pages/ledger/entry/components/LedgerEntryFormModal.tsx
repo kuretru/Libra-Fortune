@@ -813,6 +813,7 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
                                         <UnlockOutlined />
                                       )
                                     }
+                                    htmlType="button"
                                     size="small"
                                     title={
                                       isLocked ? `解除${lockLabel}` : lockLabel
@@ -837,7 +838,11 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
                                   'details',
                                   details.map((detail, index) =>
                                     index === field.name
-                                      ? { ...detail, fundedRatio: value ?? '' }
+                                      ? {
+                                          ...detail,
+                                          fundedRatio: value ?? '',
+                                          lockType: detailLockTypes.ratio,
+                                        }
                                       : detail,
                                   ),
                                 );
@@ -880,6 +885,7 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
                                       <UnlockOutlined />
                                     )
                                   }
+                                  htmlType="button"
                                   size="small"
                                   title={
                                     isLocked ? `解除${lockLabel}` : lockLabel
@@ -906,7 +912,11 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
                                   'details',
                                   details.map((detail, index) =>
                                     index === field.name
-                                      ? { ...detail, amount: value ?? '' }
+                                      ? {
+                                          ...detail,
+                                          amount: value ?? '',
+                                          lockType: detailLockTypes.amount,
+                                        }
                                       : detail,
                                   ),
                                 );
