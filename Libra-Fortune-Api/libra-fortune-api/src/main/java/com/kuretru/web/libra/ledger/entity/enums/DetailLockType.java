@@ -10,7 +10,7 @@ public enum DetailLockType implements BaseEnum<DetailLockType> {
 
     UNLOCK("unlock", "未锁定"),
     LOCK_RATIO("lock_ratio", "锁比例"),
-    LOCK_AMOUNT("local_amount", "锁金额");
+    LOCK_AMOUNT("lock_amount", "锁金额");
 
     @EnumValue
     @JsonValue

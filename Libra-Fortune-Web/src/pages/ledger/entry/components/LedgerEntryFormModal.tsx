@@ -302,7 +302,7 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
     return {
       unlock: getValue('unlock'),
       ratio: getValue('lock_ratio'),
-      amount: getValue('local_amount'),
+      amount: getValue('lock_amount'),
     };
   }, [detailLockTypeOptions]);
 
