@@ -416,6 +416,7 @@ const LedgerEntry: React.FC = () => {
       fieldProps: {
         mode: 'multiple',
         options: tagSetOptions,
+        virtual: false,
       },
     },
     {
