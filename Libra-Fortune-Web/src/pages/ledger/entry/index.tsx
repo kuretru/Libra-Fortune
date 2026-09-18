@@ -47,11 +47,15 @@ type CategoryCascaderOption = {
   children?: CategoryCascaderOption[];
 };
 
-type LedgerEntrySearchParams = LibraFortune.Ledger.LedgerEntryQuery & {
+type LedgerEntrySearchParams = Omit<
+  LibraFortune.Ledger.LedgerEntryQuery,
+  'username'
+> & {
   categoryIds?: number[];
   dateRange?: string[];
   name?: string;
   tagId?: number[];
+  username?: string | string[];
 };
 
 const buildCategoryQueryOptions = (
@@ -86,6 +90,13 @@ const parseCategoryQueryValue = (value?: (number | string)[]) => {
     categoryIdL1: Number.isInteger(categoryIdL1) ? categoryIdL1 : undefined,
     categoryIdL2: Number.isInteger(categoryIdL2) ? categoryIdL2 : undefined,
   };
+};
+
+const parseUsernameQueryValue = (
+  value?: string | string[],
+): string | undefined => {
+  const username = Array.isArray(value) ? value[0] : value;
+  return username?.trim() || undefined;
 };
 
 const parsePositiveInteger = (value: string | null): number | undefined => {
@@ -130,7 +141,7 @@ const parseSearchParams = (search: string): LedgerEntrySearchParams => {
     tagIdIn: tagId.length ? tagId : undefined,
     tagSetId: parsePositiveInteger(params.get('tagSetId')),
     type: params.get('type') ?? undefined,
-    username: params.get('username') ?? undefined,
+    username: params.get('username') ? [params.get('username')!] : undefined,
   };
 };
 
@@ -437,7 +448,16 @@ const LedgerEntry: React.FC = () => {
       valueType: 'select',
       hideInTable: true,
       fieldProps: {
+        maxCount: 1,
+        mode: 'tags',
+        optionFilterProp: 'label',
         options: memberOptions,
+        placeholder: '请选择或输入分担人',
+      },
+      search: {
+        transform: (value?: string | string[]) => ({
+          username: parseUsernameQueryValue(value),
+        }),
       },
     },
     {
@@ -550,8 +570,10 @@ const LedgerEntry: React.FC = () => {
       dateBegin,
       dateEnd,
       categoryIds,
+      username,
       ...query
     } = params;
+    const usernameValue = parseUsernameQueryValue(username);
     const sortField = (['originalAmount', 'settlementAmount'] as const).find(
       (field) => sorter[field],
     );
@@ -565,7 +587,7 @@ const LedgerEntry: React.FC = () => {
       nameLike: name,
       originalCurrency: query.originalCurrency,
       settlementCurrency: query.settlementCurrency,
-      username: query.username,
+      username: usernameValue,
       tagSetId: query.tagSetId,
       tagIdIn: query.tagIdIn,
     });
@@ -581,6 +603,7 @@ const LedgerEntry: React.FC = () => {
       dateBegin,
       dateEnd,
       ...query,
+      username: usernameValue,
       sortField: sortOrder ? sortField : undefined,
       sortOrder,
     });
