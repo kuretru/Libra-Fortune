@@ -9,8 +9,8 @@ import lombok.Getter;
 public enum EntryType implements BaseEnum<EntryType> {
 
     EXPENSE("expense", "支出"),
-    INCOME("income", "收入"),
-    TRANSFER("transfer", "转账");
+    INCOME("income", "收入")
+    ;
 
     @EnumValue
     @JsonValue
