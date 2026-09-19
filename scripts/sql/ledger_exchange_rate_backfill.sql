@@ -1,4 +1,8 @@
 ALTER TABLE `ledger_v2_entry`
+  ADD COLUMN `used_exchange_rate` decimal(14,4) NULL COMMENT '使用汇率，原始消费金额/结算金额'
+  AFTER `settlement_currency`;
+
+ALTER TABLE `ledger_v2_entry`
   ADD COLUMN `exchange_rate` decimal(14,4) NULL COMMENT '汇率，原始消费金额/结算金额'
   AFTER `settlement_currency`;
 

@@ -270,6 +270,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         // 校验金额
         verifyAmount(record.getOriginalAmount(), "原始消费金额");
         verifyAmount(record.getSettlementAmount(), "结算金额");
+        verifyUsedExchangeRate(record);
 
         // 校验标签
         var tagSetItemIdList = record.getTags().stream().map(LedgerEntryTagDTO::getTagId).toList();
@@ -282,6 +283,19 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     private void verifyAmount(BigDecimal amount, String name) throws ServiceException {
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "不能小于0");
+        }
+    }
+
+    private void verifyUsedExchangeRate(LedgerEntryDTO record) throws ServiceException {
+        if (record.getUsedExchangeRate() == null) {
+            return;
+        }
+        if (record.getUsedExchangeRate().compareTo(BigDecimal.ZERO) <= 0) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("使用汇率必须大于0");
+        }
+        var expectedSettlementAmount = record.getOriginalAmount().divide(record.getUsedExchangeRate(), 2, RoundingMode.HALF_DOWN);
+        if (record.getSettlementAmount().compareTo(expectedSettlementAmount) != 0) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("结算金额与使用汇率计算结果不一致");
         }
     }
 
