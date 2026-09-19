@@ -335,7 +335,11 @@ const LedgerEntry: React.FC = () => {
         options: entryTypeOptions,
       },
       width: 84,
-      renderText: (value: string) => entryTypeLabelMap.get(value) ?? value,
+      render: (_, record) => (
+        <Tag color={record.type === 'income' ? 'green' : 'red'}>
+          {entryTypeLabelMap.get(record.type) ?? record.type}
+        </Tag>
+      ),
     },
     {
       dataIndex: 'dateRange',
