@@ -39,6 +39,7 @@ import java.util.List;
 public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, LedgerEntryDO, LedgerEntryDTO, LedgerEntryQuery> implements LedgerEntryService {
 
     private static final BigDecimal HUNDRED = new BigDecimal("100.00");
+    private static final BigDecimal ZERO_EXCHANGE_RATE = new BigDecimal("0.0000");
 
     private final MetadataCategoryService categoryService;
     private final MetadataCurrencyService currencyService;
@@ -208,6 +209,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     protected LedgerEntryDO beforeCreate(LedgerEntryDTO record) throws ServiceException {
         ledgerService.verifyCanManagerEntry(record.getLedgerId());
         verifyDTO(record);
+        fillExchangeRate(record);
         return super.beforeCreate(record);
     }
 
@@ -223,6 +225,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     protected LedgerEntryDO beforeUpdate(LedgerEntryDTO record) throws ServiceException {
         ledgerService.verifyCanManagerEntry(record.getLedgerId());
         verifyDTO(record);
+        fillExchangeRate(record);
         return super.beforeUpdate(record);
     }
 
@@ -264,12 +267,48 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("结算货币类型不合法");
         }
 
+        // 校验金额
+        verifyAmount(record.getOriginalAmount(), "原始消费金额");
+        verifyAmount(record.getSettlementAmount(), "结算金额");
+        verifyUsedExchangeRate(record);
+
         // 校验标签
         var tagSetItemIdList = record.getTags().stream().map(LedgerEntryTagDTO::getTagId).toList();
         tagSetService.verifyTagSetItems(tagSetItemIdList);
 
         // 校验明细
         verifyDetails(record, record.getDetails());
+    }
+
+    private void verifyAmount(BigDecimal amount, String name) throws ServiceException {
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException(name + "不能小于0");
+        }
+    }
+
+    private void verifyUsedExchangeRate(LedgerEntryDTO record) throws ServiceException {
+        if (record.getUsedExchangeRate() == null) {
+            return;
+        }
+        if (record.getUsedExchangeRate().compareTo(BigDecimal.ZERO) <= 0) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("使用汇率必须大于0");
+        }
+        var expectedSettlementAmount = record.getOriginalAmount().divide(record.getUsedExchangeRate(), 2, RoundingMode.HALF_DOWN);
+        if (record.getSettlementAmount().compareTo(expectedSettlementAmount) != 0) {
+            throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("结算金额与使用汇率计算结果不一致");
+        }
+    }
+
+    private void fillExchangeRate(LedgerEntryDTO record) {
+        record.setExchangeRate(calculateExchangeRate(record.getOriginalAmount(), record.getSettlementAmount()));
+        record.setReverseExchangeRate(calculateExchangeRate(record.getSettlementAmount(), record.getOriginalAmount()));
+    }
+
+    private BigDecimal calculateExchangeRate(BigDecimal numerator, BigDecimal denominator) {
+        if (denominator.compareTo(BigDecimal.ZERO) == 0) {
+            return ZERO_EXCHANGE_RATE;
+        }
+        return numerator.divide(denominator, 4, RoundingMode.HALF_UP);
     }
 
     private void verifyCategory(Long categoryIdL1, Long categoryIdL2) throws ServiceException {
@@ -290,6 +329,7 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
         if (details.isEmpty()) {
             throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("条目明细不能为空");
         }
+        var settlementAmountIsZero = entry.getSettlementAmount().compareTo(BigDecimal.ZERO) == 0;
         var sum = new BigDecimal(0);
         var ratioSum = new BigDecimal(0);
         var fundedUsernameSet = new HashSet<String>();
@@ -297,9 +337,11 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
             if (entry.getId() != null && detail.getEntryId() != null && !detail.getEntryId().equals(entry.getId())) {
                 throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("条目详情不属于该条目");
             }
-            var percent = detail.getAmount().divide(entry.getSettlementAmount(), 4, RoundingMode.HALF_DOWN).multiply(HUNDRED).setScale(2, RoundingMode.HALF_DOWN);
-            if (!percent.equals(detail.getFundedRatio())) {
-                throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担金额与分担比例对不上");
+            if (!settlementAmountIsZero) {
+                var percent = detail.getAmount().divide(entry.getSettlementAmount(), 4, RoundingMode.HALF_DOWN).multiply(HUNDRED).setScale(2, RoundingMode.HALF_DOWN);
+                if (!percent.equals(detail.getFundedRatio())) {
+                    throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担金额与分担比例对不上");
+                }
             }
             if (fundedUsernameSet.contains(detail.getUsername())) {
                 throw UserErrorCodes.REQUEST_PARAMETER_ERROR.asException("分担人重复");

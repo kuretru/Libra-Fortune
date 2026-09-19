@@ -99,6 +99,13 @@ const parseUsernameQueryValue = (
   return username?.trim() || undefined;
 };
 
+const formatExchangeRate = (value: unknown): string => {
+  if (value === undefined || value === null || value === '') return '';
+  const match = /^(\d+)(?:\.(\d*))?$/.exec(String(value));
+  if (!match) return String(value);
+  return `${match[1]}.${(match[2] ?? '').slice(0, 4).padEnd(4, '0')}`;
+};
+
 const parsePositiveInteger = (value: string | null): number | undefined => {
   if (!value) return undefined;
   const result = Number(value);
@@ -327,8 +334,12 @@ const LedgerEntry: React.FC = () => {
       fieldProps: {
         options: entryTypeOptions,
       },
-      width: 84,
-      renderText: (value: string) => entryTypeLabelMap.get(value) ?? value,
+      width: 60,
+      render: (_, record) => (
+        <Tag color={record.type === 'income' ? 'green' : 'red'}>
+          {entryTypeLabelMap.get(record.type) ?? record.type}
+        </Tag>
+      ),
     },
     {
       dataIndex: 'dateRange',
@@ -373,7 +384,7 @@ const LedgerEntry: React.FC = () => {
       },
       renderText: (_, record) =>
         categoryNameMap.get(record.categoryIdL2) ?? record.categoryIdL2,
-      width: 100,
+      width: 120,
     },
     {
       dataIndex: 'originalAmount',
@@ -418,6 +429,21 @@ const LedgerEntry: React.FC = () => {
       fieldProps: {
         options: currencyOptions,
       },
+    },
+    {
+      dataIndex: 'exchangeRate',
+      title: '汇率',
+      render: (_, record) => (
+        <Space size={4} wrap>
+          {record.usedExchangeRate && (
+            <Tag>使用 {formatExchangeRate(record.usedExchangeRate)}</Tag>
+          )}
+          <Tag>付款/结算 {formatExchangeRate(record.exchangeRate)}</Tag>
+          <Tag>结算/付款 {formatExchangeRate(record.reverseExchangeRate)}</Tag>
+        </Space>
+      ),
+      search: false,
+      width: 120,
     },
     {
       dataIndex: 'tagIdIn',
