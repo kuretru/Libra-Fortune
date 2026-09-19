@@ -61,6 +61,9 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     @Schema(description = "结算货币")
     private String settlementCurrency;
 
+    @Schema(description = "汇率，原始消费金额/结算金额")
+    private BigDecimal exchangeRate;
+
     @Schema(description = "备注")
     private String remark;
 

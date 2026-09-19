@@ -46,6 +46,9 @@ public class LedgerEntryDO extends BaseCreateUpdateDO {
     /** 结算货币 */
     private String settlementCurrency;
 
+    /** 汇率，原始消费金额/结算金额 */
+    private BigDecimal exchangeRate;
+
     /** 备注 */
     private String remark;
 
