@@ -117,29 +117,21 @@ const formatExchangeRate = (value: unknown): string => {
 };
 
 const calculateExchangeRate = (
-  originalAmount: unknown,
-  originalCurrency: unknown,
-  settlementAmount: unknown,
-  settlementCurrency: unknown,
+  numeratorAmount: unknown,
+  denominatorAmount: unknown,
 ): string | undefined => {
-  if (
-    isEmptyFormValue(originalAmount) ||
-    isEmptyFormValue(originalCurrency) ||
-    isEmptyFormValue(settlementAmount) ||
-    isEmptyFormValue(settlementCurrency)
-  ) {
+  if (isEmptyFormValue(numeratorAmount) || isEmptyFormValue(denominatorAmount)) {
     return undefined;
   }
 
-  const settlementCents = amountToCents(String(settlementAmount));
-  if (settlementCents === undefined) return undefined;
-  if (settlementCents === 0n) return '0.0000';
-  if (originalCurrency === settlementCurrency) return '1.0000';
+  const denominatorCents = amountToCents(String(denominatorAmount));
+  if (denominatorCents === undefined) return undefined;
+  if (denominatorCents === 0n) return '0.0000';
 
-  const originalCents = amountToCents(String(originalAmount));
-  if (originalCents === undefined) return undefined;
+  const numeratorCents = amountToCents(String(numeratorAmount));
+  if (numeratorCents === undefined) return undefined;
   return exchangeRateUnitsToString(
-    (originalCents * 10000n + settlementCents / 2n) / settlementCents,
+    (numeratorCents * 10000n + denominatorCents / 2n) / denominatorCents,
   );
 };
 
@@ -309,9 +301,7 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm<LedgerEntryFormValues>();
   const originalAmount = Form.useWatch('originalAmount', form);
-  const originalCurrency = Form.useWatch('originalCurrency', form);
   const settlementAmount = Form.useWatch('settlementAmount', form);
-  const settlementCurrency = Form.useWatch('settlementCurrency', form);
   const detailValues = Form.useWatch('details', form) ?? [];
   const calculateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const originalAmountAutoFilledRef = useRef(false);
@@ -393,20 +383,17 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
     if (!open) return;
     form.setFieldValue(
       'exchangeRate',
-      calculateExchangeRate(
-        originalAmount,
-        originalCurrency,
-        settlementAmount,
-        settlementCurrency,
-      ),
+      calculateExchangeRate(originalAmount, settlementAmount),
+    );
+    form.setFieldValue(
+      'reverseExchangeRate',
+      calculateExchangeRate(settlementAmount, originalAmount),
     );
   }, [
     form,
     open,
     originalAmount,
-    originalCurrency,
     settlementAmount,
-    settlementCurrency,
   ]);
 
   useEffect(() => {
@@ -808,7 +795,19 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
           />
           <ProFormDigit
             name="exchangeRate"
-            label="汇率"
+            label="付款/结算"
+            min={0}
+            disabled
+            fieldProps={{
+              formatter: (value) => formatExchangeRate(value),
+              precision: 4,
+              stringMode: true,
+              step: '0.0001',
+            }}
+          />
+          <ProFormDigit
+            name="reverseExchangeRate"
+            label="结算/付款"
             min={0}
             disabled
             fieldProps={{

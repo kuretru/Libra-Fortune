@@ -23,6 +23,7 @@ declare namespace LibraFortune.Ledger {
     settlementAmount: string;
     settlementCurrency: string;
     exchangeRate?: string;
+    reverseExchangeRate?: string;
     remark?: string;
     tags?: LedgerEntryTagDTO[];
     details?: LedgerEntryDetailDTO[];

@@ -429,15 +429,14 @@ const LedgerEntry: React.FC = () => {
     {
       dataIndex: 'exchangeRate',
       title: '汇率',
-      align: 'right',
-      valueType: 'digit',
-      fieldProps: {
-        precision: 4,
-        stringMode: true,
-      },
-      render: (_, record) => formatExchangeRate(record.exchangeRate),
+      render: (_, record) => (
+        <Space size={4} wrap>
+          <Tag>付款/结算 {formatExchangeRate(record.exchangeRate)}</Tag>
+          <Tag>结算/付款 {formatExchangeRate(record.reverseExchangeRate)}</Tag>
+        </Space>
+      ),
       search: false,
-      width: 90,
+      width: 240,
     },
     {
       dataIndex: 'tagIdIn',
