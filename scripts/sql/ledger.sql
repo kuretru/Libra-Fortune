@@ -28,6 +28,7 @@ CREATE TABLE `ledger_v2_entry` (
   `settlement_amount` decimal(10,2) NOT NULL COMMENT '结算金额',
   `settlement_currency` char(3) COLLATE utf8mb4_general_ci NOT NULL COMMENT '结算货币',
   `exchange_rate` decimal(14,4) NOT NULL DEFAULT 1.0000 COMMENT '汇率，原始消费金额/结算金额',
+  `reverse_exchange_rate` decimal(14,4) NOT NULL DEFAULT 1.0000 COMMENT '反向汇率，结算金额/原始消费金额',
   `remark` text COLLATE utf8mb4_general_ci COMMENT '备注',
   PRIMARY KEY (`id`),
   KEY `idx_main` (`ledger_id`,`category_id_l1`,`category_id_l2`,`date`)

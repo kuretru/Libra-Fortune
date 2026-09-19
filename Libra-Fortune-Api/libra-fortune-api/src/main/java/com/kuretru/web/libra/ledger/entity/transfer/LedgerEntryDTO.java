@@ -64,6 +64,9 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     @Schema(description = "汇率，原始消费金额/结算金额")
     private BigDecimal exchangeRate;
 
+    @Schema(description = "反向汇率，结算金额/原始消费金额")
+    private BigDecimal reverseExchangeRate;
+
     @Schema(description = "备注")
     private String remark;
 

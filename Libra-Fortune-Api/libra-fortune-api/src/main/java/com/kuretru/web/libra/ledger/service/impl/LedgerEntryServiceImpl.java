@@ -40,7 +40,6 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
 
     private static final BigDecimal HUNDRED = new BigDecimal("100.00");
     private static final BigDecimal ZERO_EXCHANGE_RATE = new BigDecimal("0.0000");
-    private static final BigDecimal DEFAULT_EXCHANGE_RATE = new BigDecimal("1.0000");
 
     private final MetadataCategoryService categoryService;
     private final MetadataCurrencyService currencyService;
@@ -287,13 +286,15 @@ public class LedgerEntryServiceImpl extends BaseServiceImpl<LedgerEntryMapper, L
     }
 
     private void fillExchangeRate(LedgerEntryDTO record) {
-        if (record.getSettlementAmount().compareTo(BigDecimal.ZERO) == 0) {
-            record.setExchangeRate(ZERO_EXCHANGE_RATE);
-        } else if (record.getOriginalCurrency().equals(record.getSettlementCurrency())) {
-            record.setExchangeRate(DEFAULT_EXCHANGE_RATE);
-        } else {
-            record.setExchangeRate(record.getOriginalAmount().divide(record.getSettlementAmount(), 4, RoundingMode.HALF_UP));
+        record.setExchangeRate(calculateExchangeRate(record.getOriginalAmount(), record.getSettlementAmount()));
+        record.setReverseExchangeRate(calculateExchangeRate(record.getSettlementAmount(), record.getOriginalAmount()));
+    }
+
+    private BigDecimal calculateExchangeRate(BigDecimal numerator, BigDecimal denominator) {
+        if (denominator.compareTo(BigDecimal.ZERO) == 0) {
+            return ZERO_EXCHANGE_RATE;
         }
+        return numerator.divide(denominator, 4, RoundingMode.HALF_UP);
     }
 
     private void verifyCategory(Long categoryIdL1, Long categoryIdL2) throws ServiceException {

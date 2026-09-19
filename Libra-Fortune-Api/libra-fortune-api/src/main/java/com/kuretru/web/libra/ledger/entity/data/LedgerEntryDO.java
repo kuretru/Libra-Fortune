@@ -49,6 +49,9 @@ public class LedgerEntryDO extends BaseCreateUpdateDO {
     /** 汇率，原始消费金额/结算金额 */
     private BigDecimal exchangeRate;
 
+    /** 反向汇率，结算金额/原始消费金额 */
+    private BigDecimal reverseExchangeRate;
+
     /** 备注 */
     private String remark;
 
