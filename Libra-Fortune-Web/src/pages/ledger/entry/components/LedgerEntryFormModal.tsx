@@ -34,6 +34,7 @@ import React, {
   useState,
 } from 'react';
 import * as entryApi from '@/services/libra-fortune/ledger/entry';
+import * as calculatorApi from '@/services/libra-fortune/tools/calculator';
 import CategoryTagSelector from './CategoryTagSelector';
 import type {
   DetailLockTypes,
@@ -108,6 +109,12 @@ const centsToAmount = (value: bigint): string =>
 
 const exchangeRateUnitsToString = (value: bigint): string =>
   `${value / 10000n}.${(value % 10000n).toString().padStart(4, '0')}`;
+
+const exchangeRateToUnits = (value: string): bigint | undefined => {
+  const match = /^(\d+)(?:\.(\d{1,4}))?$/.exec(value);
+  if (!match) return undefined;
+  return BigInt(match[1]) * 10000n + BigInt((match[2] ?? '').padEnd(4, '0'));
+};
 
 const formatExchangeRate = (value: unknown): string => {
   if (isEmptyFormValue(value)) return '';
@@ -302,8 +309,13 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
   const [form] = Form.useForm<LedgerEntryFormValues>();
   const originalAmount = Form.useWatch('originalAmount', form);
   const settlementAmount = Form.useWatch('settlementAmount', form);
+  const usedExchangeRate = Form.useWatch('usedExchangeRate', form);
   const detailValues = Form.useWatch('details', form) ?? [];
   const calculateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const usedExchangeRateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const usedExchangeRateRequestRef = useRef(0);
   const originalAmountAutoFilledRef = useRef(false);
   const continuousEntryRef = useRef(false);
 
@@ -536,6 +548,64 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
     }, 0);
   }, [recalculateFundedAmounts]);
 
+  const calculateSettlementAmountByUsedRate = useCallback(async () => {
+    const nextOriginalAmount = form.getFieldValue('originalAmount');
+    const nextUsedExchangeRate = form.getFieldValue('usedExchangeRate');
+    if (
+      isEmptyFormValue(nextOriginalAmount) ||
+      isEmptyFormValue(nextUsedExchangeRate)
+    ) {
+      return;
+    }
+    if (amountToCents(String(nextOriginalAmount)) === undefined) {
+      return;
+    }
+    const usedExchangeRateUnits = exchangeRateToUnits(
+      String(nextUsedExchangeRate),
+    );
+    if (usedExchangeRateUnits === undefined || usedExchangeRateUnits === 0n) {
+      return;
+    }
+
+    const requestId = usedExchangeRateRequestRef.current + 1;
+    usedExchangeRateRequestRef.current = requestId;
+    try {
+      const response = await calculatorApi.divide({
+        x: String(nextOriginalAmount),
+        y: String(nextUsedExchangeRate),
+        accuracy: 2,
+      });
+      if (requestId !== usedExchangeRateRequestRef.current) return;
+      form.setFieldValue('settlementAmount', response.data.result);
+      scheduleRecalculateFundedAmounts();
+    } catch {
+      if (requestId !== usedExchangeRateRequestRef.current) return;
+      messageApi.open({
+        type: 'error',
+        content: '使用汇率计算结算金额失败',
+      });
+    }
+  }, [form, messageApi, scheduleRecalculateFundedAmounts]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (usedExchangeRateTimerRef.current) {
+      clearTimeout(usedExchangeRateTimerRef.current);
+      usedExchangeRateTimerRef.current = null;
+    }
+    if (isEmptyFormValue(originalAmount) || isEmptyFormValue(usedExchangeRate)) {
+      return;
+    }
+    usedExchangeRateTimerRef.current = setTimeout(() => {
+      calculateSettlementAmountByUsedRate();
+    }, 300);
+  }, [
+    calculateSettlementAmountByUsedRate,
+    open,
+    originalAmount,
+    usedExchangeRate,
+  ]);
+
   const onSettlementAmountChange = useCallback(
     (value: DecimalInputValue) => {
       const originalCurrency = form.getFieldValue('originalCurrency');
@@ -597,6 +667,9 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
       if (calculateTimerRef.current) {
         clearTimeout(calculateTimerRef.current);
       }
+      if (usedExchangeRateTimerRef.current) {
+        clearTimeout(usedExchangeRateTimerRef.current);
+      }
     },
     [],
   );
@@ -633,6 +706,9 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
         originalCurrency: values.originalCurrency!,
         settlementAmount: values.settlementAmount!,
         settlementCurrency: values.settlementCurrency!,
+        usedExchangeRate: isEmptyFormValue(values.usedExchangeRate)
+          ? undefined
+          : values.usedExchangeRate,
         remark: values.remark,
         tags: sortTagIds(values.tagIds ?? [], tagSetOptions).map((tagId) => ({
           tagId,
@@ -778,6 +854,7 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
             name="settlementAmount"
             label="结算金额"
             min={0}
+            disabled={!isEmptyFormValue(usedExchangeRate)}
             fieldProps={{
               onChange: (value) =>
                 onSettlementAmountChange(value as unknown as DecimalInputValue),
@@ -792,6 +869,17 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
             label="结算货币"
             options={currencyOptions}
             rules={[{ required: true }]}
+          />
+          <ProFormDigit
+            name="usedExchangeRate"
+            label="使用汇率"
+            min={0}
+            fieldProps={{
+              formatter: (value) => formatExchangeRate(value),
+              precision: 4,
+              stringMode: true,
+              step: '0.0001',
+            }}
           />
           <ProFormDigit
             name="exchangeRate"
