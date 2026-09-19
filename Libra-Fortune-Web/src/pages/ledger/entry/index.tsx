@@ -334,7 +334,7 @@ const LedgerEntry: React.FC = () => {
       fieldProps: {
         options: entryTypeOptions,
       },
-      width: 84,
+      width: 60,
       render: (_, record) => (
         <Tag color={record.type === 'income' ? 'green' : 'red'}>
           {entryTypeLabelMap.get(record.type) ?? record.type}
@@ -384,7 +384,7 @@ const LedgerEntry: React.FC = () => {
       },
       renderText: (_, record) =>
         categoryNameMap.get(record.categoryIdL2) ?? record.categoryIdL2,
-      width: 100,
+      width: 120,
     },
     {
       dataIndex: 'originalAmount',
@@ -443,7 +443,7 @@ const LedgerEntry: React.FC = () => {
         </Space>
       ),
       search: false,
-      width: 240,
+      width: 120,
     },
     {
       dataIndex: 'tagIdIn',
