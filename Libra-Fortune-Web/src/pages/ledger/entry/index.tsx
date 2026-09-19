@@ -431,6 +431,9 @@ const LedgerEntry: React.FC = () => {
       title: '汇率',
       render: (_, record) => (
         <Space size={4} wrap>
+          {record.usedExchangeRate && (
+            <Tag>使用 {formatExchangeRate(record.usedExchangeRate)}</Tag>
+          )}
           <Tag>付款/结算 {formatExchangeRate(record.exchangeRate)}</Tag>
           <Tag>结算/付款 {formatExchangeRate(record.reverseExchangeRate)}</Tag>
         </Space>
