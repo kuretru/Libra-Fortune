@@ -99,6 +99,13 @@ const parseUsernameQueryValue = (
   return username?.trim() || undefined;
 };
 
+const formatExchangeRate = (value: unknown): string => {
+  if (value === undefined || value === null || value === '') return '';
+  const match = /^(\d+)(?:\.(\d*))?$/.exec(String(value));
+  if (!match) return String(value);
+  return `${match[1]}.${(match[2] ?? '').slice(0, 4).padEnd(4, '0')}`;
+};
+
 const parsePositiveInteger = (value: string | null): number | undefined => {
   if (!value) return undefined;
   const result = Number(value);
@@ -418,6 +425,19 @@ const LedgerEntry: React.FC = () => {
       fieldProps: {
         options: currencyOptions,
       },
+    },
+    {
+      dataIndex: 'exchangeRate',
+      title: '汇率',
+      align: 'right',
+      valueType: 'digit',
+      fieldProps: {
+        precision: 4,
+        stringMode: true,
+      },
+      render: (_, record) => formatExchangeRate(record.exchangeRate),
+      search: false,
+      width: 90,
     },
     {
       dataIndex: 'tagIdIn',

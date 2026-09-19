@@ -106,6 +106,43 @@ const amountToCents = (value: string): bigint | undefined => {
 const centsToAmount = (value: bigint): string =>
   `${value / 100n}.${(value % 100n).toString().padStart(2, '0')}`;
 
+const exchangeRateUnitsToString = (value: bigint): string =>
+  `${value / 10000n}.${(value % 10000n).toString().padStart(4, '0')}`;
+
+const formatExchangeRate = (value: unknown): string => {
+  if (isEmptyFormValue(value)) return '';
+  const match = /^(\d+)(?:\.(\d*))?$/.exec(String(value));
+  if (!match) return String(value);
+  return `${match[1]}.${(match[2] ?? '').slice(0, 4).padEnd(4, '0')}`;
+};
+
+const calculateExchangeRate = (
+  originalAmount: unknown,
+  originalCurrency: unknown,
+  settlementAmount: unknown,
+  settlementCurrency: unknown,
+): string | undefined => {
+  if (
+    isEmptyFormValue(originalAmount) ||
+    isEmptyFormValue(originalCurrency) ||
+    isEmptyFormValue(settlementAmount) ||
+    isEmptyFormValue(settlementCurrency)
+  ) {
+    return undefined;
+  }
+
+  const settlementCents = amountToCents(String(settlementAmount));
+  if (settlementCents === undefined) return undefined;
+  if (settlementCents === 0n) return '0.0000';
+  if (originalCurrency === settlementCurrency) return '1.0000';
+
+  const originalCents = amountToCents(String(originalAmount));
+  if (originalCents === undefined) return undefined;
+  return exchangeRateUnitsToString(
+    (originalCents * 10000n + settlementCents / 2n) / settlementCents,
+  );
+};
+
 const ratioUnitsFromCents = (amount: bigint, total: bigint): bigint =>
   (amount * 10000n + total / 2n) / total;
 
@@ -271,6 +308,10 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
 }) => {
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm<LedgerEntryFormValues>();
+  const originalAmount = Form.useWatch('originalAmount', form);
+  const originalCurrency = Form.useWatch('originalCurrency', form);
+  const settlementAmount = Form.useWatch('settlementAmount', form);
+  const settlementCurrency = Form.useWatch('settlementCurrency', form);
   const detailValues = Form.useWatch('details', form) ?? [];
   const calculateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const originalAmountAutoFilledRef = useRef(false);
@@ -350,6 +391,26 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
 
   useEffect(() => {
     if (!open) return;
+    form.setFieldValue(
+      'exchangeRate',
+      calculateExchangeRate(
+        originalAmount,
+        originalCurrency,
+        settlementAmount,
+        settlementCurrency,
+      ),
+    );
+  }, [
+    form,
+    open,
+    originalAmount,
+    originalCurrency,
+    settlementAmount,
+    settlementCurrency,
+  ]);
+
+  useEffect(() => {
+    if (!open) return;
 
     if (currentRecord) {
       originalAmountAutoFilledRef.current = false;
@@ -379,7 +440,17 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
     if (!settlementAmount) return;
 
     const settlementCents = amountToCents(settlementAmount);
-    if (settlementCents === undefined || settlementCents === 0n) return;
+    if (settlementCents === undefined) return;
+    if (settlementCents === 0n) {
+      form.setFieldValue(
+        'details',
+        details.map((detail) => ({
+          ...detail,
+          amount: centsToAmount(0n),
+        })),
+      );
+      return;
+    }
 
     const amounts = details.map((detail) => {
       if (detail.lockType === detailLockTypes.ratio) {
@@ -734,6 +805,18 @@ const LedgerEntryFormModal: React.FC<LedgerEntryFormModalProps> = ({
             label="结算货币"
             options={currencyOptions}
             rules={[{ required: true }]}
+          />
+          <ProFormDigit
+            name="exchangeRate"
+            label="汇率"
+            min={0}
+            disabled
+            fieldProps={{
+              formatter: (value) => formatExchangeRate(value),
+              precision: 4,
+              stringMode: true,
+              step: '0.0001',
+            }}
           />
         </Space>
         <Form.Item
