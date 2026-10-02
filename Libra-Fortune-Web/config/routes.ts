@@ -66,6 +66,11 @@ export default [
         component: './account/account',
       },
       {
+        name: '转账记录',
+        path: '/account/transfer',
+        component: './account/transfer',
+      },
+      {
         name: '余额快照',
         path: '/account/balance',
         component: './account/balance',

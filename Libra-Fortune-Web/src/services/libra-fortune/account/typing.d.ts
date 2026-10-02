@@ -12,6 +12,29 @@ declare namespace LibraFortune.Account {
     canHoldFunds?: boolean;
   }
 
+  type AccountTransferDTO = GalaxyWeb.BaseCreateUpdateDTO & {
+    owner?: string;
+    date: string;
+    name: string;
+    sourceAccountId: number;
+    sourceAmount: string;
+    sourceCurrency: string;
+    targetAccountId: number;
+    targetAmount: string;
+    targetCurrency: string;
+    remark?: string;
+  }
+
+  type AccountTransferQuery = {
+    dateBegin?: string;
+    dateEnd?: string;
+    nameLike?: string;
+    sourceAccountId?: number;
+    sourceCurrency?: string;
+    targetAccountId?: number;
+    targetCurrency?: string;
+  }
+
   type AccountBalanceQuery = {
     dateBegin?: string;
     dateEnd?: string;
