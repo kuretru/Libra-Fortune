@@ -48,7 +48,7 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     private BigDecimal originalAmount;
 
     @NotEmpty
-    @Size(min = 3, max = 3)
+    @Size(min = 3, max = 4)
     @Schema(description = "原始消费货币")
     private String originalCurrency;
 
@@ -57,7 +57,7 @@ public class LedgerEntryDTO extends BaseCreateUpdateDTO {
     private BigDecimal settlementAmount;
 
     @NotEmpty
-    @Size(min = 3, max = 3)
+    @Size(min = 3, max = 4)
     @Schema(description = "结算货币")
     private String settlementCurrency;
 

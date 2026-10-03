@@ -19,7 +19,7 @@ CREATE TABLE `metadata_currency` (
   `create_by` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT '主动创建记录的用户',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录上一次被动更新的时刻',
   `update_by` varchar(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT '上一次被动更新记录的用户',
-  `code` char(3) COLLATE utf8mb4_general_ci NOT NULL COMMENT '货币代码',
+  `code` varchar(4) COLLATE utf8mb4_general_ci NOT NULL COMMENT '货币代码',
   `symbol` char(1) COLLATE utf8mb4_general_ci NOT NULL COMMENT '货币符号',
   `name` varchar(16) COLLATE utf8mb4_general_ci NOT NULL COMMENT '货币名称',
   `sequence` int NOT NULL COMMENT '排序标识',

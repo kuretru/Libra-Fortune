@@ -14,7 +14,7 @@ import lombok.ToString;
 public class MetadataCurrencyDTO extends BaseCreateUpdateDTO {
 
     @NotEmpty
-    @Size(min = 3, max = 3)
+    @Size(min = 3, max = 4)
     @Schema(description = "货币代码")
     private String code;
 

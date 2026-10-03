@@ -44,7 +44,7 @@ public class AccountTransferDTO extends BaseCreateUpdateDTO {
     private BigDecimal sourceAmount;
 
     @NotEmpty
-    @Size(min = 3, max = 3)
+    @Size(min = 3, max = 4)
     @Schema(description = "转出货币")
     private String sourceCurrency;
 
@@ -60,7 +60,7 @@ public class AccountTransferDTO extends BaseCreateUpdateDTO {
     private BigDecimal targetAmount;
 
     @NotEmpty
-    @Size(min = 3, max = 3)
+    @Size(min = 3, max = 4)
     @Schema(description = "转入货币")
     private String targetCurrency;
 
