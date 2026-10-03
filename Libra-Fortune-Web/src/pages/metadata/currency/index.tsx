@@ -212,7 +212,11 @@ const MetadataCurrency: React.FC = () => {
           name="code"
           label="货币代码"
           placeholder="请输入货币代码"
-          rules={[{ required: true }]}
+          rules={[
+            { required: true },
+            { min: 3, message: '货币代码至少 3 位' },
+            { max: 4, message: '货币代码不能超过 4 位' },
+          ]}
         />
         <ProFormText
           name="symbol"
